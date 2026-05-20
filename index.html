@@ -195,190 +195,187 @@
         }
 
         .upload-row {
-            display: flex; align-items: stretch; gap: 14px;
+            --upload-head-font: calc(12px + 1.5pt);
+            --upload-title-font: calc(11px + 1.5pt);
+            --upload-body-font: calc(10px + 1.5pt);
+            --upload-caption-font: calc(9px + 2pt);
+            --upload-panel-bg: linear-gradient(155deg, #fafbfd 0%, #eef3f9 100%);
+            --upload-panel-border: #d4dde8;
+            --upload-panel-accent: var(--school-navy);
+            display: flex;
+            align-items: stretch;
+            gap: 12px;
             width: 100%;
         }
         .upload-box,
         .upload-guide-box {
-            flex: 1 1 0;
+            flex-shrink: 0;
             min-width: 0;
-            max-width: none;
-            width: calc(50% - 7px);
-        }
-        .upload-box {
-            display: flex; align-items: center;
-            gap: 12px;
-            padding: calc(14px - 1mm) 16px; min-height: calc(132px - 28mm);
-            background: linear-gradient(145deg, #f7fafd 0%, #eef4fa 100%);
-            border: 2px dashed #a8bdd4; border-radius: var(--radius-lg); cursor: pointer;
-            transition: border-color 0.25s var(--ease), background 0.25s var(--ease),
-                box-shadow 0.25s var(--ease), transform 0.2s var(--ease);
-        }
-        .upload-text-container {
-            flex: 1; min-width: 0;
-            display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
-            text-align: left;
-        }
-        .upload-step,
-        .upload-title,
-        .upload-desc {
-            width: 100%;
-            text-align: left;
-        }
-        .upload-box:hover {
-            border-color: var(--school-navy-light); background: #f0f6fc;
-            box-shadow: var(--shadow-sm), 0 0 0 4px rgba(61, 107, 158, 0.1);
-        }
-        .upload-box.drag-over {
-            border-color: var(--school-navy); background: #e8f2fa;
-            box-shadow: var(--shadow-md), 0 0 0 4px rgba(30, 58, 95, 0.14);
-            transform: translateY(-1px);
-        }
-        .upload-box.success {
-            border: 2px solid #6ee7b7; border-style: solid;
-            background: linear-gradient(145deg, #f0fdf8 0%, #ecfdf5 100%);
-        }
-        .upload-box.success.drag-over { background: #d1fae5; }
-        .upload-icon-wrap {
-            flex-shrink: 0; width: 56px; height: 56px; border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            background: #fff; border: 1px solid var(--school-border);
-            box-shadow: var(--shadow-xs);
-            align-self: center;
-        }
-        .upload-box.success .upload-icon-wrap {
-            border-color: var(--school-success); background: #fff;
-        }
-        .upload-icon { width: 30px; height: 30px; color: var(--school-navy); }
-        .upload-box.success .upload-icon { color: var(--school-success); }
-        .upload-step {
-            font-size: calc(10px + 1.5pt); font-weight: 800; color: var(--school-navy);
-            letter-spacing: 0.03em;
-        }
-        .upload-step::before {
-            content: '① '; color: var(--school-accent);
-        }
-        .upload-title {
-            font-size: calc(12px + 1pt); font-weight: 800; color: var(--school-navy-dark);
-            line-height: 1.3;
-            word-break: keep-all;
-            overflow-wrap: break-word;
-        }
-        .upload-title .upload-format {
-            display: inline-block; margin-left: 6px; padding: 1px 7px;
-            font-size: calc(10px + 1pt); font-weight: 700; color: var(--school-navy);
-            background: #fff; border: 1px solid #c5d0e0; border-radius: 6px;
-            vertical-align: middle;
-        }
-        .upload-desc {
-            font-size: calc(10px + 1pt); color: var(--school-text); font-weight: 600;
-            line-height: 1.32; margin: 0;
-            overflow-wrap: break-word;
-        }
-        .upload-side-step {
-            font-size: calc(11px + 4pt); font-weight: 800; color: var(--school-navy);
-            letter-spacing: 0.04em;
-            width: 100%;
-            text-align: left;
-        }
-        .upload-side-step::before {
-            content: '② '; color: var(--school-accent);
-        }
-        .upload-guide-box {
             display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            justify-content: space-between;
-            gap: 8px;
-            padding: calc(14px - 1mm) 16px;
-            min-height: calc(132px - 28mm);
-            background: linear-gradient(160deg, #f9fbfd 0%, #f0f5fb 100%);
-            border: 1px solid var(--school-border-light);
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            min-height: calc(132px - 48mm);
+            background: var(--upload-panel-bg);
+            border: 1px solid var(--upload-panel-border);
+            border-left: 3px solid var(--upload-panel-accent);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-xs);
             color: var(--school-navy-dark);
             font-family: inherit;
             text-align: left;
         }
-        .upload-guide-head {
+        .upload-box {
+            flex: 4 1 0;
+            border-style: dashed;
+            border-left-style: solid;
+            cursor: pointer;
+            transition: border-color 0.25s var(--ease), background 0.25s var(--ease),
+                box-shadow 0.25s var(--ease), transform 0.2s var(--ease);
+        }
+        .upload-guide-box {
+            flex: 6 1 0;
+        }
+        .upload-icon-wrap {
+            flex-shrink: 0;
+            align-self: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
             display: flex;
             align-items: center;
-            gap: 8px;
-            flex-shrink: 0;
-            margin-top: 0;
-            font-size: calc(13px + 1pt);
-        }
-        .upload-guide-head .template-icon-wrap {
-            width: 2em;
-            height: 2em;
-        }
-        .upload-guide-head .upload-guide-icon {
-            width: 1.15em;
-            height: 1.15em;
-        }
-        .template-icon-wrap {
-            flex-shrink: 0;
-            width: 72px; height: 72px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
+            justify-content: center;
             background: #fff;
             border: 1px solid var(--school-border);
             box-shadow: var(--shadow-xs);
         }
+        .upload-icon,
         .upload-guide-icon {
-            width: 40px; height: 40px;
+            display: block;
+            width: 22px;
+            height: 22px;
             flex-shrink: 0;
             color: var(--school-navy);
         }
-        .upload-guide-title {
+        .upload-text-container,
+        .upload-guide-content {
             flex: 1;
             min-width: 0;
-            font-size: calc(13px + 1pt);
-            font-weight: 800;
-            color: var(--school-navy-dark);
-            line-height: 1.25;
-            text-align: left;
-        }
-        .upload-guide-body {
-            width: 100%;
-            margin-top: 0;
-            padding-top: 0;
-            text-align: left;
-            align-self: stretch;
-            flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
-            gap: 6px;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 4px;
         }
-        .upload-guide-desc {
+        .upload-panel-head,
+        .upload-step,
+        .upload-guide-title {
+            width: 100%;
             margin: 0;
-            font-size: calc(11px + 1pt);
-            color: var(--school-muted);
-            line-height: 1.4;
-            text-align: left;
+            font-size: var(--upload-head-font);
+            font-weight: 800;
+            color: var(--school-navy-dark);
+            letter-spacing: 0.02em;
+            line-height: 1.2;
+        }
+        .upload-box .upload-panel-head::before,
+        .upload-box .upload-step::before {
+            content: '① ';
+            color: var(--school-accent);
+        }
+        .upload-guide-box .upload-panel-head::before,
+        .upload-guide-box .upload-guide-title::before {
+            content: '② ';
+            color: var(--school-accent);
+        }
+        .upload-title {
+            width: 100%;
+            margin: 0;
+            font-size: var(--upload-title-font);
+            font-weight: 700;
+            color: var(--school-navy-dark);
+            line-height: 1.28;
+            word-break: keep-all;
+            overflow-wrap: break-word;
+        }
+        .upload-title .upload-format {
+            display: inline-block;
+            margin-left: 5px;
+            padding: 0 6px;
+            font-size: var(--upload-caption-font);
+            font-weight: 700;
+            color: var(--school-navy);
+            background: #fff;
+            border: 1px solid #c5d0e0;
+            border-radius: 5px;
+            vertical-align: middle;
+        }
+        .upload-desc,
+        .upload-guide-desc {
+            width: 100%;
+            margin: 0;
+            font-size: var(--upload-body-font);
+            font-weight: 600;
+            color: var(--school-text);
+            line-height: 1.3;
+            overflow-wrap: break-word;
         }
         .upload-guide-list {
+            width: 100%;
             margin: 0;
-            padding: 0 0 0 1.2em;
-            font-size: calc(11px + 0.5pt);
-            color: var(--school-muted);
-            line-height: 1.38;
-            text-align: left;
+            padding: 0 0 0 1.15em;
+            font-size: var(--upload-body-font);
+            font-weight: 600;
+            color: var(--school-text);
+            line-height: 1.3;
             list-style-position: outside;
         }
         .upload-guide-list li {
             text-align: left;
         }
-        .upload-guide-list li + li { margin-top: 2px; }
+        .upload-guide-list li + li {
+            margin-top: 2px;
+        }
+        .upload-guide-list strong {
+            font-weight: 800;
+            color: var(--school-navy-dark);
+        }
+        .upload-box:hover {
+            border-color: var(--school-navy-light);
+            background: linear-gradient(155deg, #f5f9fd 0%, #e8f0f8 100%);
+            box-shadow: var(--shadow-sm), 0 0 0 3px rgba(61, 107, 158, 0.08);
+        }
+        .upload-box.drag-over {
+            border-color: var(--school-navy);
+            background: linear-gradient(155deg, #eef4fb 0%, #e3edf7 100%);
+            box-shadow: var(--shadow-md), 0 0 0 3px rgba(30, 58, 95, 0.12);
+            transform: translateY(-1px);
+        }
+        .upload-box.success {
+            border-style: solid;
+            border-color: #9ec9b8;
+            border-left-color: var(--school-success);
+            background: linear-gradient(155deg, #f6fcfa 0%, #ecf7f2 100%);
+        }
+        .upload-box.success .upload-icon-wrap {
+            border-color: #9ec9b8;
+        }
+        .upload-box.success .upload-icon {
+            color: var(--school-success);
+        }
+        .upload-box.success.drag-over {
+            background: linear-gradient(155deg, #ecf9f4 0%, #dff3eb 100%);
+        }
         @media (max-width: 720px) {
-            .upload-row { flex-direction: column; align-items: stretch; }
+            .upload-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
             .upload-box,
             .upload-guide-box {
-                width: 100%; max-width: none; min-width: 0; flex: 1 1 auto;
-            }
-            .upload-guide-body {
-                justify-content: flex-start;
+                width: 100%;
+                max-width: none;
+                flex: 1 1 auto;
             }
         }
 
@@ -444,7 +441,7 @@
         }
         .stats-table {
             width: 100%; border-collapse: collapse; table-layout: fixed;
-            font-size: clamp(10px, 0.72rem + 0.42vw, calc(12px + 3pt));
+            font-size: clamp(10px, 0.72rem + 0.42vw, calc(12px + 2pt));
         }
         .stats-table th,
         .stats-table td {
@@ -456,12 +453,12 @@
         .stats-table thead th {
             background: var(--school-navy-dark);
             color: #fff; font-weight: 600;
-            padding: clamp(8px, 0.45rem + 0.35vw, calc(15px - 1mm))
+            padding: clamp(7px, 0.45rem + 0.35vw, calc(14px - 1mm - 1pt))
                 clamp(6px, 0.35rem + 0.4vw, 12px);
             text-align: center;
             border-color: #1a3352;
             letter-spacing: -0.01em;
-            line-height: 1.2;
+            line-height: 1.15;
         }
         .stats-table thead th.stats-head-corner {
             width: 16%;
@@ -474,19 +471,19 @@
             background: #f4f7fa;
             color: var(--school-navy-dark); font-weight: 600;
             text-align: center;
-            padding: clamp(7px, 0.4rem + 0.3vw, calc(14px - 1mm))
+            padding: clamp(6px, 0.4rem + 0.3vw, calc(13px - 1mm - 1pt))
                 clamp(5px, 0.3rem + 0.35vw, 10px);
             border-right: 1px solid #dce4ee;
             white-space: nowrap;
-            line-height: 1.2;
+            line-height: 1.15;
         }
         .stats-table tbody td.stats-val {
-            padding: clamp(7px, 0.4rem + 0.3vw, calc(14px - 1mm))
+            padding: clamp(6px, 0.4rem + 0.3vw, calc(13px - 1mm - 1pt))
                 clamp(5px, 0.35rem + 0.4vw, 12px);
             text-align: center;
             font-weight: 500; color: var(--school-text);
             background: #fff;
-            line-height: 1.2;
+            line-height: 1.15;
         }
         .stats-table tbody tr:hover td { background: #f9fbfd; }
         .stats-table tbody tr.stats-row-divider td {
@@ -521,27 +518,6 @@
             height: 1.1em;
             border-radius: 3px;
             background: linear-gradient(180deg, var(--school-accent) 0%, var(--school-navy-light) 100%);
-        }
-        .stats-grade-dist-legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px 14px;
-            margin-bottom: 14px;
-            font-size: clamp(10px, 0.68rem + 0.35vw, calc(11px + 1pt));
-            font-weight: 600;
-            color: var(--school-muted);
-        }
-        .stats-grade-dist-legend span {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .stats-grade-dist-legend i {
-            display: inline-block;
-            width: 14px;
-            height: 14px;
-            border-radius: 3px;
-            flex-shrink: 0;
         }
         .stats-grade-dist-chart {
             display: flex;
@@ -603,12 +579,12 @@
 
         @container stats-wrap (max-width: 720px) {
             .stats-table {
-                font-size: clamp(9px, 2.6cqi + 6px, 14px);
+                font-size: clamp(9px, 2.6cqi + 6px, calc(13px + 1pt));
             }
         }
         @container stats-wrap (max-width: 520px) {
             .stats-table {
-                font-size: clamp(8px, 2.2cqi + 5px, 12px);
+                font-size: clamp(8px, 2.2cqi + 5px, calc(11px + 1pt));
             }
             .stats-table thead th.stats-head-corner,
             .stats-table tbody td.stats-row-label {
@@ -620,18 +596,18 @@
 
         @media (max-width: 900px) {
             .stats-table {
-                font-size: clamp(9px, 1.05vw + 8px, calc(12px + 2pt));
+                font-size: clamp(9px, 1.05vw + 8px, calc(12px + 1pt));
             }
         }
         @media (max-width: 600px) {
             .stats-table {
-                font-size: clamp(8px, 2.4vw + 6px, 11px);
+                font-size: clamp(8px, 2.4vw + 6px, calc(10px + 1pt));
             }
             .stats-table thead th,
             .stats-table tbody td.stats-row-label,
             .stats-table tbody td.stats-val {
-                padding-top: clamp(6px, 1.8vw, 10px);
-                padding-bottom: clamp(6px, 1.8vw, 10px);
+                padding-top: clamp(5px, 1.8vw, calc(9px + 1pt));
+                padding-bottom: clamp(5px, 1.8vw, calc(9px + 1pt));
             }
         }
 
@@ -783,12 +759,12 @@
             margin: 0;
             width: 100%;
             box-sizing: border-box;
-            padding: 0 4.5mm;
+            padding: 1.5mm 4.5mm;
             line-height: 1;
             background: linear-gradient(180deg, #f7fafd 0%, #eef3f9 100%);
             border: none;
             border-radius: 0;
-            font-size: calc(var(--rpt-font-base) + 4pt);
+            font-size: calc(var(--rpt-font-base) + 3pt);
             font-weight: 600;
             color: var(--school-navy-dark);
             display: flex;
@@ -798,12 +774,12 @@
         }
         .page-1 .student-info .avg-grade-pill {
             flex-shrink: 0;
-            padding: 0 3.5mm;
+            padding: 1.5mm 3.5mm;
             line-height: 1;
             border-radius: 999px;
             background: #fff;
             border: 1px solid #c5d4e4;
-            font-size: calc(var(--rpt-font-sm) + 4pt);
+            font-size: calc(var(--rpt-font-sm) + 3pt);
             font-weight: 700;
             color: var(--school-navy);
             white-space: nowrap;
@@ -948,32 +924,6 @@
             gap: 2mm;
             min-width: 0;
         }
-        .page-1 .report-radar-insight {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 3mm;
-            padding: 3.5mm 4mm;
-            background: linear-gradient(165deg, #fafbfd 0%, #eef4fa 100%);
-            border: 1px solid #d4dde8;
-            border-radius: 5px;
-            font-size: var(--rpt-font-base);
-            line-height: 1.45;
-            color: var(--school-navy-dark);
-        }
-        .page-1 .report-radar-insight .insight-line {
-            display: flex;
-            align-items: baseline;
-            flex-wrap: wrap;
-            gap: 2mm 3mm;
-        }
-        .page-1 .report-radar-insight .insight-line > strong {
-            flex-shrink: 0;
-            min-width: 2.6em;
-            font-size: var(--rpt-font-h);
-            font-weight: 800;
-            color: var(--school-navy-dark);
-        }
         .page-1 .report-grade-goal-panel {
             border: 1px solid #d4dde8;
             border-radius: 5px;
@@ -1039,18 +989,6 @@
             background: #f8fafc;
             color: #94a3b8;
             font-weight: 600;
-        }
-        .page-1 .report-radar-insight .insight-strong,
-        .page-1 .report-radar-insight .insight-weak {
-            font-size: calc(12px + 2pt);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-        }
-        .page-1 .report-radar-insight .insight-strong { color: #b45309; }
-        .page-1 .report-radar-insight .insight-weak { color: #1d4ed8; }
-        .page-1 .report-radar-insight .insight-grade-list {
-            font-size: calc(12px + 2pt);
-            font-weight: 800;
         }
         .page-1 .report-block-univ-ref h3 {
             font-size: var(--rpt-font-h);
@@ -1158,85 +1096,6 @@
             background: #eef4fc !important;
             color: var(--school-navy-dark);
         }
-        .page-1 .report-block-formula {
-            width: 100%;
-        }
-        .page-1 .formula-compact-box {
-            margin: 0;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 2.5mm 3.5mm;
-            font-size: var(--rpt-font-sm);
-            gap: 2mm;
-            font-weight: 600;
-            background: #f8fafc;
-            border: 1px solid #d4dde8;
-            border-left: 3px solid var(--school-navy);
-            border-radius: 5px;
-            box-shadow: 0 1px 0 rgba(15, 36, 64, 0.04);
-        }
-        .page-1 .formula-compact-box .formula-text-row {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 2mm 3mm;
-            width: 100%;
-        }
-        .page-1 .formula-compact-box .formula-label {
-            color: var(--school-navy-dark);
-            font-size: var(--rpt-font-sm);
-        }
-        .page-1 .formula-compact-box .goal-text {
-            font-weight: 700;
-            color: #9a3412;
-            background: #fff7ed;
-            padding: 1.5px 6px;
-            border-radius: 3px;
-            font-size: var(--rpt-font-sm);
-            text-align: right;
-        }
-        .page-1 .formula-compact-box .goal-note {
-            font-size: var(--rpt-font-caption);
-            color: #64748b;
-            font-weight: 500;
-        }
-        .page-1 .grade-graph-container {
-            display: flex;
-            width: 100%;
-            min-height: calc(14px + 1.5pt);
-            line-height: 1.2;
-            font-size: var(--rpt-font-caption);
-            font-weight: 700;
-            border-radius: 3px;
-            overflow: hidden;
-            color: #fff;
-            text-align: center;
-        }
-        .page-1 .grade-graph-container > div {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            flex-direction: row;
-            flex-wrap: wrap;
-            padding: 1px 2px;
-            white-space: nowrap;
-        }
-        .page-1 .grade-graph-container .g-bar-1,
-        .page-1 .grade-graph-container .g-bar-5 {
-            font-size: 0.9em;
-        }
-        .page-1 .grade-graph-container .g-bar-pct {
-            font-size: 0.95em;
-            font-weight: 600;
-            opacity: 0.95;
-        }
-        .page-1 .grade-graph-container .g-bar-1 { width: 10%; background: #c62828; }
-        .page-1 .grade-graph-container .g-bar-2 { width: 24%; background: #e65100; }
-        .page-1 .grade-graph-container .g-bar-3 { width: 32%; background: #2e7d32; }
-        .page-1 .grade-graph-container .g-bar-4 { width: 24%; background: #1565c0; }
-        .page-1 .grade-graph-container .g-bar-5 { width: 10%; background: #546e7a; }
         .page-1 .my-score-row td { background: #e8f2fc !important; }
 
         h1 { text-align: center; font-weight: 700; }
@@ -1247,20 +1106,6 @@
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th, td { border: 1px solid #cbd5e1; padding: 6px 4px; text-align: center; font-size: 11px; }
         th { background-color: #f1f5f9; }
-
-        .formula-compact-box {
-            display: flex; flex-direction: column; gap: 6px;
-        }
-        .formula-text-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
-        .grade-graph-container {
-            display: flex; width: 100%; overflow: hidden; font-weight: bold;
-            color: white; text-align: center;
-        }
-        .g-bar-1 { width: 10%; background: #c62828; }
-        .g-bar-2 { width: 24%; background: #e65100; }
-        .g-bar-3 { width: 32%; background: #2e7d32; }
-        .g-bar-4 { width: 24%; background: #1565c0; }
-        .g-bar-5 { width: 10%; background: #546e7a; }
 
         .row-label { background-color: #f1f5f9; width: 90px; font-weight: bold; }
         .symbol-up { color: #b91c1c; font-weight: bold; font-size: calc(14px + 1pt); width: 60px; }
@@ -1398,9 +1243,7 @@
             }
             #printContainer .report-panel,
             #printContainer .student-info,
-            #printContainer .formula-compact-box,
-            #printContainer .report-radar-chart,
-            #printContainer .report-radar-insight {
+            #printContainer .report-radar-chart {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
@@ -1415,14 +1258,7 @@
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-            #printContainer .grade-graph-container,
-            #printContainer .g-bar-1,
-            #printContainer .g-bar-2,
-            #printContainer .g-bar-3,
-            #printContainer .g-bar-4,
-            #printContainer .g-bar-5,
             #printContainer .report-radar-chart svg,
-            #printContainer .report-radar-insight,
             #printContainer .report-grade-goal-table .grade-badge,
             #printContainer .report-grade-goal-table .goal-cell,
             #printContainer .univ-ref-table thead th,
@@ -1466,21 +1302,19 @@
                         </svg>
                     </div>
                     <div class="upload-text-container">
-                        <span class="upload-step">성적 데이터 입력</span>
+                        <span class="upload-panel-head">성적 데이터 입력</span>
                         <div class="upload-title" id="uploadTitle">엑셀 성적 파일을 여기에 등록<span class="upload-format">.xlsx</span></div>
                         <span class="upload-desc" id="fileStatus">이 칸을 클릭하거나 .xlsx 파일을 드래그하여 등록해 주세요.</span>
                     </div>
                 </div>
                 <div class="upload-guide-box" aria-label="사용 방법 안내">
-                    <div class="upload-guide-head">
-                        <div class="template-icon-wrap" aria-hidden="true">
-                            <svg class="upload-guide-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div class="upload-guide-title">사용 방법</div>
+                    <div class="upload-icon-wrap" aria-hidden="true">
+                        <svg class="upload-guide-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                     </div>
-                    <div class="upload-guide-body">
+                    <div class="upload-guide-content">
+                        <span class="upload-panel-head">사용 방법</span>
                         <p class="upload-guide-desc">나이스에서 반별 전과목 결과를 「보고서 형태 유지」 해제 후 받은 엑셀을 한번에 업로드 가능</p>
                         <ul class="upload-guide-list">
                             <li>저장 시 <strong>보고서 형태 유지</strong> 체크 해제</li>
@@ -1547,13 +1381,6 @@
 
             <div class="stats-grade-dist" id="statsGradeDist">
                 <h3 class="stats-grade-dist-heading">1. 학년 전체 등급 분포 그래프</h3>
-                <div class="stats-grade-dist-legend" id="statsGradeDistLegend" aria-hidden="true">
-                    <span><i class="g-bar-1"></i>1등급</span>
-                    <span><i class="g-bar-2"></i>2등급</span>
-                    <span><i class="g-bar-3"></i>3등급</span>
-                    <span><i class="g-bar-4"></i>4등급</span>
-                    <span><i class="g-bar-5"></i>5등급</span>
-                </div>
                 <div class="stats-grade-dist-chart" id="statsGradeDistChart"></div>
                 <p class="stats-grade-dist-note" id="statsGradeDistNote"></p>
             </div>
@@ -1627,21 +1454,6 @@
             </div>
             </div>
 
-            <div class="report-block report-block-formula">
-            <div class="formula-compact-box">
-                <div class="formula-text-row">
-                    <span class="formula-label"><strong>※ 윗등급 차:</strong> 상위 등급 컷과의 차이</span>
-                    <span class="goal-text">목표 = 원점수 + (윗등급 차×2) <span class="goal-note">[최대 1등급컷+3]</span></span>
-                </div>
-                <div class="grade-graph-container">
-                    <div class="g-bar-1">1등급 <span class="g-bar-pct">(10%)</span></div>
-                    <div class="g-bar-2">2등급 <span class="g-bar-pct">(34%)</span></div>
-                    <div class="g-bar-3">3등급 <span class="g-bar-pct">(66%)</span></div>
-                    <div class="g-bar-4">4등급 <span class="g-bar-pct">(90%)</span></div>
-                    <div class="g-bar-5">5등급 <span class="g-bar-pct">(100%)</span></div>
-                </div>
-            </div>
-            </div>
             </section>
 
             <section class="report-zone report-zone-aux">
@@ -1666,13 +1478,12 @@
 
             <section class="report-zone report-zone-radar">
             <div class="report-block report-block-radar">
-            <h3>과목별 등급 · 강점·약점 · 목표점수</h3>
+            <h3>과목별 등급 · 강점·약점 · 목표점수를 한눈에 보기</h3>
             <div class="report-radar-layout">
                 <div class="report-radar-chart">
                     <svg id="gradeRadarChart" viewBox="0 0 240 240" role="img" aria-label="과목별 등급 레이더 차트"></svg>
                 </div>
                 <div class="report-radar-side">
-                    <div class="report-radar-insight" id="gradeRadarInsight"></div>
                     <div class="report-grade-goal-panel">
                         <p class="panel-caption">한 등급 올리기 목표점수 (원점수 + 윗등급 차×2)</p>
                         <div id="gradeRadarSummary"></div>
@@ -2987,9 +2798,8 @@ function populateTemplate(studentIdStr, options) {
 
 function renderStudentGradeRadar(subjectRows) {
     const svgEl = document.getElementById('gradeRadarChart');
-    const insightEl = document.getElementById('gradeRadarInsight');
     const summaryEl = document.getElementById('gradeRadarSummary');
-    if (!svgEl || !insightEl || !subjectRows.length) return;
+    if (!svgEl || !subjectRows.length) return;
 
     const NS = 'http://www.w3.org/2000/svg';
     const cx = 120;
@@ -3084,23 +2894,6 @@ function renderStudentGradeRadar(subjectRows) {
         row.subject + ' ' + row.grade + '등급' + (row.goal.hasGoal ? ' 목표' + row.goal.display : '')
     ).join(', ');
     svgEl.appendChild(title);
-
-    const minG = Math.min.apply(null, subjectRows.map((x) => x.grade));
-    const maxG = Math.max.apply(null, subjectRows.map((x) => x.grade));
-    const strong = subjectRows.filter((x) => x.grade === minG);
-    const weak = subjectRows.filter((x) => x.grade === maxG);
-    const fmtGrade = (arr) => arr.map((x) => x.subject + '(' + x.grade + '등급)').join(', ');
-
-    let insightHtml = '';
-    if (minG === maxG) {
-        insightHtml +=
-            '<div class="insight-line">과목별 등급 <strong class="insight-grade-list">' + minG + '등급</strong>으로 동일</div>';
-    } else {
-        insightHtml +=
-            '<div class="insight-line"><strong>강점</strong> <span class="insight-strong">' + fmtGrade(strong) + '</span></div>' +
-            '<div class="insight-line"><strong>약점</strong> <span class="insight-weak">' + fmtGrade(weak) + '</span></div>';
-    }
-    insightEl.innerHTML = insightHtml;
 
     if (summaryEl) {
         const table = document.createElement('table');
@@ -3232,10 +3025,8 @@ function resetMainTables() {
     document.getElementById('rowCut3').innerHTML = '<th class="row-label">3등급</th>'; 
     document.getElementById('rowCut4').innerHTML = '<th class="row-label">4등급</th>';
     const radarSvg = document.getElementById('gradeRadarChart');
-    const radarInsight = document.getElementById('gradeRadarInsight');
     const radarSummary = document.getElementById('gradeRadarSummary');
     if (radarSvg) radarSvg.innerHTML = '';
-    if (radarInsight) radarInsight.innerHTML = '';
     if (radarSummary) radarSummary.innerHTML = '';
     const distTitle = document.getElementById('distPageTitle');
     if (distTitle) distTitle.textContent = '학생 주변 성적분포';
