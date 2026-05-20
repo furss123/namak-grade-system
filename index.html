@@ -66,49 +66,42 @@
         }
         .site-header-inner {
             position: relative; z-index: 1;
-            max-width: var(--content-max); margin: 0 auto; padding: 22px 28px 24px;
-            display: flex; align-items: center; gap: 22px;
+            max-width: var(--content-max); margin: 0 auto; padding: 26px 32px 28px;
+            display: flex; align-items: center; gap: 26px;
         }
         .school-logo {
-            width: 88px; height: 88px; border-radius: 50%;
+            width: 108px; height: 108px; border-radius: 50%;
             object-fit: contain; background: #fff; flex-shrink: 0;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22), 0 0 0 3px rgba(255, 255, 255, 0.15);
         }
         .site-header-text {
             display: flex; flex-direction: column; justify-content: center;
-            min-height: 88px; flex: 1; min-width: 0; text-align: left; gap: 6px;
+            min-height: 108px; flex: 1; min-width: 0; text-align: left; gap: 8px;
         }
         .header-school {
-            margin: 0; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.14em;
-            text-transform: none; color: rgba(255, 255, 255, 0.72);
+            margin: 0; font-size: 1rem; font-weight: 700; letter-spacing: 0.12em;
+            text-transform: none; color: rgba(255, 255, 255, 0.78);
         }
         .site-header-text h1 {
-            margin: 0; font-size: 1.65rem; font-weight: 800; letter-spacing: -0.03em;
+            margin: 0; font-size: 2.05rem; font-weight: 800; letter-spacing: -0.03em;
             line-height: 1.2; text-align: left; color: #fff;
         }
         .site-header-text h1 .header-em {
             color: #f5e6b8; font-weight: 800;
         }
         .header-subline {
-            display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
-            margin-top: 4px;
+            display: flex; flex-wrap: wrap; align-items: center; gap: 10px;
+            margin-top: 2px;
         }
         .header-chip {
-            display: inline-flex; align-items: center; padding: 5px 12px;
-            border-radius: 999px; font-size: 0.8rem; font-weight: 600; line-height: 1.2;
+            display: inline-flex; align-items: center; padding: 6px 14px;
+            border-radius: 999px; font-size: 0.95rem; font-weight: 600; line-height: 1.25;
             background: rgba(255, 255, 255, 0.12); border: 1px solid rgba(255, 255, 255, 0.2);
             color: rgba(255, 255, 255, 0.95); letter-spacing: -0.01em;
         }
         .header-chip-accent {
             background: rgba(196, 160, 53, 0.22); border-color: rgba(196, 160, 53, 0.45);
             color: #fff8e7;
-        }
-        .header-badge {
-            margin-left: auto; padding: 8px 16px; border-radius: 999px;
-            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.22);
-            font-size: 0.75rem; font-weight: 600; color: rgba(255, 255, 255, 0.95);
-            white-space: nowrap; backdrop-filter: blur(6px);
-            letter-spacing: 0.03em;
         }
 
         .app-main { width: 100%; margin: 0; padding: 0; }
@@ -525,7 +518,7 @@
 
     <header class="site-header no-print">
         <div class="site-header-inner">
-            <img src="assets/namak-logo.png" alt="남악고등학교" class="school-logo" width="88" height="88">
+            <img src="assets/namak-logo.png" alt="남악고등학교" class="school-logo" width="108" height="108">
             <div class="site-header-text">
                 <p class="header-school">남악고등학교</p>
                 <h1>1학년 <span class="header-em">성적 조회</span> 시스템</h1>
@@ -534,7 +527,6 @@
                     <span class="header-chip">고교학점제 5등급 반영</span>
                 </div>
             </div>
-            <span class="header-badge">성적 분석 · 인쇄</span>
         </div>
     </header>
 
