@@ -724,7 +724,6 @@
             letter-spacing: -0.03em; line-height: 1.3;
             pointer-events: none;
         }
-        .page-2 .page-doc-header h1 { font-size: calc(18px + 7pt); }
         #printContainer .report-wrapper { counter-reset: report-page 0; }
         #printContainer .page { counter-increment: report-page; }
         #printContainer .page-footer-num::before {
@@ -747,25 +746,107 @@
         .page-top-accent-navy { background: #0f2440; }
         .page-top-accent-mid { background: #1e3a5f; }
         .page-top-accent-gold { background: #c4a035; }
+        .page-1 .page-body.report-page-one {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2mm;
+            overflow: hidden;
+        }
         .page-1 .student-info {
-            margin-bottom: 3mm; padding: 3.5mm 5mm;
+            margin-bottom: 0; padding: 2.5mm 4mm;
             background: linear-gradient(180deg, #f5f8fc 0%, #eef3f9 100%);
             border: 1px solid #e2e8f0; border-radius: 3px;
-            font-size: calc(12px + 1.5pt); font-weight: 600; color: var(--school-navy-dark);
+            font-size: calc(11px + 1pt); font-weight: 600; color: var(--school-navy-dark);
         }
-        .page-1 .report-block { margin-bottom: 10mm; }
-        .page-1 .report-block.report-block-main { margin-bottom: 3mm; }
-        .page-1 .report-block:last-child { margin-bottom: 0; }
+        .page-1 .page-doc-header {
+            min-height: 14mm; margin-bottom: 2mm; padding-bottom: 2mm;
+        }
+        .page-1 .page-doc-header h1 { font-size: calc(17px + 5pt); }
+        .page-1 .report-block { margin-bottom: 0; flex-shrink: 0; }
+        .page-1 .report-block.report-block-main { margin-bottom: 0; }
         .page-1 .report-block h3 {
-            margin: 0 0 2mm 0; font-size: calc(10px + 1.5pt); font-weight: 700;
-            color: var(--school-navy); padding-left: 8px;
-            border-left: 4px solid var(--school-accent); background: transparent;
+            margin: 0 0 1mm 0; font-size: calc(9px + 1pt); font-weight: 700;
+            color: var(--school-navy); padding-left: 6px;
+            border-left: 3px solid var(--school-accent); background: transparent;
         }
         .page-1 .report-block table { margin-bottom: 0; }
         .page-1 .report-block th,
         .page-1 .report-block td {
-            padding: 4px 3px; font-size: calc(10px + 1.5pt); line-height: 1.25;
+            padding: 2px 2px; font-size: calc(9px + 1pt); line-height: 1.2;
             border-color: #334155;
+        }
+        .page-1 .report-aux-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1.5mm;
+        }
+        .page-1 .report-aux-grid .report-block h3 {
+            font-size: calc(8px + 1pt);
+            padding-left: 5px;
+            border-left-width: 2px;
+        }
+        .page-1 .report-block-dist .dist-table-note {
+            margin: 0 0 0.8mm 0;
+            text-align: right;
+            font-size: calc(7.5px + 0.5pt);
+            color: var(--school-muted);
+            font-weight: 600;
+        }
+        .page-1 .report-block-dist th,
+        .page-1 .report-block-dist td {
+            padding: 1px 1px;
+            font-size: calc(7.5px + 0.5pt);
+        }
+        .page-1 .report-block-dist .symbol-up,
+        .page-1 .report-block-dist .symbol-down {
+            font-size: calc(9px + 0.5pt);
+            width: auto;
+        }
+        .page-1 .report-radar-layout {
+            display: grid;
+            grid-template-columns: 42mm 1fr;
+            gap: 2mm;
+            align-items: stretch;
+        }
+        .page-1 .report-radar-chart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            border: 1px solid #dce4ee;
+            border-radius: 3px;
+            padding: 1mm;
+        }
+        .page-1 .report-radar-chart svg {
+            width: 100%;
+            max-height: 40mm;
+            height: auto;
+        }
+        .page-1 .report-radar-insight {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 2mm;
+            padding: 2.5mm 3mm;
+            background: linear-gradient(160deg, #f9fbfd 0%, #eef4fa 100%);
+            border: 1px solid #dce4ee;
+            border-radius: 3px;
+            font-size: calc(8.5px + 0.5pt);
+            line-height: 1.35;
+            color: var(--school-navy-dark);
+        }
+        .page-1 .report-radar-insight strong {
+            color: var(--school-navy);
+            font-weight: 800;
+        }
+        .page-1 .report-radar-insight .insight-strong {
+            color: #b91c1c;
+        }
+        .page-1 .report-radar-insight .insight-weak {
+            color: #1d4ed8;
+        }
+        .page-1 .report-radar-insight .insight-grade-list {
+            font-weight: 700;
         }
         .page-1 .report-block thead th,
         .page-1 .report-block tbody th.row-label {
@@ -773,18 +854,22 @@
         }
         .page-1 #rowGrade td, .page-1 #rowGrade th.row-label { font-weight: 800; }
         .page-1 .formula-compact-box {
-            margin: 0; padding: 4px 8px; font-size: calc(9.5px + 1.5pt); gap: 2px; font-weight: 600;
+            margin: 0; padding: 2px 6px; font-size: calc(8px + 0.5pt); gap: 1px; font-weight: 600;
             background: #f8fafc; border: 1px solid #c5d0e0; border-left: 3px solid var(--school-navy);
             border-radius: 2px;
         }
+        .page-1 .formula-compact-box .formula-text-row {
+            flex-wrap: nowrap; gap: 4px;
+        }
         .page-1 .formula-compact-box .goal-text {
             font-weight: 700; color: #9a3412; background: #fff7ed;
-            padding: 1px 4px; border-radius: 2px;
+            padding: 0 3px; border-radius: 2px;
+            font-size: calc(8px + 0.5pt);
         }
-        .page-1 .formula-compact-box .goal-note { font-size: calc(11px + 1.5pt); color: #64748b; font-weight: normal; }
+        .page-1 .formula-compact-box .goal-note { font-size: calc(8px + 0.5pt); color: #64748b; font-weight: normal; }
         .page-1 .grade-graph-container {
-            height: calc(14px + 1.5pt); line-height: calc(14px + 1.5pt);
-            font-size: calc(8px + 1.5pt); border-radius: 2px;
+            height: calc(11px + 1pt); line-height: calc(11px + 1pt);
+            font-size: calc(7px + 0.5pt); border-radius: 2px;
         }
         .page-1 #rowMax th.row-label, .page-1 #rowMax td { background: #f1f5f9 !important; }
         .page-1 #rowGoal th.row-label, .page-1 #rowGoal td {
@@ -819,14 +904,6 @@
         .symbol-down { color: #1d4ed8; font-weight: bold; font-size: calc(14px + 1pt); width: 60px; }
         .my-score-row { background: #e0ecf8 !important; font-weight: bold; }
         .my-score-row td { border: 2px solid var(--school-navy) !important; }
-        .page-2 #distTableNote {
-            text-align: right; font-size: calc(9px + 1pt); margin: 0 0 4mm 0;
-            color: var(--school-muted); font-weight: 600;
-        }
-        .page-2 #distributionTable thead th {
-            background: #e8eef5; color: var(--school-navy-dark); font-weight: 700;
-        }
-
         .page-scroll-nav {
             position: fixed;
             right: max(14px, calc((100vw - var(--content-max)) / 2 - 58px));
@@ -971,6 +1048,8 @@
             #printContainer .g-bar-3,
             #printContainer .g-bar-4,
             #printContainer .g-bar-5,
+            #printContainer .report-radar-chart svg,
+            #printContainer .report-radar-insight,
             #printContainer .page-1 .student-info {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -1037,7 +1116,7 @@
         <section class="panel-section">
             <div class="section-label">학생 성적 조회</div>
             <div class="query-card">
-                <div class="query-card-title">단일 학번 조회 (상세 보고서 · 성적 분포 포함)</div>
+                <div class="query-card-title">단일 학번 조회 (1페이지 보고서 · 분포·레이더 포함)</div>
                 <div class="input-area">
             <input type="text" id="studentId" value="1101" placeholder="학번 입력 (예: 1101)">
             <button class="search-btn" onclick="searchSingleStudent()">
@@ -1135,7 +1214,7 @@
                 <span class="page-top-accent-mid"></span>
                 <span class="page-top-accent-gold"></span>
             </div>
-            <div class="page-body">
+            <div class="page-body report-page-one">
             <div class="page-doc-header">
                 <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
                 <h1>2026학년도 정기고사 결과 보고서</h1>
@@ -1161,85 +1240,83 @@
             </table>
             </div>
 
-            <div class="report-block">
+            <div class="report-block report-block-formula">
             <div class="formula-compact-box">
                 <div class="formula-text-row">
-                    <div><strong>※ 윗등급 차:</strong> 상위 등급 컷 점수와의 차이</div>
-                    <div class="goal-text">목표점수(한 등급 올리기) = 원점수 + (윗등급 차 × 2) <span class="goal-note">[최대: 1등급 컷 + 3점]</span></div>
+                    <div><strong>※ 윗등급 차:</strong> 상위 등급 컷과의 차이</div>
+                    <div class="goal-text">목표 = 원점수 + (윗등급 차×2) <span class="goal-note">[최대 1등급컷+3]</span></div>
                 </div>
                 <div class="grade-graph-container">
-                    <div class="g-bar-1">1등급 (10%)</div>
-                    <div class="g-bar-2">2등급 (~34%)</div>
-                    <div class="g-bar-3">3등급 (~66%)</div>
-                    <div class="g-bar-4">4등급 (~90%)</div>
-                    <div class="g-bar-5">5등급 (~100%)</div>
+                    <div class="g-bar-1">1등급</div>
+                    <div class="g-bar-2">2등급</div>
+                    <div class="g-bar-3">3등급</div>
+                    <div class="g-bar-4">4등급</div>
+                    <div class="g-bar-5">5등급</div>
                 </div>
             </div>
             </div>
 
+            <div class="report-aux-grid">
             <div class="report-block">
-            <h3>등급별 최하점수 (5등급 컷 - <span class="total-count">-</span>명 기준)</h3>
+            <h3>등급 컷 (<span class="total-count">-</span>명)</h3>
             <table id="cutLineTable">
                 <thead>
                     <tr id="cutTableHead"><th class="row-label">구분</th></tr>
                 </thead>
                 <tbody>
-                    <tr id="rowCut1"><th class="row-label">1등급(10%)</th></tr>
-                    <tr id="rowCut2"><th class="row-label">2등급(34%)</th></tr>
-                    <tr id="rowCut3"><th class="row-label">3등급(66%)</th></tr>
-                    <tr id="rowCut4"><th class="row-label">4등급(90%)</th></tr>
+                    <tr id="rowCut1"><th class="row-label">1등급</th></tr>
+                    <tr id="rowCut2"><th class="row-label">2등급</th></tr>
+                    <tr id="rowCut3"><th class="row-label">3등급</th></tr>
+                    <tr id="rowCut4"><th class="row-label">4등급</th></tr>
                 </tbody>
             </table>
             </div>
 
             <div class="report-block">
-            <h3>과목별 최고점수</h3>
+            <h3>최고점수</h3>
             <table id="maxScoreTable">
                 <thead>
                     <tr id="maxTableHead"><th class="row-label">구분</th></tr>
                 </thead>
                 <tbody>
-                    <tr id="rowMax" style="background-color: #eee; font-weight: bold;"><th class="row-label">최고점수</th></tr>
+                    <tr id="rowMax" style="background-color: #eee; font-weight: bold;"><th class="row-label">최고</th></tr>
                 </tbody>
             </table>
             </div>
 
             <div class="report-block">
-            <h3>목표 점수 (한 등급 올리기 기준)</h3>
+            <h3>목표 점수</h3>
             <table id="goalScoreTable">
                 <thead>
                     <tr id="goalTableHead"><th class="row-label">구분</th></tr>
                 </thead>
                 <tbody>
-                    <tr id="rowGoal" style="background-color: #fff9c4; font-weight: bold; border: 2px solid #fbc02d;"><th class="row-label">목표 점수</th></tr>
+                    <tr id="rowGoal" style="background-color: #fff9c4; font-weight: bold; border: 2px solid #fbc02d;"><th class="row-label">목표</th></tr>
                 </tbody>
             </table>
             </div>
             </div>
-            <footer class="page-footer">
-                <p class="page-footer-num" aria-label="페이지 번호"></p>
-            </footer>
-        </div>
 
-        <div class="page page-2">
-            <div class="page-top-accent" aria-hidden="true">
-                <span class="page-top-accent-navy"></span>
-                <span class="page-top-accent-mid"></span>
-                <span class="page-top-accent-gold"></span>
-            </div>
-            <div class="page-body">
-            <div class="page-doc-header">
-                <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
-                <h1 id="distPageTitle">학생 주변 성적분포</h1>
-            </div>
-            <p id="distTableNote" style="text-align: right; font-size: 10px; margin: 0 0 5px 0;">(※ 데이터가 없는 구간은 빈칸으로 표시되며, 내 점수 기준 위로는 오름차순, 아래로는 내림차순 정렬됩니다.)</p>
-            
+            <div class="report-block report-block-dist">
+            <h3 id="distSectionTitle">학생 주변 성적분포</h3>
+            <p id="distTableNote" class="dist-table-note">(※ 동일 점수는 괄호 안 인원으로 표시)</p>
             <table id="distributionTable">
                 <thead>
-                    <tr id="distTableHead"><th style="width: 12%;">구분</th></tr>
+                    <tr id="distTableHead"><th style="width: 10%;">구분</th></tr>
                 </thead>
                 <tbody id="distTableBody"></tbody>
             </table>
+            </div>
+
+            <div class="report-block report-block-radar">
+            <h3>과목별 등급 · 강점·약점 (레이더)</h3>
+            <div class="report-radar-layout">
+                <div class="report-radar-chart">
+                    <svg id="gradeRadarChart" viewBox="0 0 240 240" role="img" aria-label="과목별 등급 레이더 차트"></svg>
+                </div>
+                <div class="report-radar-insight" id="gradeRadarInsight"></div>
+            </div>
+            </div>
             </div>
             <footer class="page-footer">
                 <p class="page-footer-num" aria-label="페이지 번호"></p>
@@ -2330,9 +2407,15 @@ function populateTemplate(studentIdStr) {
     });
 
     document.getElementById('infoAvgGrade').textContent = (weightedGradeSum / totalWeight).toFixed(2);
+
+    const gradeMap = {};
+    subjects.forEach((subject) => {
+        gradeMap[subject] = processedGradesCache[studentIdStr][subject].grade;
+    });
+    renderStudentGradeRadar(subjects, gradeMap);
     
-    const DIST_NEARBY = 10;
-    const distTitle = document.getElementById('distPageTitle');
+    const DIST_NEARBY = 3;
+    const distTitle = document.getElementById('distSectionTitle');
     if (distTitle) distTitle.textContent = `${studentName} 학생 주변 성적분포`;
 
     const distBody = document.getElementById('distTableBody');
@@ -2361,7 +2444,7 @@ function populateTemplate(studentIdStr) {
     }
     const distNote = document.getElementById('distTableNote');
     if (distNote) {
-        distNote.textContent = `(※ 동일 점수는 한 칸에 표시하며 괄호 안은 동점 인원수입니다. ${studentName} 학생 점수 기준 위로는 오름차순, 아래로는 내림차순입니다.)`;
+        distNote.textContent = `(※ 동일 점수는 괄호 안 인원으로 표시 · ${studentName} 학생 기준 상·하위 ${DIST_NEARBY}구간)`;
     }
     const myTr = document.createElement('tr');
     myTr.className = 'my-score-row';
@@ -2382,15 +2465,110 @@ function populateTemplate(studentIdStr) {
     return true;
 }
 
-function cloneReport(isRangeSearch) {
+function renderStudentGradeRadar(subjects, gradeMap) {
+    const svgEl = document.getElementById('gradeRadarChart');
+    const insightEl = document.getElementById('gradeRadarInsight');
+    if (!svgEl || !insightEl || !subjects.length) return;
+
+    const NS = 'http://www.w3.org/2000/svg';
+    const cx = 120;
+    const cy = 120;
+    const maxR = 86;
+    const n = subjects.length;
+    const angles = subjects.map((_, i) => -Math.PI / 2 + (2 * Math.PI * i) / n);
+    const scores = subjects.map((s) => 6 - gradeMap[s]);
+
+    function polar(r, idx) {
+        return {
+            x: cx + r * Math.cos(angles[idx]),
+            y: cy + r * Math.sin(angles[idx])
+        };
+    }
+
+    svgEl.innerHTML = '';
+
+    for (let level = 1; level <= 5; level++) {
+        const r = (level / 5) * maxR;
+        const pts = angles.map((_, i) => polar(r, i));
+        const poly = document.createElementNS(NS, 'polygon');
+        poly.setAttribute('points', pts.map((p) => p.x + ',' + p.y).join(' '));
+        poly.setAttribute('fill', 'none');
+        poly.setAttribute('stroke', '#dce4ee');
+        poly.setAttribute('stroke-width', level === 5 ? '1' : '0.6');
+        svgEl.appendChild(poly);
+    }
+
+    angles.forEach((_, i) => {
+        const end = polar(maxR, i);
+        const line = document.createElementNS(NS, 'line');
+        line.setAttribute('x1', String(cx));
+        line.setAttribute('y1', String(cy));
+        line.setAttribute('x2', String(end.x));
+        line.setAttribute('y2', String(end.y));
+        line.setAttribute('stroke', '#cbd5e1');
+        line.setAttribute('stroke-width', '0.8');
+        svgEl.appendChild(line);
+    });
+
+    const dataPts = scores.map((sc, i) => polar((sc / 5) * maxR, i));
+    const dataPoly = document.createElementNS(NS, 'polygon');
+    dataPoly.setAttribute('points', dataPts.map((p) => p.x + ',' + p.y).join(' '));
+    dataPoly.setAttribute('fill', 'rgba(30, 58, 95, 0.28)');
+    dataPoly.setAttribute('stroke', '#1e3a5f');
+    dataPoly.setAttribute('stroke-width', '2');
+    svgEl.appendChild(dataPoly);
+
+    subjects.forEach((sub, i) => {
+        const pt = dataPts[i];
+        const dot = document.createElementNS(NS, 'circle');
+        dot.setAttribute('cx', String(pt.x));
+        dot.setAttribute('cy', String(pt.y));
+        dot.setAttribute('r', '3');
+        dot.setAttribute('fill', '#1e3a5f');
+        svgEl.appendChild(dot);
+
+        const labPt = polar(maxR + 14, i);
+        const text = document.createElementNS(NS, 'text');
+        text.setAttribute('x', String(labPt.x));
+        text.setAttribute('y', String(labPt.y));
+        text.setAttribute('text-anchor', 'middle');
+        text.setAttribute('dominant-baseline', 'middle');
+        text.setAttribute('font-size', '9');
+        text.setAttribute('font-weight', '700');
+        text.setAttribute('fill', '#334155');
+        const shortName = sub.length > 5 ? sub.slice(0, 5) : sub;
+        text.textContent = shortName + ' ' + gradeMap[sub];
+        svgEl.appendChild(text);
+    });
+
+    const title = document.createElementNS(NS, 'title');
+    title.textContent = subjects.map((s) => s + ' ' + gradeMap[s] + '등급').join(', ');
+    svgEl.appendChild(title);
+
+    const items = subjects.map((s) => ({ subject: s, grade: gradeMap[s] }));
+    const minG = Math.min.apply(null, items.map((x) => x.grade));
+    const maxG = Math.max.apply(null, items.map((x) => x.grade));
+    const strong = items.filter((x) => x.grade === minG);
+    const weak = items.filter((x) => x.grade === maxG);
+    const fmt = (arr) => arr.map((x) => x.subject + '(' + x.grade + '등급)').join(', ');
+
+    if (minG === maxG) {
+        insightEl.innerHTML =
+            '<div>과목별 등급이 <strong class="insight-grade-list">' + minG + '등급</strong>으로 동일합니다.</div>' +
+            '<div style="color:#64748b;">바깥에 가까울수록 우수 등급(1등급 방향)입니다.</div>';
+    } else {
+        insightEl.innerHTML =
+            '<div><strong>강점</strong> <span class="insight-strong">' + fmt(strong) + '</span></div>' +
+            '<div><strong>약점</strong> <span class="insight-weak">' + fmt(weak) + '</span></div>' +
+            '<div style="color:#64748b;">바깥에 가까울수록 우수 등급(1등급 방향)입니다.</div>';
+    }
+}
+
+function cloneReport() {
     const template = document.getElementById('reportTemplate');
     const clone = template.cloneNode(true);
     clone.style.display = 'block';
     clone.removeAttribute('id');
-    if (isRangeSearch) {
-        const page2 = clone.querySelector('.page-2');
-        if (page2) page2.remove();
-    }
     const elementsWithId = clone.querySelectorAll('[id]');
     elementsWithId.forEach(el => el.removeAttribute('id'));
     initAppFooter();
@@ -2416,7 +2594,7 @@ function searchSingleStudent(studentIdOverride, options) {
     }
     const printContainer = document.getElementById('printContainer');
     printContainer.innerHTML = '';
-    printContainer.appendChild(cloneReport(false));
+    printContainer.appendChild(cloneReport());
     showReportActionSection();
     if (!opts.silent) scrollToReportStart();
     return true;
@@ -2456,7 +2634,7 @@ function searchStudentRange(startOverride, endOverride, options) {
     printContainer.innerHTML = '';
     targetStudents.forEach(student => {
         populateTemplate(String(student['학번']));
-        printContainer.appendChild(cloneReport(true));
+        printContainer.appendChild(cloneReport());
     });
     showReportActionSection();
     if (!opts.silent) scrollToReportStart();
@@ -2487,11 +2665,17 @@ function resetMainTables() {
     document.getElementById('rowGrade').innerHTML = '<th class="row-label">등급</th>';
     document.getElementById('rowDiffUp').innerHTML = '<th class="row-label">윗등급 차</th>'; 
     document.getElementById('rowDiffDown').innerHTML = '<th class="row-label">아랫등급 차</th>';
-    document.getElementById('rowCut1').innerHTML = '<th class="row-label">1등급(10%)</th>'; 
-    document.getElementById('rowCut2').innerHTML = '<th class="row-label">2등급(34%)</th>';
-    document.getElementById('rowCut3').innerHTML = '<th class="row-label">3등급(66%)</th>'; 
-    document.getElementById('rowCut4').innerHTML = '<th class="row-label">4등급(90%)</th>';
-    document.getElementById('rowGoal').innerHTML = '<th class="row-label">목표 점수</th>';
+    document.getElementById('rowCut1').innerHTML = '<th class="row-label">1등급</th>'; 
+    document.getElementById('rowCut2').innerHTML = '<th class="row-label">2등급</th>';
+    document.getElementById('rowCut3').innerHTML = '<th class="row-label">3등급</th>'; 
+    document.getElementById('rowCut4').innerHTML = '<th class="row-label">4등급</th>';
+    document.getElementById('rowGoal').innerHTML = '<th class="row-label">목표</th>';
+    const radarSvg = document.getElementById('gradeRadarChart');
+    const radarInsight = document.getElementById('gradeRadarInsight');
+    if (radarSvg) radarSvg.innerHTML = '';
+    if (radarInsight) radarInsight.innerHTML = '';
+    const distTitle = document.getElementById('distSectionTitle');
+    if (distTitle) distTitle.textContent = '학생 주변 성적분포';
 }
 
 document.getElementById('studentId').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchSingleStudent(); });
