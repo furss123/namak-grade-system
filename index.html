@@ -378,6 +378,19 @@
         }
         .search-btn-range:hover { box-shadow: 0 6px 16px rgba(15, 118, 110, 0.28); }
 
+        .demo-banner {
+            margin-bottom: 20px; padding: 14px 18px; border-radius: var(--radius-lg);
+            background: linear-gradient(135deg, #eff6ff 0%, #ecfdf5 100%);
+            border: 1px solid #bfdbfe; color: var(--school-text);
+        }
+        .demo-banner strong { color: var(--school-navy); }
+        .demo-banner p { margin: 8px 0 0; font-size: 13px; color: var(--school-muted); line-height: 1.5; }
+        .demo-examples { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; color: var(--school-muted); }
+        .demo-chip {
+            display: inline-block; padding: 4px 10px; border-radius: 999px;
+            background: #fff; border: 1px solid var(--school-border); color: var(--school-text); font-weight: 600;
+        }
+
         .stats-dashboard { display: none; }
         .stats-dashboard .stats-table-wrap {
             overflow-x: auto; border-radius: var(--radius-lg);
@@ -733,6 +746,17 @@
     <div class="app-layout no-print">
     <main class="app-main">
     <div class="search-container">
+        <div id="demoBanner" class="demo-banner no-print">
+            <strong>가상 학교 점수</strong> — 접속 시 엑셀 성적(236명)이 적용되고, 학번 <strong>1011 ~ 1030</strong> 구간 보고서가 아래에 자동 표시됩니다.
+            <p>다른 엑셀을 올리면 데이터가 교체됩니다. 구간은 입력란에서 바꾼 뒤 「구간 조회」로 다시 볼 수 있습니다.</p>
+            <div class="demo-examples">
+                <span>기본 구간:</span>
+                <span class="demo-chip">1011 ~ 1030</span>
+                <span class="demo-chip">김서준 · 1011</span>
+                <span class="demo-chip">1030번</span>
+            </div>
+        </div>
+
         <section class="panel-section">
             <div class="section-label">성적 데이터 등록</div>
             <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="uploadExcel(this)" style="display:none;">
@@ -986,7 +1010,114 @@ function initAppFooter() {
 
 let studentData = [];
 let isFileUploaded = false;
+let isDemoData = false;
 const SESSION_STORAGE_KEY = 'gradeReport_session_v1';
+const BUNDLED_SCORES_URL = 'assets/virtual-school-scores.xlsx';
+const BUNDLED_SCORES_LABEL = '가상 학교 점수.xlsx';
+const DEFAULT_RANGE_START = '1011';
+const DEFAULT_RANGE_END = '1030';
+
+const DEMO_SUBJECTS = ['국어', '수학', '영어', '한국사', '통합사회', '통합과학'];
+const DEMO_LAST_NAMES = ['김', '이', '박', '최', '정', '강', '조', '윤', '장', '임'];
+const DEMO_FIRST_NAMES = ['민준', '서연', '도윤', '지우', '예준', '하은', '주원', '지민', '시우', '수아', '현우', '지아', '건우', '서윤', '우진', '채원', '선우', '유나', '연우', '다은'];
+
+function demoScoreFor(classNum, studentNum, subjectIndex) {
+    const seed = classNum * 1000 + studentNum * 17 + subjectIndex * 31;
+    const spread = (seed % 37) - 18;
+    const bases = [78, 74, 76, 72, 75, 73];
+    return Math.min(99, Math.max(42, Math.round((bases[subjectIndex] + spread + (classNum % 5)) * 100) / 100));
+}
+
+function generateDemoStudentData() {
+    const students = [];
+    let nameIdx = 0;
+    const gradeYear = 1;
+
+    for (let ban = 1; ban <= 10; ban++) {
+        for (let num = 1; num <= 25; num++) {
+            const studentId = String(gradeYear) + String(ban) + String(num).padStart(2, '0');
+            const row = {
+                '학번': studentId,
+                '이름': DEMO_LAST_NAMES[nameIdx % DEMO_LAST_NAMES.length] + DEMO_FIRST_NAMES[nameIdx % DEMO_FIRST_NAMES.length],
+                '학년': gradeYear,
+                '반': ban,
+                '번호': num
+            };
+            DEMO_SUBJECTS.forEach((subject, si) => {
+                row[subject] = demoScoreFor(ban, num, si);
+            });
+            students.push(row);
+            nameIdx++;
+        }
+    }
+    return students;
+}
+
+function loadDemoData() {
+    studentData = generateDemoStudentData();
+    subjectUnitMap = buildDefaultSubjectUnits(DEMO_SUBJECTS, true);
+    isFileUploaded = true;
+    isDemoData = true;
+    processAllGrades();
+    setUploadState('예시 데이터 적용됨', true, `가상 예시 (${studentData.length}명 · 1~10반)`);
+    displayGeneralStats();
+    clearPrintContainer();
+    hideReportActionSection();
+}
+
+function applyParsedStudentData(parsedData, fileName, options = {}) {
+    if (!parsedData.length || !parsedData[0]['학번']) return false;
+    studentData = parsedData;
+    isDemoData = !!options.isDemo;
+    if (!Object.keys(subjectUnitMap).length) {
+        subjectUnitMap = buildDefaultSubjectUnits(getSubjects(studentData[0]), true);
+    }
+    isFileUploaded = true;
+    processAllGrades();
+    setUploadState('데이터 분석 완료!', true, fileName);
+    displayGeneralStats();
+    if (options.saveSession) saveSessionData(fileName);
+    return true;
+}
+
+function loadGradesFromArrayBuffer(buffer, fileName, options = {}) {
+    if (typeof XLSX === 'undefined') return false;
+    try {
+        const data = new Uint8Array(buffer);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const parsedData = parseWorkbookToStudents(workbook);
+        return applyParsedStudentData(parsedData, fileName, options);
+    } catch (err) {
+        console.error(err);
+        return false;
+    }
+}
+
+async function loadBundledSchoolData() {
+    try {
+        const res = await fetch(BUNDLED_SCORES_URL);
+        if (!res.ok) throw new Error('bundled fetch ' + res.status);
+        const buffer = await res.arrayBuffer();
+        return loadGradesFromArrayBuffer(buffer, BUNDLED_SCORES_LABEL, { isDemo: true, saveSession: false });
+    } catch (err) {
+        console.warn('가상 학교 점수 파일 로드 실패:', err);
+        return false;
+    }
+}
+
+function runDefaultRangePreview() {
+    const startEl = document.getElementById('startStudentId');
+    const endEl = document.getElementById('endStudentId');
+    if (startEl) startEl.value = DEFAULT_RANGE_START;
+    if (endEl) endEl.value = DEFAULT_RANGE_END;
+    const ok = searchStudentRange(DEFAULT_RANGE_START, DEFAULT_RANGE_END, { silent: true });
+    if (ok) {
+        requestAnimationFrame(function() {
+            const container = document.getElementById('printContainer');
+            if (container) container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
+}
 
 // 전역 캐시: 계산 부하를 줄이고 무결성을 보장하기 위해 업로드 직후 모든 등급과 석차를 미리 계산해 저장합니다.
 let processedGradesCache = {};
@@ -1496,19 +1627,8 @@ function processExcelFile(file) {
             const workbook = XLSX.read(data, {type: 'array'});
             const parsedData = parseWorkbookToStudents(workbook);
 
-            if (parsedData.length > 0 && parsedData[0]['학번']) {
-                studentData = parsedData;
-                if (!Object.keys(subjectUnitMap).length) {
-                    subjectUnitMap = buildDefaultSubjectUnits(getSubjects(studentData[0]), true);
-                }
-                isFileUploaded = true;
-                
-                // 엔진 구동 (모든 등급/통계 계산)
-                processAllGrades();
-                
-                setUploadState("데이터 분석 완료!", true, file.name);
-                displayGeneralStats();
-                saveSessionData(file.name);
+            if (applyParsedStudentData(parsedData, file.name, { isDemo: false, saveSession: true })) {
+                runDefaultRangePreview();
             } else {
                 isFileUploaded = false;
                 studentData = [];
@@ -1542,8 +1662,12 @@ function setUploadState(statusText, isSuccess, fileName = "") {
     const fileStatus = document.getElementById('fileStatus');
     if (isSuccess) {
         uploadBox.classList.add('success');
-        uploadTitle.textContent = "성적 데이터 분석 완료! (고교학점제 규정 적용)";
-        fileStatus.textContent = `▶ ${fileName} 등록 성공 (${studentData.length}명)`;
+        uploadTitle.textContent = isDemoData
+            ? "예시 데이터 적용 중 (고교학점제 규정 시연)"
+            : "성적 데이터 분석 완료! (고교학점제 규정 적용)";
+        fileStatus.textContent = isDemoData
+            ? `▶ ${fileName} (${studentData.length}명) · 기본 구간 ${DEFAULT_RANGE_START}~${DEFAULT_RANGE_END} 미리보기`
+            : `▶ ${fileName} 등록 성공 (${studentData.length}명)`;
     } else {
         uploadBox.classList.remove('success');
         uploadTitle.innerHTML = getDefaultUploadTitleHtml();
@@ -1739,21 +1863,36 @@ function searchSingleStudent() {
     showReportActionSection();
 }
 
-function searchStudentRange() {
-    if (!isFileUploaded || studentData.length === 0) { alert("엑셀 성적 파일을 먼저 등록해주세요."); return; }
-    const startIdStr = document.getElementById('startStudentId').value.trim();
-    const endIdStr = document.getElementById('endStudentId').value.trim();
-    if (!startIdStr || !endIdStr) { alert("시작 학번과 끝 학번을 모두 입력해주세요."); return; }
+function searchStudentRange(startOverride, endOverride, options) {
+    const opts = options || {};
+    if (!isFileUploaded || studentData.length === 0) {
+        if (!opts.silent) alert("엑셀 성적 파일을 먼저 등록해주세요.");
+        return false;
+    }
+    const startEl = document.getElementById('startStudentId');
+    const endEl = document.getElementById('endStudentId');
+    const startIdStr = (startOverride != null ? String(startOverride) : (startEl ? startEl.value.trim() : ''));
+    const endIdStr = (endOverride != null ? String(endOverride) : (endEl ? endEl.value.trim() : ''));
+    if (!startIdStr || !endIdStr) {
+        if (!opts.silent) alert("시작 학번과 끝 학번을 모두 입력해주세요.");
+        return false;
+    }
     const startId = parseInt(startIdStr, 10);
     const endId = parseInt(endIdStr, 10);
-    if (isNaN(startId) || isNaN(endId) || startId > endId) { alert("올바른 학번 구간을 입력해주세요."); return; }
+    if (isNaN(startId) || isNaN(endId) || startId > endId) {
+        if (!opts.silent) alert("올바른 학번 구간을 입력해주세요.");
+        return false;
+    }
 
     const targetStudents = [];
     for (let id = startId; id <= endId; id++) {
         const student = studentData.find(s => parseInt(s['학번'], 10) === id);
         if (student) targetStudents.push(student);
     }
-    if (targetStudents.length === 0) { alert("해당 구간 내에 학생 데이터가 없습니다."); return; }
+    if (targetStudents.length === 0) {
+        if (!opts.silent) alert("해당 구간 내에 학생 데이터가 없습니다.");
+        return false;
+    }
     const printContainer = document.getElementById('printContainer');
     printContainer.innerHTML = '';
     targetStudents.forEach(student => {
@@ -1761,6 +1900,7 @@ function searchStudentRange() {
         printContainer.appendChild(cloneReport(true));
     });
     showReportActionSection();
+    return true;
 }
 
 function appendTh(targetId, text) {
@@ -1849,8 +1989,15 @@ document.getElementById('endStudentId').addEventListener('keydown', function(e) 
     if (link) link.addEventListener('click', downloadGradeTemplate);
 })();
 
-restoreSessionData();
-initAppFooter();
+(async function initAppOnLoad() {
+    restoreSessionData();
+    if (!isFileUploaded) {
+        const loaded = await loadBundledSchoolData();
+        if (!loaded) loadDemoData();
+    }
+    runDefaultRangePreview();
+    initAppFooter();
+})();
 </script>
 
 </body>
