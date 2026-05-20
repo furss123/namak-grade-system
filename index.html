@@ -378,19 +378,6 @@
         }
         .search-btn-range:hover { box-shadow: 0 6px 16px rgba(15, 118, 110, 0.28); }
 
-        .demo-banner {
-            margin-bottom: 20px; padding: 14px 18px; border-radius: var(--radius-lg);
-            background: linear-gradient(135deg, #eff6ff 0%, #ecfdf5 100%);
-            border: 1px solid #bfdbfe; color: var(--school-text);
-        }
-        .demo-banner strong { color: var(--school-navy); }
-        .demo-banner p { margin: 8px 0 0; font-size: 13px; color: var(--school-muted); line-height: 1.5; }
-        .demo-examples { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 12px; color: var(--school-muted); }
-        .demo-chip {
-            display: inline-block; padding: 4px 10px; border-radius: 999px;
-            background: #fff; border: 1px solid var(--school-border); color: var(--school-text); font-weight: 600;
-        }
-
         .stats-dashboard { display: none; }
         .stats-dashboard .stats-table-wrap {
             overflow-x: auto; border-radius: var(--radius-lg);
@@ -746,16 +733,6 @@
     <div class="app-layout no-print">
     <main class="app-main">
     <div class="search-container">
-        <div id="demoBanner" class="demo-banner no-print">
-            <strong>가상 학교 점수</strong> — 접속 시 엑셀 성적(236명)이 적용되고, 학번 <strong>1101</strong> 단일 조회 상세 보고서가 아래에 자동 표시됩니다.
-            <p>다른 엑셀을 올리면 데이터가 교체됩니다. 학번을 바꾼 뒤 「조회 및 분석」 또는 「구간 조회」로 볼 수 있습니다.</p>
-            <div class="demo-examples">
-                <span>기본 조회:</span>
-                <span class="demo-chip">1101 · 단일 상세</span>
-                <span class="demo-chip">1110 ~ 1130 · 구간</span>
-            </div>
-        </div>
-
         <section class="panel-section">
             <div class="section-label">성적 데이터 등록</div>
             <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="uploadExcel(this)" style="display:none;">
