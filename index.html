@@ -284,6 +284,7 @@
             box-shadow: var(--shadow-xs);
             color: var(--school-navy-dark);
             font-family: inherit;
+            text-align: left;
         }
         .template-icon-wrap {
             flex-shrink: 0;
@@ -312,18 +313,29 @@
             line-height: 1.35;
             text-align: left;
         }
+        .upload-guide-body {
+            width: 100%;
+            text-align: left;
+            align-self: stretch;
+        }
         .upload-guide-desc {
             margin: 0;
             font-size: 13px;
             color: var(--school-muted);
             line-height: 1.55;
+            text-align: left;
         }
         .upload-guide-list {
             margin: 0;
-            padding-left: 1.1em;
+            padding: 0 0 0 1.25em;
             font-size: 12px;
             color: var(--school-muted);
             line-height: 1.5;
+            text-align: left;
+            list-style-position: outside;
+        }
+        .upload-guide-list li {
+            text-align: left;
         }
         .upload-guide-list li + li { margin-top: 4px; }
         @media (max-width: 720px) {
@@ -763,14 +775,15 @@
                         </svg>
                     </div>
                     <div class="upload-guide-text">
-                        <span class="upload-side-step">나이스 업로드 안내</span>
                         <div class="upload-guide-title">나이스 엑셀 업로드</div>
-                        <p class="upload-guide-desc">나이스에서 각 반별 전과목 결과를 「보고서 형태 유지」 해제 후 받은 엑셀을 한번에 업로드 해도 됩니다.</p>
-                        <ul class="upload-guide-list">
-                            <li>저장 시 <strong>보고서 형태 유지</strong> 체크 해제</li>
-                            <li>반별 파일을 여러 개 선택해 한 번에 등록 가능</li>
-                            <li>학번·이름·원점수 열이 있으면 자동 인식</li>
-                        </ul>
+                        <div class="upload-guide-body">
+                            <p class="upload-guide-desc">나이스에서 각 반별 전과목 결과를 「보고서 형태 유지」 해제 후 받은 엑셀을 한번에 업로드 해도 됩니다.</p>
+                            <ul class="upload-guide-list">
+                                <li>저장 시 <strong>보고서 형태 유지</strong> 체크 해제</li>
+                                <li>반별 파일을 여러 개 선택해 한 번에 등록 가능</li>
+                                <li>학번·이름·원점수 열이 있으면 자동 인식</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
