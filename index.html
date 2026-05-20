@@ -189,21 +189,40 @@
             background: linear-gradient(180deg, var(--school-accent) 0%, var(--school-navy-light) 100%);
         }
 
+        .panel-section.panel-section-upload {
+            text-align: center;
+        }
+        .panel-section-upload .section-label {
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 18px;
+        }
         .upload-registration {
             max-width: min(100%, calc(900px - 7mm));
             margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
         .upload-row {
             display: flex; align-items: stretch; gap: 14px;
+            justify-content: center;
+            width: 100%;
         }
         .upload-box {
             flex: 1; min-width: 0;
-            display: flex; align-items: center; gap: 20px;
+            display: flex; align-items: center; justify-content: center;
+            gap: 20px;
             padding: calc(24px - 1.5mm) 26px; min-height: calc(132px - 3mm);
             background: linear-gradient(145deg, #f7fafd 0%, #eef4fa 100%);
             border: 2px dashed #a8bdd4; border-radius: var(--radius-lg); cursor: pointer;
             transition: border-color 0.25s var(--ease), background 0.25s var(--ease),
                 box-shadow 0.25s var(--ease), transform 0.2s var(--ease);
+        }
+        .upload-text-container {
+            flex: 1; min-width: 0; max-width: 36rem;
+            display: flex; flex-direction: column; align-items: center; gap: 8px;
+            text-align: center;
         }
         .upload-box:hover {
             border-color: var(--school-navy-light); background: #f0f6fc;
@@ -224,13 +243,13 @@
             display: flex; align-items: center; justify-content: center;
             background: #fff; border: 1px solid var(--school-border);
             box-shadow: var(--shadow-xs);
+            align-self: center;
         }
         .upload-box.success .upload-icon-wrap {
             border-color: var(--school-success); background: #fff;
         }
         .upload-icon { width: 40px; height: 40px; color: var(--school-navy); }
         .upload-box.success .upload-icon { color: var(--school-success); }
-        .upload-text-container { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 8px; }
         .upload-step {
             font-size: calc(11px + 4pt); font-weight: 800; color: var(--school-navy);
             letter-spacing: 0.04em;
@@ -255,15 +274,18 @@
         .upload-template-side {
             flex: 0 0 228px; max-width: 240px;
             display: flex; flex-direction: column; justify-content: center;
+            align-items: center;
             gap: 8px; padding: calc(16px - 1.5mm) 14px;
             background: linear-gradient(160deg, #f9fbfd 0%, #f0f5fb 100%);
             border: 1px solid var(--school-border-light);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-xs);
+            text-align: center;
         }
         .upload-side-step {
             font-size: calc(10px + 4pt); font-weight: 800; color: var(--school-navy);
             letter-spacing: 0.04em;
+            width: 100%;
         }
         .upload-side-step::before {
             content: '② '; color: var(--school-accent);
@@ -296,12 +318,13 @@
         }
         @media (max-width: 720px) {
             .upload-registration { max-width: 100%; }
-            .upload-row { flex-direction: column; }
+            .upload-row { flex-direction: column; align-items: center; }
+            .upload-box { width: 100%; max-width: 28rem; }
             .upload-template-side {
-                flex: none; max-width: none; width: 100%;
-                flex-direction: row; flex-wrap: wrap; align-items: center;
+                flex: none; max-width: min(100%, 28rem); width: 100%;
+                flex-direction: column; flex-wrap: nowrap; align-items: center;
             }
-            .template-download-link { width: auto; flex: 1; min-width: 200px; }
+            .template-download-link { width: 100%; max-width: 20rem; flex: none; min-width: 0; }
         }
 
         .query-card {
