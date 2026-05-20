@@ -890,39 +890,86 @@ let isFileUploaded = false;
 const SESSION_STORAGE_KEY = 'gradeReport_session_v1';
 
 // 전역 캐시: 계산 부하를 줄이고 무결성을 보장하기 위해 업로드 직후 모든 등급과 석차를 미리 계산해 저장합니다.
-let processedGradesCache = {}; 
+let processedGradesCache = {};
 let subjectStatsCache = {};
+let subjectUnitMap = {};
 
 const GRADE_TEMPLATE_FILENAME = '남악고_1학년_성적입력양식.xlsx';
 
-const unitWeights = { 
-    '국어': 4, '공통국어 1': 4, 
-    '수학': 4, '공통수학 1': 4, 
-    '영어': 4, '공통영어 1': 4, 
+/** 교과별 기본 단위수 (양식·파일에 단위수 행이 없을 때) */
+const DEFAULT_UNIT_WEIGHTS = {
+    '국어': 4, '공통국어 1': 4,
+    '수학': 4, '공통수학 1': 4,
+    '영어': 4, '공통영어 1': 4,
     '한국사 1': 3, '한국사': 3,
     '통합사회 1': 3, '통합사회': 3,
-    '통합과학 1': 3, '통합과학': 3 
+    '통합과학 1': 3, '통합과학': 3
 };
 
 const GRADE_TEMPLATE_HEADERS = ['반', '번호', '이름', '국어', '수학', '영어', '한국사', '통합사회', '통합과학'];
+const GRADE_TEMPLATE_META_COLS = ['반', '번호', '이름'];
 
-/** 다운로드 양식: 반·번호·이름·교과 (학번 열 없음) */
-function getGradeTemplateRows() {
-    const rows = [];
-    for (let num = 1; num <= 5; num++) {
-        rows.push({
-            '반': 1,
-            '번호': num,
-            '이름': '',
-            '국어': '',
-            '수학': '',
-            '영어': '',
-            '한국사': '',
-            '통합사회': '',
-            '통합과학': ''
-        });
+const UNIT_ROW_LABEL = /^(단위\s*수|단위수|unit(s)?|credits?)$/i;
+const UNIT_FALLBACK = 1;
+
+function getSubjectUnit(subject) {
+    if (subjectUnitMap[subject] != null && !Number.isNaN(subjectUnitMap[subject])) {
+        return subjectUnitMap[subject];
     }
-    return rows;
+    return DEFAULT_UNIT_WEIGHTS[subject] ?? UNIT_FALLBACK;
+}
+
+function buildDefaultSubjectUnits(subjects, useSchoolDefaults) {
+    const map = {};
+    subjects.forEach((s) => {
+        map[s] = useSchoolDefaults ? (DEFAULT_UNIT_WEIGHTS[s] ?? UNIT_FALLBACK) : UNIT_FALLBACK;
+    });
+    return map;
+}
+
+/** 헤더 "국어(4)", "수학 [3]" → 과목명 + 단위수 */
+function splitHeaderSubjectUnit(header) {
+    const h = normalizeHeaderKey(header);
+    if (!h) return { subject: '', unit: null };
+    const m = h.match(/^(.+?)\s*[\[(（]\s*(\d+(?:\.\d+)?)\s*[\])）]\s*$/);
+    if (m) return { subject: m[1].trim(), unit: Number(m[2]) };
+    return { subject: h, unit: null };
+}
+
+function buildCanonicalHeaders(rawHeaders) {
+    const headers = [];
+    const headerUnits = {};
+    rawHeaders.forEach((raw) => {
+        const key = normalizeHeaderKey(raw);
+        if (!key) {
+            headers.push('');
+            return;
+        }
+        const split = splitHeaderSubjectUnit(raw);
+        const subject = split.subject || key;
+        headers.push(subject);
+        if (split.unit != null && !Number.isNaN(split.unit) && split.unit > 0) {
+            headerUnits[subject] = split.unit;
+        }
+    });
+    return { headers, headerUnits };
+}
+
+function getGradeTemplateUnitRow() {
+    const row = ['단위수', '', ''];
+    GRADE_TEMPLATE_HEADERS.slice(GRADE_TEMPLATE_META_COLS.length).forEach((subject) => {
+        row.push(DEFAULT_UNIT_WEIGHTS[subject] ?? UNIT_FALLBACK);
+    });
+    return row;
+}
+
+/** 다운로드 양식: 헤더 + 단위수 행 + 예시 학생 행 */
+function buildGradeTemplateAoa() {
+    const aoa = [GRADE_TEMPLATE_HEADERS.slice(), getGradeTemplateUnitRow()];
+    for (let num = 1; num <= 5; num++) {
+        aoa.push([1, num, '', '', '', '', '', '', '']);
+    }
+    return aoa;
 }
 
 function downloadGradeTemplate(event) {
@@ -934,22 +981,30 @@ function downloadGradeTemplate(event) {
         alert('양식 생성 라이브러리를 불러오지 못했습니다. 페이지를 새로고침해 주세요.');
         return;
     }
-    const ws = XLSX.utils.json_to_sheet(getGradeTemplateRows(), { header: GRADE_TEMPLATE_HEADERS });
+    const ws = XLSX.utils.aoa_to_sheet(buildGradeTemplateAoa());
     ws['!cols'] = [
-        { wch: 5 }, { wch: 6 }, { wch: 12 },
+        { wch: 7 }, { wch: 6 }, { wch: 12 },
         { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, { wch: 10 }
     ];
     const guide = XLSX.utils.aoa_to_sheet([
         ['남악고등학교 1학년 성적 입력 양식 — 작성 안내'],
         [],
-        ['① 「Sheet1」 시트에 반·번호·이름과 교과별 원점수를 입력합니다.'],
-        ['② 필수 열: 반, 번호, 이름 (학번 열은 넣지 않습니다)'],
-        ['③ 교과 열: 국어, 수학, 영어, 한국사, 통합사회, 통합과학'],
-        ['④ .xlsx로 저장 후 「성적 데이터 등록」에서 업로드합니다.']
+        ['① 「Sheet1」 1행: 열 제목, 2행: 교과별 단위수, 3행부터 학생 성적을 입력합니다.'],
+        ['② 필수 열: 반, 번호, 이름 (학번 열이 있는 파일도 업로드 가능)'],
+        ['③ 2행 「단위수」: 각 교과 열에 단위수 입력 (또는 「단위수」 시트, 또는 열이름 국어(4) 형식)'],
+        ['④ 다른 학교: 교과 열·단위수만 맞추면 자동 인식 (학번 열 양식도 가능)'],
+        ['⑤ .xlsx로 저장 후 「성적 데이터 등록」에서 업로드합니다.']
     ]);
     guide['!cols'] = [{ wch: 58 }];
+    const unitSheet = XLSX.utils.aoa_to_sheet([
+        ['교과', '단위수'],
+        ['국어', 4], ['수학', 4], ['영어', 4],
+        ['한국사', 3], ['통합사회', 3], ['통합과학', 3]
+    ]);
+    unitSheet['!cols'] = [{ wch: 14 }, { wch: 8 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    XLSX.utils.book_append_sheet(wb, unitSheet, '단위수');
     XLSX.utils.book_append_sheet(wb, guide, '작성안내');
     XLSX.writeFile(wb, GRADE_TEMPLATE_FILENAME);
 }
@@ -986,7 +1041,7 @@ function displayGeneralStats() {
         document.getElementById('statsTableHead').appendChild(th);
 
         const stats = subjectStatsCache[subject];
-        const unit = unitWeights[subject] || 3;
+        const unit = getSubjectUnit(subject);
 
         appendStatsTd('statsRowUnit', unit);
         appendStatsTd('statsRowAvg', stats.avg, 'stats-val-avg');
@@ -1012,6 +1067,7 @@ function saveSessionData(fileName) {
     try {
         sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
             studentData,
+            subjectUnitMap,
             fileName: fileName || '',
             savedAt: Date.now()
         }));
@@ -1034,6 +1090,9 @@ function restoreSessionData() {
             return;
         }
         studentData = saved.studentData;
+        subjectUnitMap = saved.subjectUnitMap && typeof saved.subjectUnitMap === 'object'
+            ? saved.subjectUnitMap
+            : buildDefaultSubjectUnits(getSubjects(studentData[0]));
         isFileUploaded = true;
         processAllGrades();
         setUploadState('데이터 분석 완료!', true, saved.fileName || '저장된 성적 파일');
@@ -1044,7 +1103,7 @@ function restoreSessionData() {
     }
 }
 
-const UPLOAD_META_KEYS = new Set(['학번', '이름', '학년', '반', '번호']);
+const UPLOAD_META_KEYS = new Set(['학번', '이름', '학년', '반', '번호', '단위수']);
 
 function trimCell(value) {
     if (value === null || value === undefined) return '';
@@ -1099,6 +1158,7 @@ function buildStudentFromCells(cells, defaultGrade) {
 function findGradeHeaderRowIndex(aoa) {
     for (let i = 0; i < Math.min(15, aoa.length); i++) {
         const labels = (aoa[i] || []).map((c) => normalizeHeaderKey(c));
+        if (labels.includes('단위수') && !labels.includes('이름')) continue;
         if (labels.includes('이름') && (labels.includes('학번') || (labels.includes('반') && labels.includes('번호')))) {
             return i;
         }
@@ -1106,46 +1166,193 @@ function findGradeHeaderRowIndex(aoa) {
     return -1;
 }
 
-/** grade-upload-template.xlsx, 1학년 성적파일 등 (반·번호·이름·교과) */
+function hasStudentIdentity(cells) {
+    if (hasCellValue(cells['학번'])) return true;
+    if (hasCellValue(cells['이름'])) return true;
+    if (hasCellValue(cells['반']) && hasCellValue(cells['번호'])) return true;
+    return false;
+}
+
+function isUnitLabelText(value) {
+    const t = trimCell(value);
+    return t !== '' && UNIT_ROW_LABEL.test(t);
+}
+
+function isUnitDefinitionRow(cells, subjectHeaders) {
+    const markers = [cells['반'], cells['번호'], cells['이름'], cells['학번']];
+    if (markers.some((m) => isUnitLabelText(m))) return true;
+    if (!hasStudentIdentity(cells) && subjectHeaders && subjectHeaders.length > 0) {
+        return looksLikeUnitValuesRow(cells, subjectHeaders);
+    }
+    return false;
+}
+
+function looksLikeUnitValuesRow(cells, subjectHeaders) {
+    let filled = 0;
+    let unitLike = 0;
+    subjectHeaders.forEach((subject) => {
+        const raw = trimCell(cells[subject]);
+        if (raw === '') return;
+        filled++;
+        const n = Number(raw);
+        if (!Number.isNaN(n) && n >= 1 && n <= 15 && Math.abs(n - Math.round(n)) < 1e-6) unitLike++;
+    });
+    return filled > 0 && filled === unitLike && filled >= Math.min(2, subjectHeaders.length);
+}
+
+function extractSubjectUnitsFromCells(cells, subjectHeaders) {
+    const units = {};
+    const keys = subjectHeaders && subjectHeaders.length
+        ? subjectHeaders
+        : Object.keys(cells).filter((k) => k && !UPLOAD_META_KEYS.has(k));
+    keys.forEach((key) => {
+        const raw = trimCell(cells[key]);
+        if (raw === '') return;
+        const n = Number(raw);
+        if (!Number.isNaN(n) && n > 0 && n <= 20) units[key] = n;
+    });
+    return units;
+}
+
+function finalizeSubjectUnitMap(students, parsedUnits, unitsExplicit) {
+    if (!students.length) return {};
+    const subjects = getSubjects(students[0]);
+    const map = { ...parsedUnits };
+    subjects.forEach((s) => {
+        if (map[s] == null || Number.isNaN(map[s])) {
+            map[s] = unitsExplicit ? UNIT_FALLBACK : (DEFAULT_UNIT_WEIGHTS[s] ?? UNIT_FALLBACK);
+        }
+    });
+    return map;
+}
+
+function isUnitSheetName(name) {
+    const n = trimCell(name);
+    if (/작성|안내|guide/i.test(n)) return false;
+    return /단위|unit/i.test(n);
+}
+
+/** 「단위수」 시트: 교과·단위수 2열 표 */
+function parseUnitDefinitionSheet(worksheet) {
+    const aoa = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+    const units = {};
+    for (let r = 0; r < aoa.length; r++) {
+        const row = aoa[r] || [];
+        const c0 = normalizeHeaderKey(row[0]);
+        const c1 = trimCell(row[1]);
+        if (!c0 || /^(교과|과목|subject|단위)/i.test(c0)) continue;
+        const n = Number(c1);
+        if (!Number.isNaN(n) && n > 0 && n <= 20) units[c0] = n;
+    }
+    return units;
+}
+
+function extractUnitsFromWorkbook(workbook) {
+    let units = {};
+    workbook.SheetNames.forEach((name) => {
+        if (!isUnitSheetName(name)) return;
+        units = { ...units, ...parseUnitDefinitionSheet(workbook.Sheets[name]) };
+    });
+    return units;
+}
+
+function rowToCellsWithCanonical(row, canonicalHeaders) {
+    const cells = {};
+    canonicalHeaders.forEach((canon, ci) => {
+        if (!canon) return;
+        cells[canon] = (row || [])[ci];
+    });
+    return cells;
+}
+
+function parseHeaderRow(rawHeaderRow) {
+    const rawHeaders = (rawHeaderRow || []).map((c) => normalizeHeaderKey(c));
+    const { headers, headerUnits } = buildCanonicalHeaders(rawHeaders);
+    const metaHeaders = headers.filter((h) => UPLOAD_META_KEYS.has(h));
+    const subjectHeaders = headers.filter((h) => h && !UPLOAD_META_KEYS.has(h));
+    return { rawHeaders, headers, metaHeaders, subjectHeaders, headerUnits };
+}
+
+/** grade-upload-template.xlsx, 1학년 성적파일 등 (반·번호·이름·교과 + 단위수 행) */
 function parseGradeRowsFromSheet(worksheet) {
     const aoa = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-    if (!aoa.length) return [];
+    if (!aoa.length) return { students: [], subjectUnitMap: {}, unitsExplicit: false };
 
     const defaultGrade = 1;
     const headerIdx = findGradeHeaderRowIndex(aoa);
     const students = [];
+    let parsedUnits = {};
+    let unitsExplicit = false;
 
     if (headerIdx >= 0) {
-        const headers = (aoa[headerIdx] || []).map((c) => normalizeHeaderKey(c));
-        for (let r = headerIdx + 1; r < aoa.length; r++) {
-            const row = aoa[r] || [];
-            const cells = {};
-            headers.forEach((h, ci) => {
-                if (h) cells[h] = row[ci];
-            });
+        const headerInfo = parseHeaderRow(aoa[headerIdx]);
+        const { rawHeaders, headers, subjectHeaders, headerUnits } = headerInfo;
+        parsedUnits = { ...headerUnits };
+        if (Object.keys(headerUnits).length) unitsExplicit = true;
+
+        let dataStart = headerIdx + 1;
+        if (dataStart < aoa.length) {
+            const maybeUnit = rowToCellsWithCanonical(aoa[dataStart], headers);
+            if (isUnitDefinitionRow(maybeUnit, subjectHeaders)) {
+                parsedUnits = { ...parsedUnits, ...extractSubjectUnitsFromCells(maybeUnit, subjectHeaders) };
+                unitsExplicit = true;
+                dataStart++;
+            }
+        }
+        for (let r = dataStart; r < aoa.length; r++) {
+            const cells = rowToCellsWithCanonical(aoa[r], headers);
+            if (isUnitDefinitionRow(cells, subjectHeaders)) {
+                parsedUnits = { ...parsedUnits, ...extractSubjectUnitsFromCells(cells, subjectHeaders) };
+                unitsExplicit = true;
+                continue;
+            }
             const student = buildStudentFromCells(cells, defaultGrade);
             if (student) students.push(student);
         }
-        return students;
+        return {
+            students,
+            subjectUnitMap: finalizeSubjectUnitMap(students, parsedUnits, unitsExplicit),
+            unitsExplicit
+        };
     }
 
     const rawRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
     for (const row of rawRows) {
         const cells = {};
+        const rowUnits = {};
         Object.keys(row).forEach((key) => {
-            cells[normalizeHeaderKey(key)] = row[key];
+            const split = splitHeaderSubjectUnit(key);
+            const canon = split.subject || normalizeHeaderKey(key);
+            if (split.unit != null) rowUnits[canon] = split.unit;
+            cells[canon] = row[key];
         });
+        if (Object.keys(rowUnits).length) {
+            parsedUnits = { ...parsedUnits, ...rowUnits };
+            unitsExplicit = true;
+        }
+        if (isUnitDefinitionRow(cells, Object.keys(cells).filter((k) => !UPLOAD_META_KEYS.has(k)))) {
+            parsedUnits = { ...parsedUnits, ...extractSubjectUnitsFromCells(cells) };
+            unitsExplicit = true;
+            continue;
+        }
         const student = buildStudentFromCells(cells, defaultGrade);
         if (student) students.push(student);
     }
-    return students;
+    return {
+        students,
+        subjectUnitMap: finalizeSubjectUnitMap(students, parsedUnits, unitsExplicit),
+        unitsExplicit
+    };
 }
 
 function parseWorkbookToStudents(workbook) {
+    const workbookUnits = extractUnitsFromWorkbook(workbook);
+    const unitsFromWorkbook = Object.keys(workbookUnits).length > 0;
     const tried = new Set();
     const rankedNames = [];
 
     workbook.SheetNames.forEach((name) => {
+        if (isUnitSheetName(name)) return;
         let rank = 10;
         if (name === '성적데이터') rank = 0;
         else if (name.includes('성적')) rank = 1;
@@ -1159,9 +1366,15 @@ function parseWorkbookToStudents(workbook) {
     for (const { name, rank } of rankedNames) {
         if (rank >= 99 || tried.has(name)) continue;
         tried.add(name);
-        const students = parseGradeRowsFromSheet(workbook.Sheets[name]);
-        if (students.length > 0) return students;
+        const parsed = parseGradeRowsFromSheet(workbook.Sheets[name]);
+        if (parsed.students.length > 0) {
+            const mergedUnits = { ...workbookUnits, ...parsed.subjectUnitMap };
+            const explicit = unitsFromWorkbook || parsed.unitsExplicit;
+            subjectUnitMap = finalizeSubjectUnitMap(parsed.students, mergedUnits, explicit);
+            return parsed.students;
+        }
     }
+    subjectUnitMap = {};
     return [];
 }
 
@@ -1191,7 +1404,10 @@ function processExcelFile(file) {
 
             if (parsedData.length > 0 && parsedData[0]['학번']) {
                 studentData = parsedData;
-                isFileUploaded = true; 
+                if (!Object.keys(subjectUnitMap).length) {
+                    subjectUnitMap = buildDefaultSubjectUnits(getSubjects(studentData[0]), true);
+                }
+                isFileUploaded = true;
                 
                 // 엔진 구동 (모든 등급/통계 계산)
                 processAllGrades();
@@ -1309,7 +1525,7 @@ function populateTemplate(studentIdStr) {
         // 캐시된 엔진 처리 데이터 가져오기
         const pData = processedGradesCache[studentIdStr][subject];
         const stats = subjectStatsCache[subject];
-        const unit = unitWeights[subject] || 3;
+        const unit = getSubjectUnit(subject);
         
         totalWeight += unit; 
         weightedGradeSum += (pData.grade * unit);

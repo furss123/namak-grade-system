@@ -9,7 +9,7 @@
         root.GradeEngine = factory();
     }
 })(typeof self !== 'undefined' ? self : this, function () {
-    const META_KEYS = ['학번', '이름', '학년', '반', '번호'];
+    const META_KEYS = ['학번', '이름', '학년', '반', '번호', '단위수'];
 
     const SUBJECT_ORDER = [
         '국어', '공통국어 1',
