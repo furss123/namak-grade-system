@@ -43,19 +43,25 @@
             color: #fff; padding: 0; box-shadow: var(--shadow-md);
         }
         .site-header-inner {
-            max-width: 980px; margin: 0 auto; padding: 22px 28px 24px;
-            display: flex; align-items: center; gap: 18px;
+            max-width: 980px; margin: 0 auto; padding: 20px 28px;
+            display: flex; align-items: center; gap: 20px;
         }
         .school-logo {
             width: 88px; height: 88px; border-radius: 50%;
             object-fit: contain; background: #fff; flex-shrink: 0;
             box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
         }
+        .site-header-text {
+            display: flex; flex-direction: column; justify-content: center;
+            min-height: 88px; flex: 1; min-width: 0;
+        }
         .site-header-text h1 {
-            margin: 0; font-size: 1.35rem; font-weight: 800; letter-spacing: -0.02em; line-height: 1.3;
+            margin: 0; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.02em;
+            line-height: 1.25;
         }
         .site-header-text p {
-            margin: 4px 0 0; font-size: 0.8rem; opacity: 0.88; font-weight: 500;
+            margin: 6px 0 0; font-size: 0.9rem; opacity: 0.9; font-weight: 500;
+            line-height: 1.35;
         }
         .header-badge {
             margin-left: auto; padding: 6px 14px; border-radius: 999px;
@@ -309,16 +315,19 @@
 
         @media print {
             html, body { background: white; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .site-header, .search-container, .report-action-section, .no-print { display: none !important; }
-            .report-wrapper { display: block !important; margin: 0; }
+            .site-header, .search-container, .report-action-section, .app-footer, .no-print,
+            #reportTemplate { display: none !important; }
             #printContainer { margin: 0; max-width: none; }
-            .page {
+            #printContainer .report-wrapper {
+                display: block !important; margin: 0; page-break-after: auto;
+            }
+            #printContainer .page {
                 border: none; box-shadow: none; margin: 0;
                 width: 210mm; height: 296mm; page-break-after: always; page-break-inside: avoid;
             }
-            .page.page-1 { padding: 30mm 12mm 8mm 12mm; }
-            .page.page-2 { padding: 30mm 15mm 15mm 15mm; }
-            .page:last-child { page-break-after: avoid !important; }
+            #printContainer .page.page-1 { padding: 30mm 12mm 8mm 12mm; }
+            #printContainer .page.page-2 { padding: 30mm 15mm 15mm 15mm; }
+            #printContainer .page:last-child { page-break-after: avoid !important; }
         }
     </style>
 </head>
@@ -329,7 +338,7 @@
             <img src="assets/namak-logo.png" alt="남악고등학교" class="school-logo" width="88" height="88">
             <div class="site-header-text">
                 <h1>남악고등학교 1학년 성적 조회 시스템</h1>
-                <p>2026학년도 1학기 중간고사 · 고교학점제 5등급 반영</p>
+                <p>2026학년도 1학기 정기고사 · 고교학점제 5등급 반영</p>
             </div>
             <span class="header-badge">성적 분석 · 인쇄</span>
         </div>
