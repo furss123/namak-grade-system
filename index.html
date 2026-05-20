@@ -435,11 +435,11 @@
         .stats-table thead th {
             background: var(--school-navy-dark);
             color: #fff; font-weight: 600;
-            padding: 15px 12px;
+            padding: calc(15px - 1mm) 12px;
             text-align: center;
             border-color: #1a3352;
             letter-spacing: -0.01em;
-            line-height: 1.35;
+            line-height: 1.25;
         }
         .stats-table thead th.stats-head-corner {
             width: 16%;
@@ -450,14 +450,16 @@
             width: 16%; min-width: 9.5em;
             background: #f4f7fa;
             color: var(--school-navy-dark); font-weight: 600;
-            text-align: center; padding: 14px 10px;
+            text-align: center; padding: calc(14px - 1mm) 10px;
             border-right: 1px solid #dce4ee;
             white-space: nowrap;
+            line-height: 1.25;
         }
         .stats-table tbody td.stats-val {
-            padding: 14px 12px; text-align: center;
+            padding: calc(14px - 1mm) 12px; text-align: center;
             font-weight: 500; color: var(--school-text);
             background: #fff;
+            line-height: 1.25;
         }
         .stats-table tbody tr:hover td { background: #f9fbfd; }
         .stats-table tbody tr.stats-row-divider td {
@@ -920,10 +922,10 @@
                     <tr id="statsRowAvg" class="stats-row-divider"><td class="stats-row-label">평균 점수</td></tr>
                     <tr id="statsRowMax"><td class="stats-row-label">최상위 점수</td></tr>
                     <tr id="statsRowMin"><td class="stats-row-label">최하위 점수</td></tr>
-                    <tr id="statsRowCut1" class="stats-row-divider"><td class="stats-row-label">1컷 최저 (10%)</td></tr>
-                    <tr id="statsRowCut2"><td class="stats-row-label">2컷 최저 (34%)</td></tr>
-                    <tr id="statsRowCut3"><td class="stats-row-label">3컷 최저 (66%)</td></tr>
-                    <tr id="statsRowCut4"><td class="stats-row-label">4컷 최저 (90%)</td></tr>
+                    <tr id="statsRowCut1" class="stats-row-divider"><td class="stats-row-label">1컷 최저</td></tr>
+                    <tr id="statsRowCut2"><td class="stats-row-label">2컷 최저</td></tr>
+                    <tr id="statsRowCut3"><td class="stats-row-label">3컷 최저</td></tr>
+                    <tr id="statsRowCut4"><td class="stats-row-label">4컷 최저</td></tr>
                 </tbody>
             </table>
             </div>
@@ -1231,6 +1233,13 @@ function scrollToPageBottom() {
     window.scrollTo({ top: height, left: 0, behavior: 'smooth' });
 }
 
+function scrollToReportStart() {
+    requestAnimationFrame(function() {
+        const container = document.getElementById('printContainer');
+        if (container) container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+}
+
 function initPageScrollNav() {
     const topBtn = document.getElementById('scrollToTopBtn');
     const bottomBtn = document.getElementById('scrollToBottomBtn');
@@ -1242,12 +1251,7 @@ function runDefaultSinglePreview(options) {
     const opts = options || {};
     applyDefaultSingleStudentId();
     const ok = searchSingleStudent(DEFAULT_SINGLE_STUDENT_ID, { silent: true });
-    if (ok && opts.scroll) {
-        requestAnimationFrame(function() {
-            const container = document.getElementById('printContainer');
-            if (container) container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-    }
+    if (ok && opts.scroll) scrollToReportStart();
     return ok;
 }
 
@@ -1394,10 +1398,10 @@ function displayGeneralStats() {
     document.getElementById('statsRowAvg').innerHTML = '<td class="stats-row-label">평균 점수</td>';
     document.getElementById('statsRowMax').innerHTML = '<td class="stats-row-label">최상위 점수</td>';
     document.getElementById('statsRowMin').innerHTML = '<td class="stats-row-label">최하위 점수</td>';
-    document.getElementById('statsRowCut1').innerHTML = '<td class="stats-row-label">1컷 최저 (10%)</td>';
-    document.getElementById('statsRowCut2').innerHTML = '<td class="stats-row-label">2컷 최저 (34%)</td>';
-    document.getElementById('statsRowCut3').innerHTML = '<td class="stats-row-label">3컷 최저 (66%)</td>';
-    document.getElementById('statsRowCut4').innerHTML = '<td class="stats-row-label">4컷 최저 (90%)</td>';
+    document.getElementById('statsRowCut1').innerHTML = '<td class="stats-row-label">1컷 최저</td>';
+    document.getElementById('statsRowCut2').innerHTML = '<td class="stats-row-label">2컷 최저</td>';
+    document.getElementById('statsRowCut3').innerHTML = '<td class="stats-row-label">3컷 최저</td>';
+    document.getElementById('statsRowCut4').innerHTML = '<td class="stats-row-label">4컷 최저</td>';
 
     subjects.forEach(subject => {
         const th = document.createElement('th');
@@ -2161,6 +2165,7 @@ function searchSingleStudent(studentIdOverride, options) {
     printContainer.innerHTML = '';
     printContainer.appendChild(cloneReport(false));
     showReportActionSection();
+    if (!opts.silent) scrollToReportStart();
     return true;
 }
 
@@ -2201,6 +2206,7 @@ function searchStudentRange(startOverride, endOverride, options) {
         printContainer.appendChild(cloneReport(true));
     });
     showReportActionSection();
+    if (!opts.silent) scrollToReportStart();
     return true;
 }
 
