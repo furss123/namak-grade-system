@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>등급 엔진 검증 (2022 개정 5등급제)</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+    <script src="grade-engine.js"></script>
+    <style>
+        body { font-family: 'Malgun Gothic', sans-serif; max-width: 960px; margin: 24px auto; padding: 0 16px; background: #f8fafc; color: #1e293b; }
+        h1 { font-size: 22px; color: #2563eb; }
+        .card { background: #fff; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+        button { padding: 10px 20px; border: none; border-radius: 8px; background: #2563eb; color: #fff; font-weight: bold; cursor: pointer; margin-right: 8px; }
+        button.secondary { background: #64748b; }
+        .pass { color: #059669; font-weight: bold; }
+        .fail { color: #dc2626; font-weight: bold; }
+        pre { background: #f1f5f9; padding: 12px; border-radius: 8px; overflow-x: auto; font-size: 12px; }
+        .case-block { margin-top: 16px; padding-top: 16px; border-top: 1px solid #e2e8f0; }
+        label { font-size: 13px; color: #64748b; }
+    </style>
+</head>
+<body>
+    <h1>등급 산출 규칙 검증</h1>
+    <p>fixture 엑셀을 엔진으로 계산한 뒤 <code>expected/*.json</code> 정답지와 비교합니다.</p>
+
+    <div class="card">
+        <button type="button" id="runAllBtn">전체 케이스 검증</button>
+        <button type="button" class="secondary" id="runIndexBtn">index.html 연동 안내</button>
+        <p id="summary" style="margin-top:16px;"></p>
+        <div id="results"></div>
+    </div>
+
+    <div class="card">
+        <h2 style="margin-top:0;font-size:16px;">단일 fixture 검증</h2>
+        <label>fixture (.xlsx) + expected (.json) 선택</label><br><br>
+        <input type="file" id="fixtureFile" accept=".json,.fixture.json"> fixture (.fixture.json)<br><br>
+        <input type="file" id="expectedFile" accept=".json"> expected<br><br>
+        <button type="button" id="runSingleBtn">검증 실행</button>
+        <div id="singleResult"></div>
+    </div>
+
+    <script>
+        const CASE_IDS = [
+            'case01_basic_10',
+            'case02_tie_boundary_20',
+            'case03_rounding_23',
+            'case04_score_rounding',
+            'case05_tie_within_grade',
+            'case06_intermediate_step34'
+        ];
+
+        function loadFixtureArray(buffer) {
+            const wb = XLSX.read(buffer, { type: 'array' });
+            const ws = wb.Sheets[wb.SheetNames[0]];
+            return XLSX.utils.sheet_to_json(ws);
+        }
+
+        function compareCase(students, expected) {
+            const subject = expected.subject || '국어';
+            const { processedGradesCache, cutLimits } = GradeEngine.processAllGrades(students);
+            const errors = [];
+
+            for (const key of ['N', 'cut1', 'cut2', 'cut3', 'cut4']) {
+                if (cutLimits[key] !== expected.cutLimits[key]) {
+                    errors.push(`cutLimits.${key}: 기대 ${expected.cutLimits[key]}, 실제 ${cutLimits[key]}`);
+                }
+            }
+
+            for (const [id, exp] of Object.entries(expected.students)) {
+                const act = processedGradesCache[id]?.[subject];
+                if (!act) { errors.push(`학번 ${id}: 결과 없음`); continue; }
+                ['score','rankStr','rank','tieCount','interRank','grade','step'].forEach(f => {
+                    if (act[f] !== exp[f]) errors.push(`${id} ${f}: 기대 ${exp[f]}, 실제 ${act[f]}`);
+                });
+            }
+            return { ok: errors.length === 0, errors, expected };
+        }
+
+        function renderCaseResult(caseId, title, ok, errors, expected) {
+            let html = `<div class="case-block"><h3>${caseId} — ${title} <span class="${ok ? 'pass' : 'fail'}">${ok ? 'PASS' : 'FAIL'}</span></h3>`;
+            if (expected?.cutLimits) {
+                html += `<p>N=${expected.cutLimits.N}, cut: ${expected.cutLimits.cut1}/${expected.cutLimits.cut2}/${expected.cutLimits.cut3}/${expected.cutLimits.cut4}</p>`;
+            }
+            if (!ok) html += `<pre>${errors.join('\n')}</pre>`;
+            html += '</div>';
+            return html;
+        }
+
+        async function runAll() {
+            const resultsEl = document.getElementById('results');
+            const summaryEl = document.getElementById('summary');
+            resultsEl.innerHTML = '<p>검증 중…</p>';
+            let passed = 0, failed = 0;
+            let html = '';
+
+            for (const id of CASE_IDS) {
+                try {
+                    const [fixRes, expRes] = await Promise.all([
+                        fetch(`fixtures/${id}.fixture.json`),
+                        fetch(`expected/${id}.json`)
+                    ]);
+                    if (!fixRes.ok || !expRes.ok) throw new Error('파일 로드 실패');
+                    const fixture = await fixRes.json();
+                    const students = fixture.students;
+                    const expected = await expRes.json();
+                    const { ok, errors } = compareCase(students, expected);
+                    if (ok) passed++; else failed++;
+                    html += renderCaseResult(id, expected.title, ok, errors, expected);
+                } catch (e) {
+                    failed++;
+                    html += `<div class="case-block"><h3>${id} <span class="fail">ERROR</span></h3><pre>${e.message}\n\nfile:// 로 열면 fetch가 차단됩니다.\nverification 폴더에서: npx --yes serve .</pre></div>`;
+                }
+            }
+
+            resultsEl.innerHTML = html;
+            summaryEl.innerHTML = `<strong>결과: ${passed} passed, ${failed} failed</strong>`;
+        }
+
+        document.getElementById('runAllBtn').addEventListener('click', runAll);
+
+        document.getElementById('runSingleBtn').addEventListener('click', async () => {
+            const fix = document.getElementById('fixtureFile').files[0];
+            const exp = document.getElementById('expectedFile').files[0];
+            const el = document.getElementById('singleResult');
+            if (!fix || !exp) { el.innerHTML = '<p class="fail">fixture와 expected JSON을 모두 선택하세요.</p>'; return; }
+            const fixture = JSON.parse(await fix.text());
+            const students = fixture.students || fixture;
+            const expected = JSON.parse(await exp.text());
+            const { ok, errors } = compareCase(students, expected);
+            el.innerHTML = renderCaseResult(expected.caseId, expected.title, ok, errors, expected);
+        });
+
+        document.getElementById('runIndexBtn').addEventListener('click', () => {
+            alert('index.html은 verification/grade-engine.js를 사용합니다.\n이 페이지 PASS = 본편 엔진과 정답지 일치.\nCLI: node run-tests.mjs');
+        });
+    </script>
+</body>
+</html>

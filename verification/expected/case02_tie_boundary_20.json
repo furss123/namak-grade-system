@@ -1,0 +1,45 @@
+{
+  "caseId": "case02_tie_boundary_20",
+  "title": "20명 · 경계 걸친 동점 (STEP 3·4)",
+  "description": "6~8위 동점(82.0). highest=6, lowest=8 → STEP2 실패 → 중간석차 7 → 35% → 3등급.",
+  "checks": [
+    "cut2=7, 동점 그룹 6(3)",
+    "intermediateRank=7.0, percent=35% → 3등급",
+    "동점자 전원 동일 등급·동일 석차표기"
+  ],
+  "rulesVersion": "2022-개정-5등급제",
+  "N": 20,
+  "cutLimits": { "N": 20, "cut1": 2, "cut2": 7, "cut3": 13, "cut4": 18 },
+  "subject": "국어",
+  "subjectStats": {
+    "avg": "77.0",
+    "max": "98.0",
+    "min": "56.0",
+    "cut1": "96.0",
+    "cut2": "90.0",
+    "cut3": "70.0",
+    "cut4": "60.0"
+  },
+  "students": {
+    "1201": { "이름": "학생01", "rawInput": 98, "score": 98, "rankStr": "1", "rank": 1, "tieCount": 1, "interRank": "1.0", "intermediateRankPercent": 5, "grade": 1, "step": "STEP2", "highestRank": 1, "lowestRank": 1 },
+    "1202": { "이름": "학생02", "rawInput": 96, "score": 96, "rankStr": "2", "rank": 2, "tieCount": 1, "interRank": "2.0", "intermediateRankPercent": 10, "grade": 1, "step": "STEP2", "highestRank": 2, "lowestRank": 2 },
+    "1203": { "이름": "학생03", "rawInput": 94, "score": 94, "rankStr": "3", "rank": 3, "tieCount": 1, "interRank": "3.0", "intermediateRankPercent": 15, "grade": 2, "step": "STEP2", "highestRank": 3, "lowestRank": 3 },
+    "1204": { "이름": "학생04", "rawInput": 92, "score": 92, "rankStr": "4", "rank": 4, "tieCount": 1, "interRank": "4.0", "intermediateRankPercent": 20, "grade": 2, "step": "STEP2", "highestRank": 4, "lowestRank": 4 },
+    "1205": { "이름": "학생05", "rawInput": 90, "score": 90, "rankStr": "5", "rank": 5, "tieCount": 1, "interRank": "5.0", "intermediateRankPercent": 25, "grade": 2, "step": "STEP2", "highestRank": 5, "lowestRank": 5 },
+    "1206": { "이름": "학생06", "rawInput": 82, "score": 82, "rankStr": "6(3)", "rank": 6, "tieCount": 3, "interRank": "7.0", "intermediateRankPercent": 35, "grade": 3, "step": "STEP3_4", "highestRank": 6, "lowestRank": 8 },
+    "1207": { "이름": "학생07", "rawInput": 82, "score": 82, "rankStr": "6(3)", "rank": 6, "tieCount": 3, "interRank": "7.0", "intermediateRankPercent": 35, "grade": 3, "step": "STEP3_4", "highestRank": 6, "lowestRank": 8 },
+    "1208": { "이름": "학생08", "rawInput": 82, "score": 82, "rankStr": "6(3)", "rank": 6, "tieCount": 3, "interRank": "7.0", "intermediateRankPercent": 35, "grade": 3, "step": "STEP3_4", "highestRank": 6, "lowestRank": 8 },
+    "1209": { "이름": "학생09", "rawInput": 78, "score": 78, "rankStr": "9", "rank": 9, "tieCount": 1, "interRank": "9.0", "intermediateRankPercent": 45, "grade": 3, "step": "STEP2", "highestRank": 9, "lowestRank": 9 },
+    "1210": { "이름": "학생10", "rawInput": 76, "score": 76, "rankStr": "10", "rank": 10, "tieCount": 1, "interRank": "10.0", "intermediateRankPercent": 50, "grade": 3, "step": "STEP2", "highestRank": 10, "lowestRank": 10 },
+    "1211": { "이름": "학생11", "rawInput": 74, "score": 74, "rankStr": "11", "rank": 11, "tieCount": 1, "interRank": "11.0", "intermediateRankPercent": 55, "grade": 3, "step": "STEP2", "highestRank": 11, "lowestRank": 11 },
+    "1212": { "이름": "학생12", "rawInput": 72, "score": 72, "rankStr": "12", "rank": 12, "tieCount": 1, "interRank": "12.0", "intermediateRankPercent": 60, "grade": 3, "step": "STEP2", "highestRank": 12, "lowestRank": 12 },
+    "1213": { "이름": "학생13", "rawInput": 70, "score": 70, "rankStr": "13", "rank": 13, "tieCount": 1, "interRank": "13.0", "intermediateRankPercent": 65, "grade": 3, "step": "STEP2", "highestRank": 13, "lowestRank": 13 },
+    "1214": { "이름": "학생14", "rawInput": 68, "score": 68, "rankStr": "14", "rank": 14, "tieCount": 1, "interRank": "14.0", "intermediateRankPercent": 70, "grade": 4, "step": "STEP2", "highestRank": 14, "lowestRank": 14 },
+    "1215": { "이름": "학생15", "rawInput": 66, "score": 66, "rankStr": "15", "rank": 15, "tieCount": 1, "interRank": "15.0", "intermediateRankPercent": 75, "grade": 4, "step": "STEP2", "highestRank": 15, "lowestRank": 15 },
+    "1216": { "이름": "학생16", "rawInput": 64, "score": 64, "rankStr": "16", "rank": 16, "tieCount": 1, "interRank": "16.0", "intermediateRankPercent": 80, "grade": 4, "step": "STEP2", "highestRank": 16, "lowestRank": 16 },
+    "1217": { "이름": "학생17", "rawInput": 62, "score": 62, "rankStr": "17", "rank": 17, "tieCount": 1, "interRank": "17.0", "intermediateRankPercent": 85, "grade": 4, "step": "STEP2", "highestRank": 17, "lowestRank": 17 },
+    "1218": { "이름": "학생18", "rawInput": 60, "score": 60, "rankStr": "18", "rank": 18, "tieCount": 1, "interRank": "18.0", "intermediateRankPercent": 90, "grade": 4, "step": "STEP2", "highestRank": 18, "lowestRank": 18 },
+    "1219": { "이름": "학생19", "rawInput": 58, "score": 58, "rankStr": "19", "rank": 19, "tieCount": 1, "interRank": "19.0", "intermediateRankPercent": 95, "grade": 5, "step": "STEP2", "highestRank": 19, "lowestRank": 19 },
+    "1220": { "이름": "학생20", "rawInput": 56, "score": 56, "rankStr": "20", "rank": 20, "tieCount": 1, "interRank": "20.0", "intermediateRankPercent": 100, "grade": 5, "step": "STEP2", "highestRank": 20, "lowestRank": 20 }
+  }
+}

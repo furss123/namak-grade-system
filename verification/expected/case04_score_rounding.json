@@ -1,0 +1,33 @@
+{
+  "caseId": "case04_score_rounding",
+  "title": "8명 · 환산점수 소수 반올림",
+  "description": "85.005→85.01, 85.004→85.00. 반올림 후 동점 그룹이 달라짐.",
+  "checks": [
+    "85.005 → 85.01 (동점 85.01 그룹)",
+    "85.004 → 85.00 (별도 그룹)",
+    "반올림 전 동점이 아니어도 반올림 후 동점 가능"
+  ],
+  "rulesVersion": "2022-개정-5등급제",
+  "N": 8,
+  "cutLimits": { "N": 8, "cut1": 1, "cut2": 3, "cut3": 5, "cut4": 7 },
+  "subject": "국어",
+  "subjectStats": {
+    "avg": "83.3",
+    "max": "90.1",
+    "min": "70.0",
+    "cut1": "90.1",
+    "cut2": "90.1",
+    "cut3": "85.0",
+    "cut4": "75.0"
+  },
+  "students": {
+    "1401": { "이름": "반올림A", "rawInput": 90.125, "score": 90.13, "rankStr": "1", "rank": 1, "tieCount": 1, "interRank": "1.0", "intermediateRankPercent": 12.5, "grade": 1, "step": "STEP2", "highestRank": 1, "lowestRank": 1 },
+    "1402": { "이름": "반올림B", "rawInput": 90.124, "score": 90.12, "rankStr": "2", "rank": 2, "tieCount": 1, "interRank": "2.0", "intermediateRankPercent": 25, "grade": 2, "step": "STEP2", "highestRank": 2, "lowestRank": 2 },
+    "1403": { "이름": "반올림C", "rawInput": 85.005, "score": 85.01, "rankStr": "3(2)", "rank": 3, "tieCount": 2, "interRank": "3.5", "intermediateRankPercent": 43.75, "grade": 3, "step": "STEP3_4", "highestRank": 3, "lowestRank": 4 },
+    "1404": { "이름": "반올림D", "rawInput": 85.005, "score": 85.01, "rankStr": "3(2)", "rank": 3, "tieCount": 2, "interRank": "3.5", "intermediateRankPercent": 43.75, "grade": 3, "step": "STEP3_4", "highestRank": 3, "lowestRank": 4 },
+    "1405": { "이름": "반올림E", "rawInput": 85.004, "score": 85, "rankStr": "5", "rank": 5, "tieCount": 1, "interRank": "5.0", "intermediateRankPercent": 62.5, "grade": 3, "step": "STEP2", "highestRank": 5, "lowestRank": 5 },
+    "1406": { "이름": "반올림F", "rawInput": 80.996, "score": 81, "rankStr": "6", "rank": 6, "tieCount": 1, "interRank": "6.0", "intermediateRankPercent": 75, "grade": 4, "step": "STEP2", "highestRank": 6, "lowestRank": 6 },
+    "1407": { "이름": "반올림G", "rawInput": 75, "score": 75, "rankStr": "7", "rank": 7, "tieCount": 1, "interRank": "7.0", "intermediateRankPercent": 87.5, "grade": 4, "step": "STEP2", "highestRank": 7, "lowestRank": 7 },
+    "1408": { "이름": "반올림H", "rawInput": 70, "score": 70, "rankStr": "8", "rank": 8, "tieCount": 1, "interRank": "8.0", "intermediateRankPercent": 100, "grade": 5, "step": "STEP2", "highestRank": 8, "lowestRank": 8 }
+  }
+}

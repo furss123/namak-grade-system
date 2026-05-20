@@ -1,0 +1,12 @@
+{
+  "generatedAt": "2026-05-20T00:00:00.000Z",
+  "rulesVersion": "2022-개정-5등급제",
+  "cases": [
+    { "id": "case01_basic_10", "title": "기본 10명 · 동점 없음", "fixtureJson": "fixtures/case01_basic_10.fixture.json", "expected": "expected/case01_basic_10.json", "N": 10, "cutLimits": { "N": 10, "cut1": 1, "cut2": 3, "cut3": 7, "cut4": 9 } },
+    { "id": "case02_tie_boundary_20", "title": "20명 · 경계 걸친 동점 (STEP 3·4)", "fixtureJson": "fixtures/case02_tie_boundary_20.fixture.json", "expected": "expected/case02_tie_boundary_20.json", "N": 20, "cutLimits": { "N": 20, "cut1": 2, "cut2": 7, "cut3": 13, "cut4": 18 } },
+    { "id": "case03_rounding_23", "title": "23명 · 컷 인원 반올림", "fixtureJson": "fixtures/case03_rounding_23.fixture.json", "expected": "expected/case03_rounding_23.json", "N": 23, "cutLimits": { "N": 23, "cut1": 2, "cut2": 8, "cut3": 15, "cut4": 21 } },
+    { "id": "case04_score_rounding", "title": "8명 · 환산점수 소수 반올림", "fixtureJson": "fixtures/case04_score_rounding.fixture.json", "expected": "expected/case04_score_rounding.json", "N": 8, "cutLimits": { "N": 8, "cut1": 1, "cut2": 3, "cut3": 5, "cut4": 7 } },
+    { "id": "case05_tie_within_grade", "title": "15명 · 한 등급 구간 내 동점 (STEP 2)", "fixtureJson": "fixtures/case05_tie_within_grade.fixture.json", "expected": "expected/case05_tie_within_grade.json", "N": 15, "cutLimits": { "N": 15, "cut1": 2, "cut2": 5, "cut3": 10, "cut4": 14 } },
+    { "id": "case06_intermediate_step34", "title": "10명 · STEP 3·4 (3~4위 동점)", "fixtureJson": "fixtures/case06_intermediate_step34.fixture.json", "expected": "expected/case06_intermediate_step34.json", "N": 10, "cutLimits": { "N": 10, "cut1": 1, "cut2": 3, "cut3": 7, "cut4": 9 } }
+  ]
+}

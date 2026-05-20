@@ -1,0 +1,13 @@
+{
+  "name": "grade-verification",
+  "private": true,
+  "description": "2022 개정 5등급제 동점자 처리 검증 세트",
+  "scripts": {
+    "build": "node build.cjs",
+    "generate": "node build.cjs && node generate.mjs",
+    "test": "node run-tests.mjs"
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  }
+}
