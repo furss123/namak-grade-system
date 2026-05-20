@@ -848,18 +848,17 @@
             font-weight: 600;
             width: 22%;
         }
-        .page-1 .report-aux-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2.2mm;
+        .page-1 .report-block-maxcut h3 {
+            font-size: calc(9.5px + 1pt);
         }
-        .page-1 .report-aux-grid .report-block h3 {
-            font-size: calc(9px + 0.5pt);
-            margin-bottom: 1.2mm;
-            padding-left: 7px;
+        .page-1 #rowMax th.row-label,
+        .page-1 #rowMax td {
+            background: #f1f5f9 !important;
+            font-weight: 700;
         }
-        .page-1 .report-aux-grid .report-panel {
-            height: 100%;
+        .page-1 #rowCut1 th.row-label,
+        .page-1 #rowCut1 td {
+            border-top: 1.5px solid #c5d0de;
         }
         .page-2 .page-body.report-page-two {
             display: flex;
@@ -1068,8 +1067,6 @@
             border-radius: 3px;
             overflow: hidden;
         }
-        .page-1 #rowMax th.row-label,
-        .page-1 #rowMax td { background: #f1f5f9 !important; }
         .page-1 .my-score-row td { background: #e8f2fc !important; }
 
         h1 { text-align: center; font-weight: 700; }
@@ -1472,15 +1469,15 @@
             </section>
 
             <section class="report-zone report-zone-aux">
-            <div class="report-aux-grid">
-            <div class="report-block">
-            <h3>등급 컷 (<span class="total-count">-</span>명)</h3>
+            <div class="report-block report-block-maxcut">
+            <h3>최고 점수 및 등급 컷 (<span class="total-count">-</span>명)</h3>
             <div class="report-panel">
-            <table id="cutLineTable">
+            <table id="maxCutTable">
                 <thead>
-                    <tr id="cutTableHead"><th class="row-label">구분</th></tr>
+                    <tr id="maxCutTableHead"><th class="row-label">구분</th></tr>
                 </thead>
                 <tbody>
+                    <tr id="rowMax"><th class="row-label">최고점수</th></tr>
                     <tr id="rowCut1"><th class="row-label">1등급</th></tr>
                     <tr id="rowCut2"><th class="row-label">2등급</th></tr>
                     <tr id="rowCut3"><th class="row-label">3등급</th></tr>
@@ -1488,22 +1485,6 @@
                 </tbody>
             </table>
             </div>
-            </div>
-
-            <div class="report-block">
-            <h3>최고점수</h3>
-            <div class="report-panel">
-            <table id="maxScoreTable">
-                <thead>
-                    <tr id="maxTableHead"><th class="row-label">구분</th></tr>
-                </thead>
-                <tbody>
-                    <tr id="rowMax" style="background-color: #eee; font-weight: bold;"><th class="row-label">최고</th></tr>
-                </tbody>
-            </table>
-            </div>
-            </div>
-
             </div>
             </section>
 
@@ -2671,8 +2652,7 @@ function populateTemplate(studentIdStr, options) {
 
     subjects.forEach(subject => {
         appendTh('mainTableHead', subject);
-        appendTh('cutTableHead', subject);
-        appendTh('maxTableHead', subject);
+        appendTh('maxCutTableHead', subject);
         appendTh('distTableHead', subject);
 
         const pData = processedGradesCache[studentIdStr][subject];
@@ -2720,14 +2700,14 @@ function populateTemplate(studentIdStr, options) {
         appendTd('rowGrade', pData.grade);
         appendTd('rowDiffUp', diffUp);
         appendTd('rowDiffDown', diffDown);
-        appendTd('rowCut1', stats.cut1);
-        appendTd('rowCut2', stats.cut2);
-        appendTd('rowCut3', stats.cut3);
-        appendTd('rowCut4', stats.cut4);
         const maxScore = stats.allScoresSorted && stats.allScoresSorted.length
             ? stats.allScoresSorted[0].toFixed(2)
             : '-';
         appendTd('rowMax', maxScore);
+        appendTd('rowCut1', stats.cut1);
+        appendTd('rowCut2', stats.cut2);
+        appendTd('rowCut3', stats.cut3);
+        appendTd('rowCut4', stats.cut4);
     });
 
     document.getElementById('infoAvgGrade').textContent = (weightedGradeSum / totalWeight).toFixed(2);
@@ -2848,7 +2828,6 @@ function renderStudentGradeRadar(subjectRows) {
     if (goalTargets.length) {
         insightHtml += '<div><strong>목표</strong> <span class="insight-goal">' + fmtGoal(goalTargets) + '</span></div>';
     }
-    insightHtml += '<div style="color:#64748b;">레이더 바깥 = 우수 등급 · 목표는 한 등급 상승 기준</div>';
     insightEl.innerHTML = insightHtml;
 
     if (summaryEl) {
@@ -2967,8 +2946,7 @@ function appendTd(targetId, text) {
 
 function resetMainTables() {
     document.getElementById('mainTableHead').innerHTML = '<th class="row-label">교과명</th>'; 
-    document.getElementById('cutTableHead').innerHTML = '<th class="row-label">구분</th>';
-    document.getElementById('maxTableHead').innerHTML = '<th class="row-label">구분</th>';
+    document.getElementById('maxCutTableHead').innerHTML = '<th class="row-label">구분</th>';
     document.getElementById('rowMax').innerHTML = '<th class="row-label">최고점수</th>';
     document.getElementById('distTableHead').innerHTML = '<th class="row-label" style="width: 12%;">구분</th>';
     document.getElementById('rowUnit').innerHTML = '<th class="row-label">단위수</th>'; 
