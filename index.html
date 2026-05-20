@@ -792,7 +792,7 @@
             <div class="query-card">
                 <div class="query-card-title">단일 학번 조회 (상세 보고서 · 성적 분포 포함)</div>
                 <div class="input-area">
-            <input type="text" id="studentId" placeholder="학번 입력 (예: 1101)">
+            <input type="text" id="studentId" value="1101" placeholder="학번 입력 (예: 1101)">
             <button class="search-btn" onclick="searchSingleStudent()">
                 <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -1016,6 +1016,7 @@ const BUNDLED_SCORES_URL = 'assets/virtual-school-scores.xlsx';
 const BUNDLED_SCORES_LABEL = '가상 학교 점수.xlsx';
 const DEFAULT_RANGE_START = '1110';
 const DEFAULT_RANGE_END = '1130';
+const DEFAULT_SINGLE_STUDENT_ID = '1101';
 
 const DEMO_SUBJECTS = ['국어', '수학', '영어', '한국사', '통합사회', '통합과학'];
 const DEMO_LAST_NAMES = ['김', '이', '박', '최', '정', '강', '조', '윤', '장', '임'];
@@ -1105,7 +1106,13 @@ async function loadBundledSchoolData() {
     }
 }
 
+function applyDefaultSingleStudentId() {
+    const studentEl = document.getElementById('studentId');
+    if (studentEl) studentEl.value = DEFAULT_SINGLE_STUDENT_ID;
+}
+
 function runDefaultRangePreview() {
+    applyDefaultSingleStudentId();
     const startEl = document.getElementById('startStudentId');
     const endEl = document.getElementById('endStudentId');
     if (startEl) startEl.value = DEFAULT_RANGE_START;
@@ -1690,7 +1697,7 @@ function clearPrintContainer() {
 function resetResults() {
     clearPrintContainer();
     hideReportActionSection();
-    document.getElementById('studentId').value = '';
+    applyDefaultSingleStudentId();
     document.getElementById('startStudentId').value = '';
     document.getElementById('endStudentId').value = '';
 }
