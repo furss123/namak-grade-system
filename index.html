@@ -495,6 +495,107 @@
             font-weight: 700; color: var(--school-navy-dark);
         }
 
+        .stats-grade-dist {
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid var(--school-border-light);
+        }
+        .stats-grade-dist-heading {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: calc(0.82rem + 4pt);
+            font-weight: 700;
+            color: var(--school-navy);
+            letter-spacing: -0.01em;
+            margin-bottom: 14px;
+        }
+        .stats-grade-dist-heading::before {
+            content: '';
+            width: 3px;
+            height: 1.1em;
+            border-radius: 3px;
+            background: linear-gradient(180deg, var(--school-accent) 0%, var(--school-navy-light) 100%);
+        }
+        .stats-grade-dist-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 14px;
+            margin-bottom: 14px;
+            font-size: clamp(10px, 0.68rem + 0.35vw, calc(11px + 1pt));
+            font-weight: 600;
+            color: var(--school-muted);
+        }
+        .stats-grade-dist-legend span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .stats-grade-dist-legend i {
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+        .stats-grade-dist-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 14px 16px;
+            background: #fff;
+            border: 1px solid #d4dde8;
+            border-radius: var(--radius-lg);
+            box-shadow: 0 2px 12px rgba(15, 36, 64, 0.06);
+        }
+        .stats-grade-dist-row {
+            display: grid;
+            grid-template-columns: minmax(4.2em, 11%) 1fr;
+            gap: 10px 12px;
+            align-items: center;
+        }
+        .stats-grade-dist-subject {
+            font-size: clamp(10px, 0.7rem + 0.35vw, calc(12px + 1pt));
+            font-weight: 700;
+            color: var(--school-navy-dark);
+            text-align: center;
+            word-break: keep-all;
+        }
+        .stats-grade-dist-bar {
+            display: flex;
+            width: 100%;
+            min-height: 30px;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid #dce4ee;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            line-height: 1.15;
+        }
+        .stats-grade-dist-seg {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+            padding: 4px 2px;
+            font-size: clamp(8px, 0.58rem + 0.28vw, 10px);
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .stats-grade-dist-seg.g-bar-1 { background: #c62828; }
+        .stats-grade-dist-seg.g-bar-2 { background: #e65100; }
+        .stats-grade-dist-seg.g-bar-3 { background: #2e7d32; }
+        .stats-grade-dist-seg.g-bar-4 { background: #1565c0; }
+        .stats-grade-dist-seg.g-bar-5 { background: #546e7a; }
+        .stats-grade-dist-note {
+            margin: 10px 0 0;
+            font-size: calc(10px + 1pt);
+            color: var(--school-muted);
+            font-weight: 600;
+            text-align: right;
+        }
+
         @container stats-wrap (max-width: 720px) {
             .stats-table {
                 font-size: clamp(9px, 2.6cqi + 6px, 14px);
@@ -984,6 +1085,19 @@
                     <tr id="statsRowCut4"><td class="stats-row-label">4등급 최저</td></tr>
                 </tbody>
             </table>
+            </div>
+
+            <div class="stats-grade-dist" id="statsGradeDist">
+                <h3 class="stats-grade-dist-heading">1. 학년 전체 등급 분포 그래프</h3>
+                <div class="stats-grade-dist-legend" id="statsGradeDistLegend" aria-hidden="true">
+                    <span><i class="g-bar-1"></i>1등급</span>
+                    <span><i class="g-bar-2"></i>2등급</span>
+                    <span><i class="g-bar-3"></i>3등급</span>
+                    <span><i class="g-bar-4"></i>4등급</span>
+                    <span><i class="g-bar-5"></i>5등급</span>
+                </div>
+                <div class="stats-grade-dist-chart" id="statsGradeDistChart"></div>
+                <p class="stats-grade-dist-note" id="statsGradeDistNote"></p>
             </div>
         </section>
 
@@ -1477,7 +1591,90 @@ function displayGeneralStats() {
         appendStatsTd('statsRowCut4', stats.cut4);
     });
 
+    renderStatsGradeDistribution(subjects);
+
     document.getElementById('statsDashboard').style.display = 'block';
+}
+
+function countGradeDistributionBySubject(subjects) {
+    const dist = {};
+    subjects.forEach((subject) => {
+        dist[subject] = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+    });
+    studentData.forEach((student) => {
+        const studentId = String(student['학번']);
+        const grades = processedGradesCache[studentId];
+        if (!grades) return;
+        subjects.forEach((subject) => {
+            const grade = grades[subject] && grades[subject].grade;
+            if (grade >= 1 && grade <= 5) dist[subject][grade]++;
+        });
+    });
+    return dist;
+}
+
+function renderStatsGradeDistribution(subjects) {
+    const chartEl = document.getElementById('statsGradeDistChart');
+    const noteEl = document.getElementById('statsGradeDistNote');
+    if (!chartEl) return;
+
+    const totalStudents = studentData.length;
+    const dist = countGradeDistributionBySubject(subjects);
+    chartEl.innerHTML = '';
+
+    subjects.forEach((subject) => {
+        const counts = dist[subject];
+        const row = document.createElement('div');
+        row.className = 'stats-grade-dist-row';
+
+        const label = document.createElement('div');
+        label.className = 'stats-grade-dist-subject';
+        label.textContent = subject;
+        row.appendChild(label);
+
+        const bar = document.createElement('div');
+        bar.className = 'stats-grade-dist-bar';
+        bar.setAttribute('role', 'img');
+        bar.setAttribute(
+            'aria-label',
+            subject + ' 등급 분포: ' +
+            [1, 2, 3, 4, 5].map((g) => g + '등급 ' + counts[g] + '명').join(', ')
+        );
+
+        for (let grade = 1; grade <= 5; grade++) {
+            const count = counts[grade];
+            if (!count) continue;
+            const pct = (count / totalStudents) * 100;
+            const seg = document.createElement('div');
+            seg.className = 'stats-grade-dist-seg g-bar-' + grade;
+            seg.style.width = pct.toFixed(2) + '%';
+            seg.title = grade + '등급 ' + count + '명 (' + pct.toFixed(1) + '%)';
+            if (pct >= 7) {
+                seg.textContent = grade + '등급 ' + count + '명';
+            } else if (pct >= 4) {
+                seg.textContent = String(count);
+            }
+            bar.appendChild(seg);
+        }
+
+        if (!bar.children.length) {
+            const empty = document.createElement('div');
+            empty.className = 'stats-grade-dist-seg g-bar-5';
+            empty.style.width = '100%';
+            empty.style.background = '#e8edf4';
+            empty.style.color = '#64748b';
+            empty.textContent = '데이터 없음';
+            bar.appendChild(empty);
+        }
+
+        row.appendChild(bar);
+        chartEl.appendChild(row);
+    });
+
+    if (noteEl) {
+        noteEl.textContent =
+            '총 ' + totalStudents + '명 기준 · 막대 너비는 과목별 등급 인원 비율(%)입니다.';
+    }
 }
 
 function appendStatsTd(rowId, text, className = 'stats-val') {
