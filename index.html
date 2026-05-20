@@ -735,7 +735,7 @@
     <div class="search-container">
         <section class="panel-section">
             <div class="section-label">성적 데이터 등록</div>
-            <input type="file" id="excelFile" accept=".xlsx, .xls" onchange="uploadExcel(this)" style="display:none;">
+            <input type="file" id="excelFile" accept=".xlsx, .xls" multiple onchange="uploadExcel(this)" style="display:none;">
             <div class="upload-row">
                 <div class="upload-box" id="uploadBox" onclick="document.getElementById('excelFile').click()">
                     <div class="upload-icon-wrap" aria-hidden="true">
@@ -746,7 +746,7 @@
                     <div class="upload-text-container">
                         <span class="upload-step">성적 데이터 입력</span>
                         <div class="upload-title" id="uploadTitle">엑셀 성적 파일을 여기에 등록<span class="upload-format">.xlsx</span></div>
-                        <span class="upload-desc" id="fileStatus">양식을 받아 작성한 뒤, 이 칸을 클릭하거나 .xlsx 파일을 드래그하여 등록해 주세요.</span>
+                        <span class="upload-desc" id="fileStatus">양식·나이스 원본 엑셀을 클릭하거나 드래그해 주세요. 여러 파일을 한 번에 올릴 수 있습니다.</span>
                     </div>
                 </div>
                 <a href="assets/grade-upload-template.xlsx" class="upload-template-box" id="templateDownloadLink" download="남악고_1학년_성적입력양식.xlsx" role="button" aria-label="성적 입력 양식 다운로드">
@@ -1046,7 +1046,9 @@ function applyParsedStudentData(parsedData, fileName, options = {}) {
     if (!parsedData.length || !parsedData[0]['학번']) return false;
     studentData = parsedData;
     isDemoData = !!options.isDemo;
-    if (!Object.keys(subjectUnitMap).length) {
+    if (options.subjectUnitMap && Object.keys(options.subjectUnitMap).length) {
+        subjectUnitMap = options.subjectUnitMap;
+    } else if (!Object.keys(subjectUnitMap).length) {
         subjectUnitMap = buildDefaultSubjectUnits(getSubjects(studentData[0]), true);
     }
     isFileUploaded = true;
@@ -1062,8 +1064,11 @@ function loadGradesFromArrayBuffer(buffer, fileName, options = {}) {
     try {
         const data = new Uint8Array(buffer);
         const workbook = XLSX.read(data, { type: 'array' });
-        const parsedData = parseWorkbookToStudents(workbook);
-        return applyParsedStudentData(parsedData, fileName, options);
+        const parsed = parseWorkbookToStudents(workbook);
+        return applyParsedStudentData(parsed.students, fileName, {
+            ...options,
+            subjectUnitMap: parsed.subjectUnitMap
+        });
     } catch (err) {
         console.error(err);
         return false;
@@ -1151,13 +1156,21 @@ function buildCanonicalHeaders(rawHeaders) {
     const headers = [];
     const headerUnits = {};
     rawHeaders.forEach((raw) => {
-        const key = normalizeHeaderKey(raw);
+        const key = canonicalizeHeaderLabel(raw);
         if (!key) {
             headers.push('');
             return;
         }
-        const split = splitHeaderSubjectUnit(raw);
+        if (NON_SUBJECT_HEADERS.has(key)) {
+            headers.push('');
+            return;
+        }
+        const split = splitHeaderSubjectUnit(key);
         const subject = split.subject || key;
+        if (NON_SUBJECT_HEADERS.has(subject)) {
+            headers.push('');
+            return;
+        }
         headers.push(subject);
         if (split.unit != null && !Number.isNaN(split.unit) && split.unit > 0) {
             headerUnits[subject] = split.unit;
@@ -1307,6 +1320,14 @@ function restoreSessionData() {
 }
 
 const UPLOAD_META_KEYS = new Set(['학번', '이름', '학년', '반', '번호', '단위수']);
+/** 나이스·보고서 열 — 교과 점수로 쓰지 않음 (원점수는 시트/과목명으로 매핑) */
+const NON_SUBJECT_HEADERS = new Set([
+    '석차', '등급', '평균', '표준편차', '백분위', '과목', '교과', '비고', '학년도', '학기',
+    '시험', '영역', '환산점수', '성취도', '집계', '순위', '동석차', '누계', '만점', '이수', '이수구분'
+]);
+const META_HEADER_ALIASES = {
+    '성명': '이름', '학생명': '이름', '성명(한글)': '이름', '성명(한자)': '이름'
+};
 
 function trimCell(value) {
     if (value === null || value === undefined) return '';
@@ -1319,6 +1340,74 @@ function hasCellValue(value) {
 
 function normalizeHeaderKey(key) {
     return trimCell(key).replace(/^\uFEFF/, '');
+}
+
+function canonicalizeHeaderLabel(key) {
+    const k = normalizeHeaderKey(key);
+    return META_HEADER_ALIASES[k] || k;
+}
+
+function parseNeisClassFromAoa(aoa) {
+    for (let r = 0; r < Math.min(8, aoa.length); r++) {
+        const row = aoa[r] || [];
+        for (const cell of row) {
+            const text = trimCell(cell);
+            const m = text.match(/(\d)\s*학년\s*(\d{1,2})\s*반/);
+            if (m) {
+                return { grade: parseInt(m[1], 10), ban: parseInt(m[2], 10) };
+            }
+        }
+    }
+    return null;
+}
+
+function inferSubjectFromSheetName(sheetName) {
+    const n = trimCell(sheetName);
+    if (!n || /^(sheet\d+|작성|안내|정보|guide)$/i.test(n)) return null;
+    if (/단위|unit/i.test(n)) return null;
+    return n.replace(/^\d+학년\s*/, '').trim() || null;
+}
+
+function neisNormalizeRowCells(cells, sheetName, sheetContext) {
+    const out = { ...cells };
+    if (!hasCellValue(out['이름']) && hasCellValue(out['성명'])) out['이름'] = out['성명'];
+    if (!hasCellValue(out['이름']) && hasCellValue(out['학생명'])) out['이름'] = out['학생명'];
+    if (sheetContext) {
+        if (!hasCellValue(out['반']) && sheetContext.ban != null) out['반'] = sheetContext.ban;
+        if (!hasCellValue(out['학년']) && sheetContext.grade != null) out['학년'] = sheetContext.grade;
+    }
+    const subject = inferSubjectFromSheetName(sheetName);
+    if (subject && hasCellValue(out['원점수']) && !hasCellValue(out[subject])) {
+        out[subject] = out['원점수'];
+    }
+    if (subject && Object.prototype.hasOwnProperty.call(out, '원점수')) {
+        delete out['원점수'];
+    }
+    return out;
+}
+
+function mergeStudentIntoMap(map, student) {
+    const id = String(student['학번']);
+    if (!map.has(id)) {
+        map.set(id, { ...student });
+        return;
+    }
+    const existing = map.get(id);
+    Object.keys(student).forEach((key) => {
+        if (UPLOAD_META_KEYS.has(key)) {
+            if (!hasCellValue(existing[key]) && hasCellValue(student[key])) existing[key] = student[key];
+            return;
+        }
+        if (hasCellValue(student[key]) || student[key] === 0) existing[key] = student[key];
+    });
+}
+
+function mergeStudentLists(lists) {
+    const map = new Map();
+    lists.forEach((students) => {
+        (students || []).forEach((s) => mergeStudentIntoMap(map, s));
+    });
+    return Array.from(map.values());
 }
 
 /** 반·번호·이름·교과 점수 / 학번·이름 양식 공통 */
@@ -1358,13 +1447,19 @@ function buildStudentFromCells(cells, defaultGrade) {
     return student;
 }
 
+function rowHasStudentIdHeaders(labels) {
+    if (labels.includes('학번')) return true;
+    if (labels.includes('반') && labels.includes('번호')) return true;
+    if (labels.includes('번호') && (labels.includes('이름') || labels.includes('성명') || labels.includes('학생명'))) return true;
+    return false;
+}
+
 function findGradeHeaderRowIndex(aoa) {
-    for (let i = 0; i < Math.min(15, aoa.length); i++) {
-        const labels = (aoa[i] || []).map((c) => normalizeHeaderKey(c));
-        if (labels.includes('단위수') && !labels.includes('이름')) continue;
-        if (labels.includes('이름') && (labels.includes('학번') || (labels.includes('반') && labels.includes('번호')))) {
-            return i;
-        }
+    for (let i = 0; i < Math.min(25, aoa.length); i++) {
+        const labels = (aoa[i] || []).map((c) => canonicalizeHeaderLabel(c));
+        if (labels.includes('단위수') && !labels.includes('이름') && !labels.includes('성명')) continue;
+        const hasName = labels.includes('이름') || labels.includes('성명') || labels.includes('학생명');
+        if (hasName && rowHasStudentIdHeaders(labels)) return i;
     }
     return -1;
 }
@@ -1476,12 +1571,13 @@ function parseHeaderRow(rawHeaderRow) {
     return { rawHeaders, headers, metaHeaders, subjectHeaders, headerUnits };
 }
 
-/** grade-upload-template.xlsx, 1학년 성적파일 등 (반·번호·이름·교과 + 단위수 행) */
-function parseGradeRowsFromSheet(worksheet) {
+/** grade-upload-template.xlsx, 1학년 성적파일, 나이스 원본 등 */
+function parseGradeRowsFromSheet(worksheet, sheetName, sheetContext) {
     const aoa = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
     if (!aoa.length) return { students: [], subjectUnitMap: {}, unitsExplicit: false };
 
     const defaultGrade = 1;
+    const neisContext = sheetContext || parseNeisClassFromAoa(aoa);
     const headerIdx = findGradeHeaderRowIndex(aoa);
     const students = [];
     let parsedUnits = {};
@@ -1509,7 +1605,8 @@ function parseGradeRowsFromSheet(worksheet) {
                 unitsExplicit = true;
                 continue;
             }
-            const student = buildStudentFromCells(cells, defaultGrade);
+            const normalized = neisNormalizeRowCells(cells, sheetName || '', neisContext);
+            const student = buildStudentFromCells(normalized, defaultGrade);
             if (student) students.push(student);
         }
         return {
@@ -1524,8 +1621,9 @@ function parseGradeRowsFromSheet(worksheet) {
         const cells = {};
         const rowUnits = {};
         Object.keys(row).forEach((key) => {
-            const split = splitHeaderSubjectUnit(key);
-            const canon = split.subject || normalizeHeaderKey(key);
+            const split = splitHeaderSubjectUnit(canonicalizeHeaderLabel(key));
+            const canon = split.subject || canonicalizeHeaderLabel(key);
+            if (NON_SUBJECT_HEADERS.has(canon)) return;
             if (split.unit != null) rowUnits[canon] = split.unit;
             cells[canon] = row[key];
         });
@@ -1538,7 +1636,8 @@ function parseGradeRowsFromSheet(worksheet) {
             unitsExplicit = true;
             continue;
         }
-        const student = buildStudentFromCells(cells, defaultGrade);
+        const normalized = neisNormalizeRowCells(cells, sheetName || '', neisContext);
+        const student = buildStudentFromCells(normalized, defaultGrade);
         if (student) students.push(student);
     }
     return {
@@ -1550,8 +1649,10 @@ function parseGradeRowsFromSheet(worksheet) {
 
 function parseWorkbookToStudents(workbook) {
     const workbookUnits = extractUnitsFromWorkbook(workbook);
-    const unitsFromWorkbook = Object.keys(workbookUnits).length > 0;
-    const tried = new Set();
+    let unitsFromWorkbook = Object.keys(workbookUnits).length > 0;
+    let mergedUnits = { ...workbookUnits };
+    let unitsExplicit = unitsFromWorkbook;
+    let allStudents = [];
     const rankedNames = [];
 
     workbook.SheetNames.forEach((name) => {
@@ -1568,18 +1669,22 @@ function parseWorkbookToStudents(workbook) {
     rankedNames.sort((a, b) => a.rank - b.rank);
 
     for (const { name, rank } of rankedNames) {
-        if (rank >= 99 || tried.has(name)) continue;
-        tried.add(name);
-        const parsed = parseGradeRowsFromSheet(workbook.Sheets[name]);
+        if (rank >= 99) continue;
+        const sheet = workbook.Sheets[name];
+        const neisContext = parseNeisClassFromAoa(XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' }));
+        const parsed = parseGradeRowsFromSheet(sheet, name, neisContext);
         if (parsed.students.length > 0) {
-            const mergedUnits = { ...workbookUnits, ...parsed.subjectUnitMap };
-            const explicit = unitsFromWorkbook || parsed.unitsExplicit;
-            subjectUnitMap = finalizeSubjectUnitMap(parsed.students, mergedUnits, explicit);
-            return parsed.students;
+            allStudents = mergeStudentLists([allStudents, parsed.students]);
+            mergedUnits = { ...mergedUnits, ...parsed.subjectUnitMap };
+            unitsExplicit = unitsExplicit || parsed.unitsExplicit;
         }
     }
-    subjectUnitMap = {};
-    return [];
+
+    if (!allStudents.length) {
+        return { students: [], subjectUnitMap: {}, unitsExplicit: false };
+    }
+    const finalUnits = finalizeSubjectUnitMap(allStudents, mergedUnits, unitsExplicit);
+    return { students: allStudents, subjectUnitMap: finalUnits, unitsExplicit };
 }
 
 function isExcelFile(file) {
@@ -1588,47 +1693,102 @@ function isExcelFile(file) {
 }
 
 function uploadExcel(input) {
-    const file = input.files[0];
-    if (!file) return;
-    processExcelFile(file);
+    if (!input.files || !input.files.length) return;
+    processExcelFiles(input.files);
 }
 
-function processExcelFile(file) {
-    if (!isExcelFile(file)) {
+function readExcelFileAsArrayBuffer(file) {
+    return new Promise(function(resolve, reject) {
+        const reader = new FileReader();
+        reader.onload = function(e) { resolve(e.target.result); };
+        reader.onerror = reject;
+        reader.readAsArrayBuffer(file);
+    });
+}
+
+function formatUploadedFileLabel(names) {
+    if (!names.length) return '';
+    if (names.length === 1) return names[0];
+    if (names.length <= 3) return names.join(', ');
+    return names.slice(0, 2).join(', ') + ' 외 ' + (names.length - 2) + '개';
+}
+
+async function processExcelFiles(fileList) {
+    const files = Array.from(fileList || []).filter(isExcelFile);
+    if (!files.length) {
         setUploadState('엑셀 파일(.xlsx, .xls)만 업로드할 수 있습니다.', false);
-        return;
+        return false;
     }
 
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const data = new Uint8Array(e.target.result);
-            const workbook = XLSX.read(data, {type: 'array'});
-            const parsedData = parseWorkbookToStudents(workbook);
+    let mergedStudents = [];
+    let mergedUnits = {};
+    let unitsExplicit = false;
+    const loadedNames = [];
+    const failedNames = [];
 
-            if (applyParsedStudentData(parsedData, file.name, { isDemo: false, saveSession: true })) {
-                runDefaultSinglePreview();
-            } else {
-                isFileUploaded = false;
-                studentData = [];
-                clearSessionData();
-                setUploadState("유효한 성적 데이터가 없거나 올바른 양식이 아닙니다.", false);
-                document.getElementById('statsDashboard').style.display = 'none';
-                hideReportActionSection();
-                clearPrintContainer();
+    try {
+        for (const file of files) {
+            try {
+                const buffer = await readExcelFileAsArrayBuffer(file);
+                const data = new Uint8Array(buffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                const parsed = parseWorkbookToStudents(workbook);
+                if (parsed.students.length > 0 && parsed.students[0]['학번']) {
+                    mergedStudents = mergeStudentLists([mergedStudents, parsed.students]);
+                    mergedUnits = { ...mergedUnits, ...parsed.subjectUnitMap };
+                    unitsExplicit = unitsExplicit || parsed.unitsExplicit;
+                    loadedNames.push(file.name);
+                } else {
+                    failedNames.push(file.name);
+                }
+            } catch (err) {
+                console.warn('파일 파싱 실패:', file.name, err);
+                failedNames.push(file.name);
             }
-        } catch (error) {
-            console.error(error);
+        }
+
+        if (!mergedStudents.length) {
             isFileUploaded = false;
             studentData = [];
             clearSessionData();
-            setUploadState("파일을 읽는 중 오류가 발생했습니다.", false);
+            const hint = failedNames.length
+                ? `인식된 파일 없음 (${failedNames.length}개 실패)`
+                : '유효한 성적 데이터가 없거나 올바른 양식이 아닙니다.';
+            setUploadState(hint, false);
             document.getElementById('statsDashboard').style.display = 'none';
             hideReportActionSection();
             clearPrintContainer();
+            return false;
         }
-    };
-    reader.readAsArrayBuffer(file);
+
+        subjectUnitMap = finalizeSubjectUnitMap(mergedStudents, mergedUnits, unitsExplicit);
+        const label = formatUploadedFileLabel(loadedNames);
+        const statusNote = failedNames.length
+            ? ` (${failedNames.length}개 파일은 건너뜀)`
+            : '';
+        if (applyParsedStudentData(mergedStudents, label + statusNote, {
+            isDemo: false,
+            saveSession: true,
+            subjectUnitMap
+        })) {
+            runDefaultSinglePreview();
+            return true;
+        }
+    } catch (error) {
+        console.error(error);
+        isFileUploaded = false;
+        studentData = [];
+        clearSessionData();
+        setUploadState('파일을 읽는 중 오류가 발생했습니다.', false);
+        document.getElementById('statsDashboard').style.display = 'none';
+        hideReportActionSection();
+        clearPrintContainer();
+    }
+    return false;
+}
+
+function processExcelFile(file) {
+    processExcelFiles([file]);
 }
 
 function getDefaultUploadTitleHtml() {
@@ -1644,9 +1804,10 @@ function setUploadState(statusText, isSuccess, fileName = "") {
         uploadTitle.textContent = isDemoData
             ? "예시 데이터 적용 중 (고교학점제 규정 시연)"
             : "성적 데이터 분석 완료! (고교학점제 규정 적용)";
+        const countLabel = `${studentData.length}명`;
         fileStatus.textContent = isDemoData
-            ? `▶ ${fileName} (${studentData.length}명) · 기본 조회 ${DEFAULT_SINGLE_STUDENT_ID} 미리보기`
-            : `▶ ${fileName} 등록 성공 (${studentData.length}명)`;
+            ? `▶ ${fileName} (${countLabel}) · 기본 조회 ${DEFAULT_SINGLE_STUDENT_ID} 미리보기`
+            : `▶ ${fileName} · 등록 성공 (${countLabel})`;
     } else {
         uploadBox.classList.remove('success');
         uploadTitle.innerHTML = getDefaultUploadTitleHtml();
@@ -1958,16 +2119,19 @@ document.getElementById('endStudentId').addEventListener('keydown', function(e) 
         e.stopPropagation();
         setDragOver(false);
 
-        const file = e.dataTransfer.files && e.dataTransfer.files[0];
-        if (!file) return;
+        const dropped = e.dataTransfer.files;
+        if (!dropped || !dropped.length) return;
+
+        const excelFiles = Array.from(dropped).filter(isExcelFile);
+        if (!excelFiles.length) return;
 
         if (typeof DataTransfer !== 'undefined') {
             const dt = new DataTransfer();
-            dt.items.add(file);
+            excelFiles.forEach((f) => dt.items.add(f));
             excelInput.files = dt.files;
         }
 
-        processExcelFile(file);
+        processExcelFiles(excelFiles);
     });
 
     document.addEventListener('dragover', function(e) { e.preventDefault(); });
