@@ -937,13 +937,26 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            gap: 1.8mm;
-            padding: 2.5mm 3mm;
+            gap: 3mm;
+            padding: 3.5mm 4mm;
             background: linear-gradient(165deg, #fafbfd 0%, #eef4fa 100%);
             border: 1px solid #d4dde8;
             border-radius: 5px;
-            font-size: calc(8.5px + 0.5pt);
-            line-height: 1.4;
+            font-size: calc(10px + 1pt);
+            line-height: 1.45;
+            color: var(--school-navy-dark);
+        }
+        .page-1 .report-radar-insight .insight-line {
+            display: flex;
+            align-items: baseline;
+            flex-wrap: wrap;
+            gap: 2mm 3mm;
+        }
+        .page-1 .report-radar-insight .insight-line > strong {
+            flex-shrink: 0;
+            min-width: 2.6em;
+            font-size: calc(11px + 1.5pt);
+            font-weight: 800;
             color: var(--school-navy-dark);
         }
         .page-1 .report-grade-goal-panel {
@@ -1012,19 +1025,16 @@
             color: #94a3b8;
             font-weight: 600;
         }
-        .page-1 .report-radar-insight strong {
-            color: var(--school-navy-dark);
+        .page-1 .report-radar-insight .insight-strong,
+        .page-1 .report-radar-insight .insight-weak {
+            font-size: calc(12px + 2pt);
             font-weight: 800;
+            letter-spacing: -0.02em;
         }
-        .page-1 .report-radar-insight .insight-strong { color: #b45309; font-weight: 700; }
-        .page-1 .report-radar-insight .insight-weak { color: #1d4ed8; font-weight: 700; }
-        .page-1 .report-radar-insight .insight-grade-list { font-weight: 800; }
-        .page-1 .report-radar-insight .insight-goal {
-            color: #9a3412;
-            font-weight: 700;
-        }
-        .page-1 .report-radar-insight .insight-goal strong {
-            color: #c2410c;
+        .page-1 .report-radar-insight .insight-strong { color: #b45309; }
+        .page-1 .report-radar-insight .insight-weak { color: #1d4ed8; }
+        .page-1 .report-radar-insight .insight-grade-list {
+            font-size: calc(12px + 2pt);
             font-weight: 800;
         }
         .page-1 .report-block-univ-ref h3 {
@@ -2892,23 +2902,15 @@ function renderStudentGradeRadar(subjectRows) {
     const strong = subjectRows.filter((x) => x.grade === minG);
     const weak = subjectRows.filter((x) => x.grade === maxG);
     const fmtGrade = (arr) => arr.map((x) => x.subject + '(' + x.grade + '등급)').join(', ');
-    const fmtGoal = (arr) => arr.map((x) => {
-        if (!x.goal.hasGoal) return x.subject + '(유지)';
-        return x.subject + ' <strong>' + x.goal.display + '</strong>';
-    }).join(' · ');
 
     let insightHtml = '';
     if (minG === maxG) {
         insightHtml +=
-            '<div>과목별 등급이 <strong class="insight-grade-list">' + minG + '등급</strong>으로 동일합니다.</div>';
+            '<div class="insight-line">과목별 등급 <strong class="insight-grade-list">' + minG + '등급</strong>으로 동일</div>';
     } else {
         insightHtml +=
-            '<div><strong>강점</strong> <span class="insight-strong">' + fmtGrade(strong) + '</span></div>' +
-            '<div><strong>약점</strong> <span class="insight-weak">' + fmtGrade(weak) + '</span></div>';
-    }
-    const goalTargets = subjectRows.filter((x) => x.goal.hasGoal);
-    if (goalTargets.length) {
-        insightHtml += '<div><strong>목표</strong> <span class="insight-goal">' + fmtGoal(goalTargets) + '</span></div>';
+            '<div class="insight-line"><strong>강점</strong> <span class="insight-strong">' + fmtGrade(strong) + '</span></div>' +
+            '<div class="insight-line"><strong>약점</strong> <span class="insight-weak">' + fmtGrade(weak) + '</span></div>';
     }
     insightEl.innerHTML = insightHtml;
 
