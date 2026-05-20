@@ -199,7 +199,7 @@
         .upload-box {
             flex: 1; min-width: 0;
             display: flex; align-items: center; gap: 20px;
-            padding: 24px 26px; min-height: 132px;
+            padding: calc(24px - 1.5mm) 26px; min-height: calc(132px - 3mm);
             background: linear-gradient(145deg, #f7fafd 0%, #eef4fa 100%);
             border: 2px dashed #a8bdd4; border-radius: var(--radius-lg); cursor: pointer;
             transition: border-color 0.25s var(--ease), background 0.25s var(--ease),
@@ -255,7 +255,7 @@
         .upload-template-side {
             flex: 0 0 228px; max-width: 240px;
             display: flex; flex-direction: column; justify-content: center;
-            gap: 10px; padding: 16px 14px;
+            gap: 8px; padding: calc(16px - 1.5mm) 14px;
             background: linear-gradient(160deg, #f9fbfd 0%, #f0f5fb 100%);
             border: 1px solid var(--school-border-light);
             border-radius: var(--radius-lg);
@@ -271,7 +271,7 @@
         .template-download-link {
             display: inline-flex; flex-direction: column; align-items: center;
             justify-content: center; gap: 8px; width: 100%;
-            padding: 12px 14px; border-radius: var(--radius-sm);
+            padding: calc(12px - 1.5mm) 14px; border-radius: var(--radius-sm);
             background: #fff; border: 1px solid var(--school-navy-light);
             color: var(--school-navy-dark); font-size: calc(11px + 4pt);
             font-weight: 700; text-decoration: none; font-family: inherit;
