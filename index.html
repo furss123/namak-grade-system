@@ -249,18 +249,40 @@
             width: 210mm; height: 296mm; margin: 0 auto 24px; box-sizing: border-box;
             background: #fff; border: 1px solid var(--school-border);
             box-shadow: var(--shadow-md); position: relative; overflow: hidden;
-            display: flex; flex-direction: column;
         }
+        /* 꼬리말: 모든 페이지 동일 높이(하단 8mm)에 고정 */
         .page-footer {
-            margin-top: auto; flex-shrink: 0; padding: 3mm 0 0;
+            position: absolute; left: 12mm; right: 12mm; bottom: 8mm;
+            margin: 0; padding: 2.5mm 0 0;
             border-top: 1px solid #c5d0e0; text-align: center;
             font-size: calc(8px + 1pt); color: #64748b; line-height: 1.45;
+            min-height: 8mm; background: #fff;
         }
+        .page.page-2 .page-footer { left: 15mm; right: 15mm; }
         .page-footer-num {
-            margin: 0 0 2mm; font-weight: 700; color: var(--school-navy);
+            margin: 0; font-weight: 700; color: var(--school-navy);
             font-size: calc(9px + 1pt); letter-spacing: 0.12em;
         }
-        .page-footer-meta { margin: 0; font-weight: 500; }
+        .page-footer-meta { display: none; }
+        .page-letterhead {
+            display: flex; align-items: center; gap: 3.5mm;
+            margin: 0 0 4mm 0; padding-bottom: 2.5mm;
+            border-bottom: 1px solid #d4dce8;
+        }
+        .page-logo {
+            width: 13mm; height: 13mm; object-fit: contain; flex-shrink: 0;
+            border-radius: 50%; background: #fff;
+            border: 1px solid #c5d0e0; box-shadow: 0 1px 3px rgba(15, 39, 68, 0.1);
+        }
+        .page-letterhead-text { min-width: 0; }
+        .page-school-name {
+            display: block; font-size: calc(11px + 1pt); font-weight: 800;
+            color: var(--school-navy-dark); letter-spacing: -0.02em; line-height: 1.3;
+        }
+        .page-school-sub {
+            display: block; margin-top: 0.5mm;
+            font-size: calc(8px + 1pt); font-weight: 600; color: var(--school-muted);
+        }
         #printContainer .report-wrapper { counter-reset: report-page 0; }
         #printContainer .page { counter-increment: report-page; }
         #printContainer .page-footer-num::before {
@@ -270,13 +292,12 @@
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4mm;
             background: linear-gradient(90deg, var(--school-navy-dark), var(--school-navy-light));
         }
-        .page.page-1 { padding: 30mm 12mm 8mm 12mm; }
-        .page.page-2 { padding: 30mm 15mm 15mm 15mm; }
-        .page-1 { display: flex; flex-direction: column; }
+        .page.page-1 { padding: 26mm 12mm 20mm 12mm; }
+        .page.page-2 { padding: 26mm 15mm 20mm 15mm; }
         .page-1 h1 {
             text-align: center; color: var(--school-navy);
             font-size: calc(21px + 1.5pt); font-weight: 800; letter-spacing: -0.02em;
-            margin: 0 0 4mm 0; padding-bottom: 3mm;
+            margin: 0 0 3mm 0; padding-bottom: 2.5mm;
             border-bottom: 2px solid var(--school-navy); text-decoration: none;
         }
         .page-2 h1 {
@@ -375,12 +396,18 @@
                 border: none; box-shadow: none; margin: 0;
                 width: 210mm; height: 296mm; page-break-after: always; page-break-inside: avoid;
             }
-            #printContainer .page.page-1 { padding: 30mm 12mm 6mm 12mm; }
-            #printContainer .page.page-2 { padding: 30mm 15mm 10mm 15mm; }
-            #printContainer .page-footer {
-                border-top-color: #94a3b8;
+            #printContainer .page.page-1 { padding: 26mm 12mm 20mm 12mm; }
+            #printContainer .page.page-2 { padding: 26mm 15mm 20mm 15mm; }
+            #printContainer .page-letterhead,
+            #printContainer .page-logo {
                 -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
+            #printContainer .page-footer {
+                position: absolute; left: 12mm; right: 12mm; bottom: 8mm;
+                border-top-color: #94a3b8; background: #fff;
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
+            #printContainer .page.page-2 .page-footer { left: 15mm; right: 15mm; }
             #printContainer .page:last-child { page-break-after: avoid !important; }
         }
     </style>
@@ -498,6 +525,13 @@
 
     <div id="reportTemplate" class="report-wrapper">
         <div class="page page-1">
+            <header class="page-letterhead">
+                <img src="assets/namak-logo.png" alt="남악고등학교" class="page-logo" width="49" height="49">
+                <div class="page-letterhead-text">
+                    <span class="page-school-name">남악고등학교</span>
+                    <span class="page-school-sub">1학년 성적 분석 · 2026학년도 1학기</span>
+                </div>
+            </header>
             <h1>2026학년도 1학기 중간고사 결과 보고서</h1>
             <div class="student-info">
                 <div id="infoStudentText">학생 정보 로딩중...</div>
@@ -576,11 +610,17 @@
             </div>
             <footer class="page-footer">
                 <p class="page-footer-num" aria-label="페이지 번호"></p>
-                <p class="page-footer-meta"></p>
             </footer>
         </div>
 
         <div class="page page-2">
+            <header class="page-letterhead">
+                <img src="assets/namak-logo.png" alt="남악고등학교" class="page-logo" width="49" height="49">
+                <div class="page-letterhead-text">
+                    <span class="page-school-name">남악고등학교</span>
+                    <span class="page-school-sub">1학년 성적 분석 · 2026학년도 1학기</span>
+                </div>
+            </header>
             <h1 id="distPageTitle">학생 주변 성적분포</h1>
             <p id="distTableNote" style="text-align: right; font-size: 10px; margin: 0 0 5px 0;">(※ 데이터가 없는 구간은 빈칸으로 표시되며, 내 점수 기준 위로는 오름차순, 아래로는 내림차순 정렬됩니다.)</p>
             
@@ -592,7 +632,6 @@
             </table>
             <footer class="page-footer">
                 <p class="page-footer-num" aria-label="페이지 번호"></p>
-                <p class="page-footer-meta"></p>
             </footer>
         </div>
     </div>
@@ -607,17 +646,11 @@ const APP_VERSION = '1.0.0';
 const APP_RELEASE_DATE = '2026-05-20';
 const APP_COPYRIGHT = '© 2026 남악고등학교. All rights reserved.';
 
-function getPageFooterMetaText() {
-    return '배포 버전 v' + APP_VERSION + ' (' + APP_RELEASE_DATE + ') · ' + APP_COPYRIGHT;
-}
-
 function initAppFooter() {
     const v = document.getElementById('appVersionDisplay');
     const c = document.getElementById('appCopyrightDisplay');
     if (v) v.textContent = 'v' + APP_VERSION + ' (' + APP_RELEASE_DATE + ')';
     if (c) c.textContent = APP_COPYRIGHT;
-    const meta = getPageFooterMetaText();
-    document.querySelectorAll('.page-footer-meta').forEach(function(el) { el.textContent = meta; });
 }
 
 let studentData = [];
