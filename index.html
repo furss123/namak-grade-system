@@ -1041,13 +1041,31 @@
         .page-1 .report-block-univ-ref h3 {
             font-size: calc(9px + 1pt);
         }
-        .page-1 .univ-ref-note {
-            margin: 0 0 1.4mm 0;
-            text-align: right;
+        .page-1 .univ-ref-note,
+        .page-1 .univ-ref-scale-note {
+            margin: 0 0 1.2mm 0;
             font-size: calc(7.5px + 0.5pt);
             color: var(--school-muted);
             font-weight: 600;
-            line-height: 1.3;
+            line-height: 1.35;
+        }
+        .page-1 .univ-ref-scale-note {
+            padding: 1.5mm 2.5mm;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 4px;
+        }
+        .page-1 .univ-ref-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2mm 4mm;
+            margin: 0 0 1.4mm 0;
+            font-size: calc(7.5px + 0.5pt);
+            font-weight: 600;
+            color: var(--school-navy-dark);
+        }
+        .page-1 .univ-ref-legend span {
+            white-space: nowrap;
         }
         .page-1 .univ-ref-table {
             width: 100%;
@@ -1056,10 +1074,11 @@
         }
         .page-1 .univ-ref-table th,
         .page-1 .univ-ref-table td {
-            padding: 1.5px 2px;
-            font-size: calc(7.5px + 0.5pt);
-            line-height: 1.25;
+            padding: 2px 2px;
+            font-size: calc(7.2px + 0.5pt);
+            line-height: 1.3;
             text-align: center;
+            vertical-align: middle;
             border: 1px solid #e2e8f0;
         }
         .page-1 .univ-ref-table thead th {
@@ -1074,14 +1093,51 @@
             font-weight: 700;
             text-align: left;
             padding-left: 4px;
-            width: 18%;
+            width: 14%;
         }
-        .page-1 .univ-ref-table tbody tr:nth-child(even) td {
+        .page-1 .univ-ref-table tbody td.ref-note-cell {
+            text-align: left;
+            font-size: calc(6.8px + 0.5pt);
+            line-height: 1.28;
+            padding: 2px 3px;
+            color: var(--school-navy-dark);
+        }
+        .page-1 .univ-ref-table tbody tr:nth-child(even) td:not(.ref-note-cell) {
             background: #fafbfd;
         }
-        .page-1 .univ-ref-table .ref-tier-s { color: #b91c1c; font-weight: 800; }
-        .page-1 .univ-ref-table .ref-tier-a { color: #c2410c; font-weight: 700; }
-        .page-1 .univ-ref-table .ref-tier-b { color: #1d4ed8; font-weight: 700; }
+        .page-1 .univ-ref-cell-inner {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+        }
+        .page-1 .univ-ref-mark {
+            font-size: calc(8px + 0.5pt);
+            line-height: 1;
+        }
+        .page-1 .univ-ref-grade {
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        .page-1 .univ-ref-sub {
+            font-size: calc(6.5px + 0.5pt);
+            font-weight: 600;
+            color: #64748b;
+        }
+        .page-1 .ref-cell-official .univ-ref-grade { color: #b91c1c; }
+        .page-1 .ref-cell-estimate .univ-ref-grade { color: #c2410c; }
+        .page-1 .ref-cell-none .univ-ref-grade { color: #475569; }
+        .page-1 .univ-ref-disclaimer {
+            margin: 1.6mm 0 0;
+            padding: 2mm 2.5mm;
+            font-size: calc(7px + 0.5pt);
+            line-height: 1.4;
+            color: var(--school-muted);
+            font-weight: 600;
+            background: #f8fafc;
+            border: 1px solid #e8edf4;
+            border-radius: 4px;
+        }
         .page-1 #rowGrade td,
         .page-1 #rowGrade th.row-label {
             font-weight: 800;
@@ -1329,6 +1385,8 @@
             #printContainer .report-grade-goal-table .goal-cell,
             #printContainer .univ-ref-table thead th,
             #printContainer .univ-ref-table tbody th.univ-name,
+            #printContainer .ref-cell-official .univ-ref-grade,
+            #printContainer .ref-cell-estimate .univ-ref-grade,
             #printContainer .page-1 .student-info {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -1583,9 +1641,15 @@
             <section class="report-zone report-zone-univ-ref">
             <div class="report-block report-block-univ-ref">
             <h3>주요 대학 학생부교과 등급 기준 안내 (참고용 커트라인)</h3>
-            <p class="univ-ref-note">※ 2022 개정 5등급제(1등급 10%·2등급 34%·3등급 66%·4등급 90%) · 교과 등급 참고 · 전형·학과별 상이</p>
+            <p class="univ-ref-scale-note"><span class="univ-ref-mark">🔴</span> <strong>2022 개정 5등급제(교육부 고교학점제)</strong> — 1등급 상위 10% · 2등급 34% · 3등급 66% · 4등급 90% · 5등급 100%</p>
+            <div class="univ-ref-legend">
+                <span><span class="univ-ref-mark">🔴</span> 공식 발표(입학처·모집요강)</span>
+                <span><span class="univ-ref-mark">🟡</span> 복수 매체 교차 확인 추정(참고용)</span>
+                <span><span class="univ-ref-mark">⚫</span> 미공시·해당없음</span>
+            </div>
+            <p class="univ-ref-note">※ 등급란은 교과 5등급 기준 경쟁 참고치이며, 입학처가 과목별 5등급 컷을 별도 공시하지 않는 경우가 많습니다.</p>
             <div class="report-panel">
-            <table class="univ-ref-table">
+            <table class="univ-ref-table" id="univRefTable">
                 <thead>
                     <tr>
                         <th>대학</th>
@@ -1595,24 +1659,71 @@
                         <th>비고</th>
                     </tr>
                 </thead>
-                <tbody>
-                    <tr><th class="univ-name">서울대</th><td class="ref-tier-s">1등급</td><td class="ref-tier-s">1등급</td><td class="ref-tier-s">1등급</td><td>최상위</td></tr>
-                    <tr><th class="univ-name">연세대</th><td class="ref-tier-s">1~2등급</td><td class="ref-tier-s">1~2등급</td><td class="ref-tier-s">1등급</td><td>SKY</td></tr>
-                    <tr><th class="univ-name">고려대</th><td class="ref-tier-s">1~2등급</td><td class="ref-tier-s">1~2등급</td><td class="ref-tier-s">1~2등급</td><td>SKY</td></tr>
-                    <tr><th class="univ-name">성균관대</th><td class="ref-tier-a">2등급 이내</td><td class="ref-tier-a">2등급 이내</td><td class="ref-tier-s">1~2등급</td><td>상위</td></tr>
-                    <tr><th class="univ-name">한양대</th><td class="ref-tier-a">2등급 이내</td><td class="ref-tier-a">2등급 이내</td><td class="ref-tier-a">1~2등급</td><td>상위</td></tr>
-                    <tr><th class="univ-name">서강대</th><td class="ref-tier-a">2등급 이내</td><td class="ref-tier-a">2등급 이내</td><td>—</td><td>상위</td></tr>
-                    <tr><th class="univ-name">중앙대</th><td class="ref-tier-a">2~3등급</td><td class="ref-tier-a">2~3등급</td><td class="ref-tier-a">2등급 이내</td><td>중상위</td></tr>
-                    <tr><th class="univ-name">경희대</th><td class="ref-tier-b">3등급 이내</td><td class="ref-tier-b">3등급 이내</td><td class="ref-tier-a">2~3등급</td><td>중상위</td></tr>
-                    <tr><th class="univ-name">이화여대</th><td class="ref-tier-a">2등급 이내</td><td>—</td><td class="ref-tier-a">2등급 이내</td><td>인문 강세</td></tr>
-                    <tr><th class="univ-name">한국외대</th><td class="ref-tier-a">2~3등급</td><td>—</td><td>—</td><td>어학·인문</td></tr>
-                    <tr><th class="univ-name">건국대(서울)</th><td class="ref-tier-b">3등급 이내</td><td class="ref-tier-b">3등급 이내</td><td>—</td><td>중상위</td></tr>
-                    <tr><th class="univ-name">동국대</th><td class="ref-tier-b">3등급 이내</td><td class="ref-tier-b">3등급 이내</td><td>—</td><td>중위권</td></tr>
-                </tbody>
+                <tbody id="univRefTableBody"></tbody>
             </table>
             </div>
+            <p class="univ-ref-disclaimer">본 자료는 참고용이며, 실제 합격선은 경쟁률·지원자 수준에 따라 다를 수 있습니다. 반드시 각 대학 입학처 공식 자료를 확인하세요.</p>
             </div>
             </section>
+            <script>
+            (function renderUnivRefTableOnly() {
+                var NONE = 'none';
+                var EST = 'estimate';
+                var OFF = 'official';
+                function cell(mark, grade, sub) {
+                    var cls = mark === OFF ? 'ref-cell-official' : (mark === EST ? 'ref-cell-estimate' : 'ref-cell-none');
+                    var markChar = mark === OFF ? '🔴' : (mark === EST ? '🟡' : '⚫');
+                    var gradeText = grade || '미공시';
+                    var subHtml = sub ? '<span class="univ-ref-sub">' + sub + '</span>' : '';
+                    return '<td class="' + cls + '"><span class="univ-ref-cell-inner"><span class="univ-ref-mark">' + markChar + '</span><span class="univ-ref-grade">' + gradeText + '</span>' + subHtml + '</span></td>';
+                }
+                var rows = [
+                    { name: '서울대', h: NONE, n: NONE, m: NONE, hG: '해당없음', nG: '해당없음', mG: '해당없음',
+                      note: '전형: 종합(지역/일반/기회균형)·교과전형 없음 · 수능최저: 전형별 적용 · 출처: 입학처 2026🔴' },
+                    { name: '연세대', h: EST, n: EST, m: EST, hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
+                      hG: '1~2등급', nG: '1~2등급', mG: '1등급',
+                      note: '전형: 교과우수자(추천/일반)·교과100% · 수능최저: 일반형 O · 출처: 2026모집요강🔴/경쟁참고 생글생글·교육비추다🟡' },
+                    { name: '고려대', h: EST, n: EST, m: EST, hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
+                      hG: '1~2등급', nG: '1~2등급', mG: '1~2등급',
+                      note: '전형: 학교추천(교과90%+서류10%) · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
+                    { name: '성균관대', h: EST, n: EST, m: EST, hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
+                      hG: '1~2등급', nG: '1~2등급', mG: '1~2등급',
+                      note: '전형: 교과(학교장추천) · 수능최저: O(등급합) · 출처: 입학처 2026🔴/교과등급 경쟁🟡' },
+                    { name: '한양대', h: EST, n: EST, m: EST, hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
+                      hG: '2등급 이내', nG: '2등급 이내', mG: '1~2등급',
+                      note: '전형: 교과(추천)·학종(추천) · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
+                    { name: '서강대', h: EST, n: EST, m: NONE, hSub: '참고용 추정', nSub: '참고용 추정',
+                      hG: '2등급 이내', nG: '2등급 이내', mG: '미공시',
+                      note: '전형: 교과·학종·지역균형 · 수능최저: 전형별 · 출처: 입학처 2026🔴/경쟁참고🟡' },
+                    { name: '중앙대', h: EST, n: EST, m: EST, hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
+                      hG: '2~3등급', nG: '2등급 이내', mG: '2등급 이내',
+                      note: '전형: 교과·학종 · 수능최저: 전형별 · 출처: 입학처 2026🔴/경쟁참고🟡' },
+                    { name: '경희대', h: EST, n: EST, m: EST, hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
+                      hG: '2~3등급', nG: '2~3등급', mG: '2~3등급',
+                      note: '전형: 교과·학종 · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
+                    { name: '이화여대', h: EST, n: NONE, m: EST, hSub: '참고용 추정', mSub: '참고용 추정',
+                      hG: '2등급 이내', nG: '미공시', mG: '2등급 이내',
+                      note: '전형: 교과(추천) · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
+                    { name: '한국외대', h: EST, n: NONE, m: NONE, hSub: '참고용 추정', hG: '2~3등급', nG: '미공시', mG: '미공시',
+                      note: '전형: 교과·학종 · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
+                    { name: '건국대(서울)', h: EST, n: EST, m: NONE, hSub: '참고용 추정', nSub: '참고용 추정',
+                      hG: '3등급 이내', nG: '3등급 이내', mG: '미공시',
+                      note: '전형: 교과·학종 · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
+                    { name: '동국대', h: EST, n: EST, m: NONE, hSub: '참고용 추정', nSub: '참고용 추정',
+                      hG: '3등급 이내', nG: '3등급 이내', mG: '미공시',
+                      note: '전형: 교과·학종 · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' }
+                ];
+                var body = document.getElementById('univRefTableBody');
+                if (!body) return;
+                body.innerHTML = rows.map(function(r) {
+                    return '<tr><th class="univ-name">' + r.name + '</th>' +
+                        cell(r.h, r.hG || '미공시', r.hSub) +
+                        cell(r.n, r.nG || '미공시', r.nSub) +
+                        cell(r.m, r.mG || '미공시', r.mSub) +
+                        '<td class="ref-note-cell">' + r.note + '</td></tr>';
+                }).join('');
+            })();
+            </script>
             </div>
             <footer class="page-footer">
                 <p class="page-footer-num" aria-label="페이지 번호"></p>
