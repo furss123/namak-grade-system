@@ -256,11 +256,11 @@
             border-top: 1px solid #c5d0e0; text-align: center;
             font-size: calc(8px + 1pt); color: #64748b; line-height: 1.45;
         }
-        .page-footer-meta { margin: 0 0 2mm; font-weight: 500; }
         .page-footer-num {
-            margin: 0; font-weight: 700; color: var(--school-navy);
+            margin: 0 0 2mm; font-weight: 700; color: var(--school-navy);
             font-size: calc(9px + 1pt); letter-spacing: 0.12em;
         }
+        .page-footer-meta { margin: 0; font-weight: 500; }
         #printContainer .report-wrapper { counter-reset: report-page 0; }
         #printContainer .page { counter-increment: report-page; }
         #printContainer .page-footer-num::before {
@@ -575,8 +575,8 @@
             </table>
             </div>
             <footer class="page-footer">
-                <p class="page-footer-meta"></p>
                 <p class="page-footer-num" aria-label="페이지 번호"></p>
+                <p class="page-footer-meta"></p>
             </footer>
         </div>
 
@@ -591,8 +591,8 @@
                 <tbody id="distTableBody"></tbody>
             </table>
             <footer class="page-footer">
-                <p class="page-footer-meta"></p>
                 <p class="page-footer-num" aria-label="페이지 번호"></p>
+                <p class="page-footer-meta"></p>
             </footer>
         </div>
     </div>
