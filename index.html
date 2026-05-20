@@ -200,15 +200,14 @@
         }
         .upload-box,
         .upload-guide-box {
-            flex: 1 1 0;
             min-width: 0;
             max-width: none;
-            width: calc(50% - 7px);
         }
         .upload-box {
+            flex: 4 1 0;
             display: flex; align-items: center;
             gap: 12px;
-            padding: calc(14px - 1mm) 16px; min-height: calc(132px - 28mm);
+            padding: calc(14px - 1mm) 16px; min-height: calc(132px - 33mm);
             background: linear-gradient(145deg, #f7fafd 0%, #eef4fa 100%);
             border: 2px dashed #a8bdd4; border-radius: var(--radius-lg); cursor: pointer;
             transition: border-color 0.25s var(--ease), background 0.25s var(--ease),
@@ -285,13 +284,15 @@
             content: '② '; color: var(--school-accent);
         }
         .upload-guide-box {
+            flex: 6 1 0;
+            width: calc(60% - 8.4px);
             display: flex;
             flex-direction: column;
             align-items: stretch;
             justify-content: space-between;
             gap: 8px;
             padding: calc(14px - 1mm) 16px;
-            min-height: calc(132px - 28mm);
+            min-height: calc(132px - 33mm);
             background: linear-gradient(160deg, #f9fbfd 0%, #f0f5fb 100%);
             border: 1px solid var(--school-border-light);
             border-radius: var(--radius-lg);
@@ -783,12 +784,12 @@
             margin: 0;
             width: 100%;
             box-sizing: border-box;
-            padding: 0 4.5mm;
+            padding: 1.5mm 4.5mm;
             line-height: 1;
             background: linear-gradient(180deg, #f7fafd 0%, #eef3f9 100%);
             border: none;
             border-radius: 0;
-            font-size: calc(var(--rpt-font-base) + 4pt);
+            font-size: calc(var(--rpt-font-base) + 3pt);
             font-weight: 600;
             color: var(--school-navy-dark);
             display: flex;
@@ -798,12 +799,12 @@
         }
         .page-1 .student-info .avg-grade-pill {
             flex-shrink: 0;
-            padding: 0 3.5mm;
+            padding: 1.5mm 3.5mm;
             line-height: 1;
             border-radius: 999px;
             background: #fff;
             border: 1px solid #c5d4e4;
-            font-size: calc(var(--rpt-font-sm) + 4pt);
+            font-size: calc(var(--rpt-font-sm) + 3pt);
             font-weight: 700;
             color: var(--school-navy);
             white-space: nowrap;
