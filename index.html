@@ -968,69 +968,110 @@ function hasCellValue(value) {
     return trimCell(value) !== '';
 }
 
-/** 학번·이름·반/번호 양식, 성적데이터 시트 모두 지원 */
-function parseGradeRowsFromSheet(worksheet) {
-    const rawRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
-    const students = [];
-    const defaultGrade = 1;
+function normalizeHeaderKey(key) {
+    return trimCell(key).replace(/^\uFEFF/, '');
+}
 
+/** 반·번호·이름·교과 점수 / 학번·이름 양식 공통 */
+function buildStudentFromCells(cells, defaultGrade) {
+    const name = trimCell(cells['이름']);
+    const banRaw = cells['반'];
+    const numRaw = cells['번호'];
+    const hasBan = hasCellValue(banRaw);
+    const hasNum = hasCellValue(numRaw);
+    let studentId = trimCell(cells['학번']);
+    const gradeYear = hasCellValue(cells['학년']) ? parseInt(cells['학년'], 10) : defaultGrade;
+
+    if (!name && !studentId && !(hasBan && hasNum)) return null;
+
+    if (!studentId && hasBan && hasNum) {
+        const ban = parseInt(banRaw, 10);
+        const num = parseInt(numRaw, 10);
+        if (Number.isNaN(ban) || Number.isNaN(num) || num < 1) return null;
+        studentId = String(gradeYear) + String(ban) + String(num).padStart(2, '0');
+    }
+
+    if (!studentId) return null;
+
+    const student = {
+        '학번': studentId,
+        '이름': name,
+        '학년': Number.isNaN(gradeYear) ? defaultGrade : gradeYear,
+        '반': hasBan ? parseInt(banRaw, 10) : parseInt(studentId.substring(1, studentId.length - 2), 10),
+        '번호': hasNum ? parseInt(numRaw, 10) : parseInt(studentId.slice(-2), 10)
+    };
+
+    Object.keys(cells).forEach((key) => {
+        if (!key || UPLOAD_META_KEYS.has(key)) return;
+        if (hasCellValue(cells[key]) || cells[key] === 0) student[key] = cells[key];
+    });
+
+    return student;
+}
+
+function findGradeHeaderRowIndex(aoa) {
+    for (let i = 0; i < Math.min(15, aoa.length); i++) {
+        const labels = (aoa[i] || []).map((c) => normalizeHeaderKey(c));
+        if (labels.includes('이름') && (labels.includes('학번') || (labels.includes('반') && labels.includes('번호')))) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+/** grade-upload-template.xlsx, 1학년 성적파일 등 (반·번호·이름·교과) */
+function parseGradeRowsFromSheet(worksheet) {
+    const aoa = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+    if (!aoa.length) return [];
+
+    const defaultGrade = 1;
+    const headerIdx = findGradeHeaderRowIndex(aoa);
+    const students = [];
+
+    if (headerIdx >= 0) {
+        const headers = (aoa[headerIdx] || []).map((c) => normalizeHeaderKey(c));
+        for (let r = headerIdx + 1; r < aoa.length; r++) {
+            const row = aoa[r] || [];
+            const cells = {};
+            headers.forEach((h, ci) => {
+                if (h) cells[h] = row[ci];
+            });
+            const student = buildStudentFromCells(cells, defaultGrade);
+            if (student) students.push(student);
+        }
+        return students;
+    }
+
+    const rawRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
     for (const row of rawRows) {
         const cells = {};
         Object.keys(row).forEach((key) => {
-            cells[trimCell(key)] = row[key];
+            cells[normalizeHeaderKey(key)] = row[key];
         });
-
-        const name = trimCell(cells['이름']);
-        const banRaw = cells['반'];
-        const numRaw = cells['번호'];
-        const hasBan = hasCellValue(banRaw);
-        const hasNum = hasCellValue(numRaw);
-        let studentId = trimCell(cells['학번']);
-        const gradeYear = hasCellValue(cells['학년']) ? Number(cells['학년']) : defaultGrade;
-
-        if (!name && !studentId && !(hasBan && hasNum)) continue;
-
-        if (!studentId && hasBan && hasNum) {
-            const ban = Number(banRaw);
-            const num = Number(numRaw);
-            if (Number.isNaN(ban) || Number.isNaN(num)) continue;
-            studentId = String(gradeYear) + String(ban) + String(num).padStart(2, '0');
-        }
-
-        if (!studentId) continue;
-
-        const student = {
-            '학번': studentId,
-            '이름': name,
-            '학년': gradeYear,
-            '반': hasBan ? Number(banRaw) : Number(studentId.substring(1, studentId.length - 2)),
-            '번호': hasNum ? Number(numRaw) : Number(studentId.slice(-2))
-        };
-
-        Object.keys(cells).forEach((key) => {
-            if (!key || UPLOAD_META_KEYS.has(key)) return;
-            if (hasCellValue(cells[key])) student[key] = cells[key];
-        });
-
-        students.push(student);
+        const student = buildStudentFromCells(cells, defaultGrade);
+        if (student) students.push(student);
     }
     return students;
 }
 
 function parseWorkbookToStudents(workbook) {
-    const sheetOrder = ['성적데이터', '성적', 'Sheet1'];
     const tried = new Set();
+    const rankedNames = [];
 
-    for (const preferred of sheetOrder) {
-        const name = workbook.SheetNames.find((n) => n === preferred);
-        if (!name || tried.has(name)) continue;
+    workbook.SheetNames.forEach((name) => {
+        let rank = 10;
+        if (name === '성적데이터') rank = 0;
+        else if (name.includes('성적')) rank = 1;
+        else if (name.includes('1학년')) rank = 2;
+        else if (name === 'Sheet1') rank = 3;
+        else if (name === '작성안내') rank = 99;
+        rankedNames.push({ name, rank });
+    });
+    rankedNames.sort((a, b) => a.rank - b.rank);
+
+    for (const { name, rank } of rankedNames) {
+        if (rank >= 99 || tried.has(name)) continue;
         tried.add(name);
-        const students = parseGradeRowsFromSheet(workbook.Sheets[name]);
-        if (students.length > 0) return students;
-    }
-
-    for (const name of workbook.SheetNames) {
-        if (tried.has(name) || name === '작성안내') continue;
         const students = parseGradeRowsFromSheet(workbook.Sheets[name]);
         if (students.length > 0) return students;
     }
