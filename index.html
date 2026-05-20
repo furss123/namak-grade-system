@@ -93,11 +93,11 @@
         .panel-section:last-child { border-bottom: none; }
         .section-label {
             display: flex; align-items: center; gap: 8px;
-            font-size: 0.82rem; font-weight: 800; color: var(--school-navy);
+            font-size: calc(0.82rem + 2pt); font-weight: 800; color: var(--school-navy);
             text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px;
         }
         .section-label::before {
-            content: ''; width: 4px; height: 14px; border-radius: 2px;
+            content: ''; width: 4px; height: calc(14px + 2pt); border-radius: 2px;
             background: linear-gradient(180deg, var(--school-accent), var(--school-navy-light));
         }
 
@@ -131,7 +131,7 @@
         }
         .query-card:last-child { margin-bottom: 0; }
         .query-card-title {
-            font-size: 12px; font-weight: 700; color: var(--school-navy); margin-bottom: 10px;
+            font-size: calc(12px + 2pt); font-weight: 700; color: var(--school-navy); margin-bottom: 10px;
         }
         .input-area { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .input-area input {
@@ -165,7 +165,7 @@
         .stats-dashboard .stats-table-wrap {
             overflow-x: auto; border-radius: 8px; border: 1px solid var(--school-border);
         }
-        .stats-table { width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed; }
+        .stats-table { width: 100%; border-collapse: collapse; font-size: calc(12px + 1pt); table-layout: fixed; }
         .stats-table thead th {
             background: linear-gradient(180deg, var(--school-navy) 0%, var(--school-navy-dark) 100%);
             color: #fff; font-weight: 600; padding: 11px 8px; border: 1px solid var(--school-navy-dark);
@@ -355,7 +355,7 @@
                 </svg>
                 <div class="upload-text-container">
                     <div class="upload-title" id="uploadTitle">엑셀 성적 파일 등록하기</div>
-                    <span class="upload-desc" id="fileStatus">여기를 클릭하거나 파일을 드래그하여 불러와주세요.</span>
+                    <span class="upload-desc" id="fileStatus">여기를 클릭하거나 드래그하여 .xlsx 성적 파일을 첨부해 주세요.</span>
                 </div>
             </div>
         </section>
