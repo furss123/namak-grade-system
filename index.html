@@ -459,20 +459,25 @@
             margin: 0 auto; box-sizing: border-box;
             background: #fff; border: 1px solid var(--school-border-light);
             box-shadow: var(--shadow-md); position: relative; overflow: hidden;
-            display: flex; flex-direction: column;
-            padding: 24mm 12mm 0 12mm;
+            display: grid;
+            grid-template-rows: 3mm minmax(0, 1fr) 11mm;
+            grid-template-columns: 1fr;
+            padding: 0;
         }
         .page-body {
-            flex: 1 1 auto; min-height: 0;
-            display: flex; flex-direction: column;
+            grid-row: 2;
+            min-height: 0; overflow: hidden;
+            padding: 21mm 12mm 2mm 12mm;
+            box-sizing: border-box;
         }
         .page-footer {
-            flex: 0 0 auto; margin-top: auto;
-            width: 100%; margin-left: 0; margin-right: 0;
-            padding: 2mm 0 8mm;
+            grid-row: 3;
+            align-self: stretch;
+            width: 100%; margin: 0;
+            padding: 2mm 12mm 0;
             border-top: 1px solid #e2e8f0; text-align: center;
-            font-size: calc(8.5px + 1pt); color: var(--school-muted); line-height: 1.4;
-            min-height: 7mm; background: #fff;
+            font-size: calc(8.5px + 1pt); color: var(--school-muted); line-height: 1.35;
+            background: #fff; box-sizing: border-box;
         }
         .page-footer-num {
             margin: 0; font-weight: 600; color: var(--school-navy-light);
@@ -507,15 +512,22 @@
             content: "- " counter(report-page) " -";
         }
         .page-top-accent {
-            position: absolute; top: 0; left: 0; right: 0; z-index: 5;
-            height: 3mm; pointer-events: none;
-            background: var(--school-navy-dark);
-            background: linear-gradient(90deg, var(--school-navy-dark) 0%, var(--school-navy) 50%, var(--school-accent) 100%);
+            grid-row: 1;
+            display: flex;
+            width: 100%; height: 3mm;
+            pointer-events: none;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
-        .page.page-1,
-        .page.page-2 { padding: 24mm 12mm 0 12mm; }
+        .page-top-accent span {
+            flex: 1;
+            height: 100%;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .page-top-accent-navy { background: #0f2440; }
+        .page-top-accent-mid { background: #1e3a5f; }
+        .page-top-accent-gold { background: #c4a035; }
         .page-1 .student-info {
             margin-bottom: 3mm; padding: 3.5mm 5mm;
             background: linear-gradient(180deg, #f5f8fc 0%, #eef3f9 100%);
@@ -596,6 +608,11 @@
             background: #e8eef5; color: var(--school-navy-dark); font-weight: 700;
         }
 
+        @page {
+            size: A4 portrait;
+            margin: 0;
+        }
+
         @media print {
             html, body {
                 background: white; margin: 0; padding: 0;
@@ -616,41 +633,48 @@
             }
             #printContainer .page {
                 border: none; box-shadow: none; margin: 0;
-                width: 210mm; height: 297mm; min-height: 297mm; max-height: 297mm;
-                display: flex !important; flex-direction: column !important;
-                overflow: hidden;
+                width: 210mm !important; height: 297mm !important;
+                min-height: 297mm !important; max-height: 297mm !important;
+                display: grid !important;
+                grid-template-rows: 3mm minmax(0, 1fr) 11mm !important;
+                overflow: hidden !important;
                 page-break-inside: avoid;
                 page-break-after: avoid;
-                padding: 24mm 12mm 0 12mm !important;
-                box-sizing: border-box;
+                padding: 0 !important;
+                box-sizing: border-box !important;
             }
             #printContainer .page + .page { page-break-before: always; }
-            #printContainer .page-body { flex: 1 1 auto; min-height: 0; }
+            #printContainer .page-body {
+                grid-row: 2 !important;
+                min-height: 0 !important;
+                overflow: hidden !important;
+                padding: 21mm 12mm 2mm 12mm !important;
+            }
             #printContainer .page-doc-header,
             #printContainer .page-logo {
                 -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
             #printContainer .page-footer {
+                grid-row: 3 !important;
                 position: relative !important;
-                flex: 0 0 auto !important;
-                margin-top: auto !important;
+                margin: 0 !important;
                 width: 100% !important;
-                left: auto !important; right: auto !important; bottom: auto !important;
-                padding: 2mm 0 8mm !important;
-                border-top-color: #94a3b8; background: #fff;
-                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+                padding: 2mm 12mm 0 !important;
+                border-top-color: #94a3b8 !important;
+                background: #fff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             #printContainer .page-top-accent {
-                display: block !important;
+                display: flex !important;
+                grid-row: 1 !important;
                 height: 3mm !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
-                background: linear-gradient(
-                    90deg,
-                    #0f2440 0%,
-                    #1e3a5f 50%,
-                    #c4a035 100%
-                ) !important;
+            }
+            #printContainer .page-top-accent span {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
             }
             #printContainer .grade-graph-container,
             #printContainer .g-bar-1,
@@ -800,7 +824,11 @@
 
     <div id="reportTemplate" class="report-wrapper">
         <div class="page page-1">
-            <div class="page-top-accent" aria-hidden="true"></div>
+            <div class="page-top-accent" aria-hidden="true">
+                <span class="page-top-accent-navy"></span>
+                <span class="page-top-accent-mid"></span>
+                <span class="page-top-accent-gold"></span>
+            </div>
             <div class="page-body">
             <div class="page-doc-header">
                 <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
@@ -888,7 +916,11 @@
         </div>
 
         <div class="page page-2">
-            <div class="page-top-accent" aria-hidden="true"></div>
+            <div class="page-top-accent" aria-hidden="true">
+                <span class="page-top-accent-navy"></span>
+                <span class="page-top-accent-mid"></span>
+                <span class="page-top-accent-gold"></span>
+            </div>
             <div class="page-body">
             <div class="page-doc-header">
                 <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
