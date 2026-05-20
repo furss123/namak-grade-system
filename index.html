@@ -926,6 +926,7 @@
             max-width: 100%;
             max-height: 54mm;
             height: auto;
+            overflow: visible;
         }
         .page-1 .report-radar-side {
             display: flex;
@@ -2892,17 +2893,34 @@ function renderStudentGradeRadar(subjectRows) {
         dot.setAttribute('fill', '#1e3a5f');
         svgEl.appendChild(dot);
 
-        const labPt = polar(maxR + 14, i);
+        const labPt = polar(maxR + 20, i);
         const text = document.createElementNS(NS, 'text');
         text.setAttribute('x', String(labPt.x));
         text.setAttribute('y', String(labPt.y));
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'middle');
-        text.setAttribute('font-size', '8.5');
-        text.setAttribute('font-weight', '700');
-        text.setAttribute('fill', '#334155');
-        const shortName = row.subject.length > 4 ? row.subject.slice(0, 4) : row.subject;
-        text.textContent = shortName + ' ' + row.grade;
+        text.setAttribute('fill', '#1e3a5f');
+        text.setAttribute('font-family', 'Pretendard, Malgun Gothic, sans-serif');
+        text.setAttribute('stroke', '#fff');
+        text.setAttribute('stroke-width', '2.5');
+        text.setAttribute('paint-order', 'stroke fill');
+
+        const nameSpan = document.createElementNS(NS, 'tspan');
+        nameSpan.setAttribute('x', String(labPt.x));
+        nameSpan.setAttribute('dy', '-0.55em');
+        nameSpan.setAttribute('font-size', '11');
+        nameSpan.setAttribute('font-weight', '700');
+        nameSpan.textContent = row.subject;
+
+        const gradeSpan = document.createElementNS(NS, 'tspan');
+        gradeSpan.setAttribute('x', String(labPt.x));
+        gradeSpan.setAttribute('dy', '1.15em');
+        gradeSpan.setAttribute('font-size', '12.5');
+        gradeSpan.setAttribute('font-weight', '800');
+        gradeSpan.textContent = row.grade + '등급';
+
+        text.appendChild(nameSpan);
+        text.appendChild(gradeSpan);
         svgEl.appendChild(text);
     });
 
