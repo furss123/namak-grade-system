@@ -30,6 +30,8 @@
             --radius-md: 12px;
             --radius-lg: 16px;
             --ease: cubic-bezier(0.4, 0, 0.2, 1);
+            --content-max: 980px;
+            --content-pad: 20px;
         }
 
         @page { size: A4; margin: 0; }
@@ -39,11 +41,17 @@
         body {
             font-family: 'Pretendard', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
             font-size: 14px; line-height: 1.55; margin: 0; padding: 0;
-            background: linear-gradient(165deg, #e4eaf2 0%, #f0f3f8 40%, #e9eef5 100%);
+            background: #e8edf3;
             color: var(--school-text);
             min-height: 100vh;
             display: flex; flex-direction: column;
             -webkit-font-smoothing: antialiased;
+        }
+        .app-layout {
+            flex: 1 0 auto; width: 100%;
+            max-width: var(--content-max); margin: 0 auto;
+            padding: 20px var(--content-pad) 0;
+            display: flex; flex-direction: column; gap: 20px;
         }
 
         /* ===== 화면 UI ===== */
@@ -58,7 +66,7 @@
         }
         .site-header-inner {
             position: relative; z-index: 1;
-            max-width: 980px; margin: 0 auto; padding: 22px 28px 24px;
+            max-width: var(--content-max); margin: 0 auto; padding: 22px 28px 24px;
             display: flex; align-items: center; gap: 22px;
         }
         .school-logo {
@@ -86,16 +94,21 @@
             letter-spacing: 0.03em;
         }
 
-        .app-main { max-width: 980px; margin: 0 auto; padding: 28px 20px 20px; width: 100%; }
+        .app-main { width: 100%; margin: 0; padding: 0; }
 
-        .app-footer {
-            width: 100%; max-width: 980px; margin: auto auto 0; padding: 22px 28px 32px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.55);
-            border-top: 1px solid var(--school-border-light);
-            color: var(--school-muted); font-size: 0.78rem; line-height: 1.75;
-            flex-shrink: 0;
+        .site-footer {
+            width: 100%; margin-top: auto; flex-shrink: 0;
+            background: #fff;
+            border-top: 1px solid var(--school-border);
+            box-shadow: 0 -4px 20px rgba(15, 36, 64, 0.06);
         }
+        .site-footer-inner {
+            max-width: var(--content-max); margin: 0 auto;
+            padding: 18px var(--content-pad) 24px;
+            text-align: center;
+            color: var(--school-muted); font-size: 0.78rem; line-height: 1.75;
+        }
+        .app-footer { /* legacy alias */ }
         .app-footer-version {
             margin: 0 0 6px; font-weight: 700; color: var(--school-navy-light);
             letter-spacing: 0.02em;
@@ -115,7 +128,6 @@
             border-bottom: 1px solid var(--school-border-light);
         }
         .panel-section:last-child { border-bottom: none; }
-        .panel-section:nth-child(even) { background: linear-gradient(180deg, #fcfdfe 0%, #fff 100%); }
         .section-label {
             display: flex; align-items: center; gap: 10px;
             font-size: calc(0.88rem + 2pt); font-weight: 700; color: var(--school-navy);
@@ -259,7 +271,7 @@
         .stats-table tr.stats-group-cut td:not(.stats-label) { background: #f5f3ff; font-weight: 600; color: #4c1d95; }
 
         .report-action-section {
-            display: none; max-width: 980px; margin: 24px auto 0;
+            display: none; width: 100%; margin: 0;
             padding: 24px 30px; background: var(--school-card);
             border-radius: var(--radius-lg); border: 1px solid var(--school-border-light);
             box-shadow: var(--shadow-md);
@@ -269,7 +281,8 @@
         }
         .report-action-section .section-label::before { display: none; }
         #printContainer {
-            max-width: 980px; margin: 28px auto 0; width: 100%;
+            width: 100%; max-width: var(--content-max); margin: 0 auto;
+            padding: 0 var(--content-pad) 8px;
             display: flex; flex-direction: column; gap: 20px;
         }
         #printContainer .page {
@@ -311,32 +324,29 @@
             font-size: calc(8.5px + 1pt); color: var(--school-muted); line-height: 1.4;
             min-height: 7mm; background: #fff;
         }
-        .page.page-2 .page-footer { left: 15mm; right: 15mm; }
         .page-footer-num {
             margin: 0; font-weight: 600; color: var(--school-navy-light);
             font-size: calc(9px + 1pt); letter-spacing: 0.2em;
         }
         .page-footer-meta { display: none; }
-        .page-letterhead {
-            display: flex; align-items: center; gap: 4mm;
-            margin: 0 0 5mm 0; padding-bottom: 3mm;
-            border-bottom: 1px solid #e2e8f0;
+        .page-doc-header {
+            display: flex; align-items: center; gap: 5mm;
+            margin: 0 0 4mm 0; padding-bottom: 3mm;
+            border-bottom: 1.5px solid var(--school-navy);
         }
-        .page-logo {
-            width: 14mm; height: 14mm; object-fit: contain; flex-shrink: 0;
+        .page-doc-header .page-logo {
+            width: 16mm; height: 16mm; object-fit: contain; flex-shrink: 0;
             border-radius: 50%; background: #fff;
             border: 1px solid #e2e8f0;
-            box-shadow: 0 1px 4px rgba(15, 36, 64, 0.08);
+            box-shadow: 0 1px 4px rgba(15, 36, 64, 0.1);
         }
-        .page-letterhead-text { min-width: 0; }
-        .page-school-name {
-            display: block; font-size: calc(11px + 1pt); font-weight: 800;
-            color: var(--school-navy-dark); letter-spacing: -0.02em; line-height: 1.3;
+        .page-doc-header h1 {
+            flex: 1; margin: 0; padding: 0; border: none;
+            text-align: left; font-size: calc(19px + 1.5pt);
+            font-weight: 700; color: var(--school-navy-dark);
+            letter-spacing: -0.03em; line-height: 1.3;
         }
-        .page-school-sub {
-            display: block; margin-top: 0.5mm;
-            font-size: calc(8px + 1pt); font-weight: 600; color: var(--school-muted);
-        }
+        .page-2 .page-doc-header h1 { font-size: calc(18px + 1pt); }
         #printContainer .report-wrapper { counter-reset: report-page 0; }
         #printContainer .page { counter-increment: report-page; }
         #printContainer .page-footer-num::before {
@@ -346,19 +356,9 @@
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3mm;
             background: linear-gradient(90deg, var(--school-navy-dark) 0%, var(--school-navy) 50%, var(--school-accent) 100%);
         }
-        .page.page-1 { padding: 26mm 12mm 20mm 12mm; }
-        .page.page-2 { padding: 26mm 15mm 20mm 15mm; }
-        .page-1 h1 {
-            text-align: center; color: var(--school-navy-dark);
-            font-size: calc(21px + 1.5pt); font-weight: 700; letter-spacing: -0.03em;
-            margin: 0 0 4mm 0; padding-bottom: 3mm;
-            border-bottom: 1.5px solid var(--school-navy); text-decoration: none;
-        }
-        .page-2 h1 {
-            text-align: center; color: var(--school-navy-dark);
-            font-size: calc(20px + 1pt); font-weight: 700; margin: 0 0 6mm 0;
-            padding-bottom: 2.5mm; border-bottom: 1.5px solid var(--school-navy); text-decoration: none;
-        }
+        .page.page-1 { padding: 24mm 12mm 20mm 12mm; }
+        .page.page-2 { padding: 24mm 12mm 20mm 12mm; }
+        .page.page-2 .page-footer { left: 12mm; right: 12mm; }
         .page-1 .student-info {
             margin-bottom: 3mm; padding: 3.5mm 5mm;
             background: linear-gradient(180deg, #f5f8fc 0%, #eef3f9 100%);
@@ -441,8 +441,9 @@
 
         @media print {
             html, body { background: white; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .site-header, .search-container, .report-action-section, .app-footer, .no-print,
+            .site-header, .app-layout, .site-footer, .app-footer, .no-print,
             #reportTemplate { display: none !important; }
+            #printContainer { display: block !important; }
             #printContainer { margin: 0; max-width: none; }
             #printContainer .report-wrapper {
                 display: block !important; margin: 0; page-break-after: auto;
@@ -451,9 +452,9 @@
                 border: none; box-shadow: none; margin: 0;
                 width: 210mm; height: 296mm; page-break-after: always; page-break-inside: avoid;
             }
-            #printContainer .page.page-1 { padding: 26mm 12mm 20mm 12mm; }
-            #printContainer .page.page-2 { padding: 26mm 15mm 20mm 15mm; }
-            #printContainer .page-letterhead,
+            #printContainer .page.page-1,
+            #printContainer .page.page-2 { padding: 24mm 12mm 20mm 12mm; }
+            #printContainer .page-doc-header,
             #printContainer .page-logo {
                 -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
@@ -462,7 +463,7 @@
                 border-top-color: #94a3b8; background: #fff;
                 -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
-            #printContainer .page.page-2 .page-footer { left: 15mm; right: 15mm; }
+            #printContainer .page.page-2 .page-footer { left: 12mm; right: 12mm; }
             #printContainer .page:last-child { page-break-after: avoid !important; }
         }
     </style>
@@ -480,7 +481,8 @@
         </div>
     </header>
 
-    <main class="app-main no-print">
+    <div class="app-layout no-print">
+    <main class="app-main">
     <div class="search-container">
         <section class="panel-section">
             <div class="section-label">성적 데이터 등록</div>
@@ -556,7 +558,7 @@
     </div>
     </main>
 
-    <div id="reportActionSection" class="report-action-section no-print">
+    <div id="reportActionSection" class="report-action-section">
         <div class="section-label">보고서 출력 · 초기화</div>
         <div class="report-action-buttons">
             <button type="button" class="print-btn" onclick="window.print()">
@@ -574,20 +576,18 @@
         </div>
     </div>
 
+    </div>
+
     <div id="printContainer"></div>
 
 
 
     <div id="reportTemplate" class="report-wrapper">
         <div class="page page-1">
-            <header class="page-letterhead">
-                <img src="assets/namak-logo.png" alt="남악고등학교" class="page-logo" width="49" height="49">
-                <div class="page-letterhead-text">
-                    <span class="page-school-name">남악고등학교</span>
-                    <span class="page-school-sub">1학년 성적 분석 · 2026학년도 1학기</span>
-                </div>
-            </header>
-            <h1>2026학년도 1학기 중간고사 결과 보고서</h1>
+            <div class="page-doc-header">
+                <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
+                <h1>2026학년도 1학기 정기고사 결과 보고서</h1>
+            </div>
             <div class="student-info">
                 <div id="infoStudentText">학생 정보 로딩중...</div>
                 <div>평균등급: <span id="infoAvgGrade">0.00</span></div>
@@ -669,14 +669,10 @@
         </div>
 
         <div class="page page-2">
-            <header class="page-letterhead">
-                <img src="assets/namak-logo.png" alt="남악고등학교" class="page-logo" width="49" height="49">
-                <div class="page-letterhead-text">
-                    <span class="page-school-name">남악고등학교</span>
-                    <span class="page-school-sub">1학년 성적 분석 · 2026학년도 1학기</span>
-                </div>
-            </header>
-            <h1 id="distPageTitle">학생 주변 성적분포</h1>
+            <div class="page-doc-header">
+                <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
+                <h1 id="distPageTitle">학생 주변 성적분포</h1>
+            </div>
             <p id="distTableNote" style="text-align: right; font-size: 10px; margin: 0 0 5px 0;">(※ 데이터가 없는 구간은 빈칸으로 표시되며, 내 점수 기준 위로는 오름차순, 아래로는 내림차순 정렬됩니다.)</p>
             
             <table id="distributionTable">
@@ -691,9 +687,11 @@
         </div>
     </div>
 
-    <footer class="app-footer no-print">
-        <p class="app-footer-version">배포 버전 <span id="appVersionDisplay">—</span></p>
-        <p class="app-footer-copy" id="appCopyrightDisplay">—</p>
+    <footer class="site-footer app-footer no-print" role="contentinfo">
+        <div class="site-footer-inner">
+            <p class="app-footer-version">배포 버전 <span id="appVersionDisplay">—</span></p>
+            <p class="app-footer-copy" id="appCopyrightDisplay">—</p>
+        </div>
     </footer>
 
 <script>
