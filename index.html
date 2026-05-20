@@ -193,11 +193,17 @@
             display: flex; align-items: stretch; gap: 14px;
             width: 100%;
         }
+        .upload-box,
+        .upload-guide-box {
+            flex: 1 1 0;
+            min-width: 0;
+            max-width: none;
+            width: calc(50% - 7px);
+        }
         .upload-box {
-            flex: 1; min-width: 0;
             display: flex; align-items: center;
-            gap: 16px;
-            padding: calc(18px - 1mm) 22px; min-height: calc(132px - 18mm);
+            gap: 12px;
+            padding: calc(16px - 1mm) 18px; min-height: calc(132px - 18mm);
             background: linear-gradient(145deg, #f7fafd 0%, #eef4fa 100%);
             border: 2px dashed #a8bdd4; border-radius: var(--radius-lg); cursor: pointer;
             transition: border-color 0.25s var(--ease), background 0.25s var(--ease),
@@ -229,7 +235,7 @@
         }
         .upload-box.success.drag-over { background: #d1fae5; }
         .upload-icon-wrap {
-            flex-shrink: 0; width: 64px; height: 64px; border-radius: 50%;
+            flex-shrink: 0; width: 56px; height: 56px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             background: #fff; border: 1px solid var(--school-border);
             box-shadow: var(--shadow-xs);
@@ -238,7 +244,7 @@
         .upload-box.success .upload-icon-wrap {
             border-color: var(--school-success); background: #fff;
         }
-        .upload-icon { width: 34px; height: 34px; color: var(--school-navy); }
+        .upload-icon { width: 30px; height: 30px; color: var(--school-navy); }
         .upload-box.success .upload-icon { color: var(--school-success); }
         .upload-step {
             font-size: calc(10px + 2pt); font-weight: 800; color: var(--school-navy);
