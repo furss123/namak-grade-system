@@ -195,6 +195,10 @@
         }
 
         .upload-row {
+            --upload-head-font: calc(12px + 1.5pt);
+            --upload-title-font: calc(11px + 1.5pt);
+            --upload-body-font: calc(10px + 1.5pt);
+            --upload-caption-font: calc(9px + 2pt);
             display: flex; align-items: stretch; gap: 12px;
             width: 100%;
         }
@@ -253,7 +257,9 @@
         .upload-icon { width: 24px; height: 24px; color: var(--school-navy); }
         .upload-box.success .upload-icon { color: var(--school-success); }
         .upload-step {
-            font-size: calc(9px + 1pt); font-weight: 800; color: var(--school-navy);
+            font-size: var(--upload-head-font);
+            font-weight: 800;
+            color: var(--school-navy-dark);
             letter-spacing: 0.02em;
             line-height: 1.2;
         }
@@ -261,20 +267,27 @@
             content: '① '; color: var(--school-accent);
         }
         .upload-title {
-            font-size: calc(11px + 0.5pt); font-weight: 800; color: var(--school-navy-dark);
+            font-size: var(--upload-title-font);
+            font-weight: 800;
+            color: var(--school-navy-dark);
             line-height: 1.25;
             word-break: keep-all;
             overflow-wrap: break-word;
         }
         .upload-title .upload-format {
             display: inline-block; margin-left: 5px; padding: 0 6px;
-            font-size: calc(9px + 0.5pt); font-weight: 700; color: var(--school-navy);
+            font-size: var(--upload-caption-font);
+            font-weight: 700;
+            color: var(--school-navy);
             background: #fff; border: 1px solid #c5d0e0; border-radius: 5px;
             vertical-align: middle;
         }
         .upload-desc {
-            font-size: calc(9px + 1pt); color: var(--school-text); font-weight: 600;
-            line-height: 1.25; margin: 0;
+            font-size: var(--upload-body-font);
+            color: var(--school-text);
+            font-weight: 600;
+            line-height: 1.25;
+            margin: 0;
             overflow-wrap: break-word;
         }
         .upload-side-step {
@@ -345,7 +358,7 @@
         .upload-guide-title {
             flex: 1;
             min-width: 0;
-            font-size: calc(12px + 0.5pt);
+            font-size: var(--upload-head-font);
             font-weight: 800;
             color: var(--school-navy-dark);
             line-height: 1.2;
@@ -353,7 +366,7 @@
         }
         .upload-guide-desc {
             margin: 0;
-            font-size: calc(10px + 0.5pt);
+            font-size: var(--upload-body-font);
             color: var(--school-muted);
             line-height: 1.3;
             text-align: left;
@@ -361,7 +374,7 @@
         .upload-guide-list {
             margin: 0;
             padding: 0 0 0 1.15em;
-            font-size: calc(10px + 0.5pt);
+            font-size: var(--upload-body-font);
             color: var(--school-muted);
             line-height: 1.28;
             text-align: left;
@@ -376,9 +389,6 @@
             .upload-box,
             .upload-guide-box {
                 width: 100%; max-width: none; min-width: 0; flex: 1 1 auto;
-            }
-            .upload-guide-body {
-                justify-content: flex-start;
             }
         }
 
