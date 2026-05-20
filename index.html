@@ -444,7 +444,7 @@
         }
         .stats-table {
             width: 100%; border-collapse: collapse; table-layout: fixed;
-            font-size: clamp(10px, 0.72rem + 0.42vw, calc(12px + 3pt));
+            font-size: clamp(10px, 0.72rem + 0.42vw, calc(12px + 2pt));
         }
         .stats-table th,
         .stats-table td {
@@ -456,12 +456,12 @@
         .stats-table thead th {
             background: var(--school-navy-dark);
             color: #fff; font-weight: 600;
-            padding: clamp(8px, 0.45rem + 0.35vw, calc(15px - 1mm))
+            padding: clamp(7px, 0.45rem + 0.35vw, calc(14px - 1mm - 1pt))
                 clamp(6px, 0.35rem + 0.4vw, 12px);
             text-align: center;
             border-color: #1a3352;
             letter-spacing: -0.01em;
-            line-height: 1.2;
+            line-height: 1.15;
         }
         .stats-table thead th.stats-head-corner {
             width: 16%;
@@ -474,19 +474,19 @@
             background: #f4f7fa;
             color: var(--school-navy-dark); font-weight: 600;
             text-align: center;
-            padding: clamp(7px, 0.4rem + 0.3vw, calc(14px - 1mm))
+            padding: clamp(6px, 0.4rem + 0.3vw, calc(13px - 1mm - 1pt))
                 clamp(5px, 0.3rem + 0.35vw, 10px);
             border-right: 1px solid #dce4ee;
             white-space: nowrap;
-            line-height: 1.2;
+            line-height: 1.15;
         }
         .stats-table tbody td.stats-val {
-            padding: clamp(7px, 0.4rem + 0.3vw, calc(14px - 1mm))
+            padding: clamp(6px, 0.4rem + 0.3vw, calc(13px - 1mm - 1pt))
                 clamp(5px, 0.35rem + 0.4vw, 12px);
             text-align: center;
             font-weight: 500; color: var(--school-text);
             background: #fff;
-            line-height: 1.2;
+            line-height: 1.15;
         }
         .stats-table tbody tr:hover td { background: #f9fbfd; }
         .stats-table tbody tr.stats-row-divider td {
@@ -603,12 +603,12 @@
 
         @container stats-wrap (max-width: 720px) {
             .stats-table {
-                font-size: clamp(9px, 2.6cqi + 6px, 14px);
+                font-size: clamp(9px, 2.6cqi + 6px, calc(13px + 1pt));
             }
         }
         @container stats-wrap (max-width: 520px) {
             .stats-table {
-                font-size: clamp(8px, 2.2cqi + 5px, 12px);
+                font-size: clamp(8px, 2.2cqi + 5px, calc(11px + 1pt));
             }
             .stats-table thead th.stats-head-corner,
             .stats-table tbody td.stats-row-label {
@@ -620,18 +620,18 @@
 
         @media (max-width: 900px) {
             .stats-table {
-                font-size: clamp(9px, 1.05vw + 8px, calc(12px + 2pt));
+                font-size: clamp(9px, 1.05vw + 8px, calc(12px + 1pt));
             }
         }
         @media (max-width: 600px) {
             .stats-table {
-                font-size: clamp(8px, 2.4vw + 6px, 11px);
+                font-size: clamp(8px, 2.4vw + 6px, calc(10px + 1pt));
             }
             .stats-table thead th,
             .stats-table tbody td.stats-row-label,
             .stats-table tbody td.stats-val {
-                padding-top: clamp(6px, 1.8vw, 10px);
-                padding-bottom: clamp(6px, 1.8vw, 10px);
+                padding-top: clamp(5px, 1.8vw, calc(9px + 1pt));
+                padding-bottom: clamp(5px, 1.8vw, calc(9px + 1pt));
             }
         }
 
