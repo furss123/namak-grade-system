@@ -455,13 +455,21 @@
         .report-wrapper:last-child { page-break-after: auto; }
 
         .page {
-            width: 210mm; height: 296mm; margin: 0 auto; box-sizing: border-box;
+            width: 210mm; height: 297mm; min-height: 297mm; max-height: 297mm;
+            margin: 0 auto; box-sizing: border-box;
             background: #fff; border: 1px solid var(--school-border-light);
             box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+            padding: 24mm 12mm 0 12mm;
+        }
+        .page-body {
+            flex: 1 1 auto; min-height: 0;
+            display: flex; flex-direction: column;
         }
         .page-footer {
-            position: absolute; left: 12mm; right: 12mm; bottom: 8mm;
-            margin: 0; padding: 2mm 0 0;
+            flex: 0 0 auto; margin-top: auto;
+            width: 100%; margin-left: 0; margin-right: 0;
+            padding: 2mm 0 8mm;
             border-top: 1px solid #e2e8f0; text-align: center;
             font-size: calc(8.5px + 1pt); color: var(--school-muted); line-height: 1.4;
             min-height: 7mm; background: #fff;
@@ -498,13 +506,16 @@
         #printContainer .page-footer-num::before {
             content: "- " counter(report-page) " -";
         }
-        .page::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3mm;
+        .page-top-accent {
+            position: absolute; top: 0; left: 0; right: 0; z-index: 5;
+            height: 3mm; pointer-events: none;
+            background: var(--school-navy-dark);
             background: linear-gradient(90deg, var(--school-navy-dark) 0%, var(--school-navy) 50%, var(--school-accent) 100%);
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
-        .page.page-1 { padding: 24mm 12mm 20mm 12mm; }
-        .page.page-2 { padding: 24mm 12mm 20mm 12mm; }
-        .page.page-2 .page-footer { left: 12mm; right: 12mm; }
+        .page.page-1,
+        .page.page-2 { padding: 24mm 12mm 0 12mm; }
         .page-1 .student-info {
             margin-bottom: 3mm; padding: 3.5mm 5mm;
             background: linear-gradient(180deg, #f5f8fc 0%, #eef3f9 100%);
@@ -605,24 +616,52 @@
             }
             #printContainer .page {
                 border: none; box-shadow: none; margin: 0;
-                width: 210mm; height: auto; min-height: 0; max-height: none;
-                overflow: visible;
+                width: 210mm; height: 297mm; min-height: 297mm; max-height: 297mm;
+                display: flex !important; flex-direction: column !important;
+                overflow: hidden;
                 page-break-inside: avoid;
                 page-break-after: avoid;
+                padding: 24mm 12mm 0 12mm !important;
+                box-sizing: border-box;
             }
             #printContainer .page + .page { page-break-before: always; }
-            #printContainer .page.page-1,
-            #printContainer .page.page-2 { padding: 24mm 12mm 20mm 12mm; }
+            #printContainer .page-body { flex: 1 1 auto; min-height: 0; }
             #printContainer .page-doc-header,
             #printContainer .page-logo {
                 -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
             #printContainer .page-footer {
-                position: absolute; left: 12mm; right: 12mm; bottom: 8mm;
+                position: relative !important;
+                flex: 0 0 auto !important;
+                margin-top: auto !important;
+                width: 100% !important;
+                left: auto !important; right: auto !important; bottom: auto !important;
+                padding: 2mm 0 8mm !important;
                 border-top-color: #94a3b8; background: #fff;
                 -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
-            #printContainer .page.page-2 .page-footer { left: 12mm; right: 12mm; }
+            #printContainer .page-top-accent {
+                display: block !important;
+                height: 3mm !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+                background: linear-gradient(
+                    90deg,
+                    #0f2440 0%,
+                    #1e3a5f 50%,
+                    #c4a035 100%
+                ) !important;
+            }
+            #printContainer .grade-graph-container,
+            #printContainer .g-bar-1,
+            #printContainer .g-bar-2,
+            #printContainer .g-bar-3,
+            #printContainer .g-bar-4,
+            #printContainer .g-bar-5,
+            #printContainer .page-1 .student-info {
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
         }
     </style>
 </head>
@@ -761,6 +800,8 @@
 
     <div id="reportTemplate" class="report-wrapper">
         <div class="page page-1">
+            <div class="page-top-accent" aria-hidden="true"></div>
+            <div class="page-body">
             <div class="page-doc-header">
                 <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
                 <h1>2026학년도 1학기 정기고사 결과 보고서</h1>
@@ -840,12 +881,15 @@
                 </tbody>
             </table>
             </div>
+            </div>
             <footer class="page-footer">
                 <p class="page-footer-num" aria-label="페이지 번호"></p>
             </footer>
         </div>
 
         <div class="page page-2">
+            <div class="page-top-accent" aria-hidden="true"></div>
+            <div class="page-body">
             <div class="page-doc-header">
                 <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
                 <h1 id="distPageTitle">학생 주변 성적분포</h1>
@@ -858,6 +902,7 @@
                 </thead>
                 <tbody id="distTableBody"></tbody>
             </table>
+            </div>
             <footer class="page-footer">
                 <p class="page-footer-num" aria-label="페이지 번호"></p>
             </footer>
