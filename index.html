@@ -592,7 +592,7 @@
                     </svg>
                     성적 입력 양식 다운로드 (.xlsx)
                 </a>
-                <span class="template-download-note">학번·이름·교과별 원점수를 입력한 파일을 업로드하세요. (예시 행은 삭제 후 사용)</span>
+                <span class="template-download-note">학번·이름(또는 반·번호·이름)과 교과 점수가 있으면 업로드 가능합니다. (예시 행은 삭제 후 사용)</span>
             </div>
         </section>
 
@@ -957,6 +957,86 @@ function restoreSessionData() {
     }
 }
 
+const UPLOAD_META_KEYS = new Set(['학번', '이름', '학년', '반', '번호']);
+
+function trimCell(value) {
+    if (value === null || value === undefined) return '';
+    return String(value).trim();
+}
+
+function hasCellValue(value) {
+    return trimCell(value) !== '';
+}
+
+/** 학번·이름·반/번호 양식, 성적데이터 시트 모두 지원 */
+function parseGradeRowsFromSheet(worksheet) {
+    const rawRows = XLSX.utils.sheet_to_json(worksheet, { defval: '' });
+    const students = [];
+    const defaultGrade = 1;
+
+    for (const row of rawRows) {
+        const cells = {};
+        Object.keys(row).forEach((key) => {
+            cells[trimCell(key)] = row[key];
+        });
+
+        const name = trimCell(cells['이름']);
+        const banRaw = cells['반'];
+        const numRaw = cells['번호'];
+        const hasBan = hasCellValue(banRaw);
+        const hasNum = hasCellValue(numRaw);
+        let studentId = trimCell(cells['학번']);
+        const gradeYear = hasCellValue(cells['학년']) ? Number(cells['학년']) : defaultGrade;
+
+        if (!name && !studentId && !(hasBan && hasNum)) continue;
+
+        if (!studentId && hasBan && hasNum) {
+            const ban = Number(banRaw);
+            const num = Number(numRaw);
+            if (Number.isNaN(ban) || Number.isNaN(num)) continue;
+            studentId = String(gradeYear) + String(ban) + String(num).padStart(2, '0');
+        }
+
+        if (!studentId) continue;
+
+        const student = {
+            '학번': studentId,
+            '이름': name,
+            '학년': gradeYear,
+            '반': hasBan ? Number(banRaw) : Number(studentId.substring(1, studentId.length - 2)),
+            '번호': hasNum ? Number(numRaw) : Number(studentId.slice(-2))
+        };
+
+        Object.keys(cells).forEach((key) => {
+            if (!key || UPLOAD_META_KEYS.has(key)) return;
+            if (hasCellValue(cells[key])) student[key] = cells[key];
+        });
+
+        students.push(student);
+    }
+    return students;
+}
+
+function parseWorkbookToStudents(workbook) {
+    const sheetOrder = ['성적데이터', '성적', 'Sheet1'];
+    const tried = new Set();
+
+    for (const preferred of sheetOrder) {
+        const name = workbook.SheetNames.find((n) => n === preferred);
+        if (!name || tried.has(name)) continue;
+        tried.add(name);
+        const students = parseGradeRowsFromSheet(workbook.Sheets[name]);
+        if (students.length > 0) return students;
+    }
+
+    for (const name of workbook.SheetNames) {
+        if (tried.has(name) || name === '작성안내') continue;
+        const students = parseGradeRowsFromSheet(workbook.Sheets[name]);
+        if (students.length > 0) return students;
+    }
+    return [];
+}
+
 function isExcelFile(file) {
     const name = file.name.toLowerCase();
     return name.endsWith('.xlsx') || name.endsWith('.xls');
@@ -979,11 +1059,9 @@ function processExcelFile(file) {
         try {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, {type: 'array'});
-            const firstSheetName = workbook.SheetNames[0];
-            const worksheet = workbook.Sheets[firstSheetName];
-            const parsedData = XLSX.utils.sheet_to_json(worksheet);
-            
-            if(parsedData.length > 0 && parsedData[0]['학번']) {
+            const parsedData = parseWorkbookToStudents(workbook);
+
+            if (parsedData.length > 0 && parsedData[0]['학번']) {
                 studentData = parsedData;
                 isFileUploaded = true; 
                 
