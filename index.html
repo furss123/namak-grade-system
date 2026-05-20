@@ -747,13 +747,12 @@
     <main class="app-main">
     <div class="search-container">
         <div id="demoBanner" class="demo-banner no-print">
-            <strong>가상 학교 점수</strong> — 접속 시 엑셀 성적(236명)이 적용되고, 학번 <strong>1110 ~ 1130</strong> 구간 보고서가 아래에 자동 표시됩니다.
-            <p>다른 엑셀을 올리면 데이터가 교체됩니다. 구간은 입력란에서 바꾼 뒤 「구간 조회」로 다시 볼 수 있습니다.</p>
+            <strong>가상 학교 점수</strong> — 접속 시 엑셀 성적(236명)이 적용되고, 학번 <strong>1101</strong> 단일 조회 상세 보고서가 아래에 자동 표시됩니다.
+            <p>다른 엑셀을 올리면 데이터가 교체됩니다. 학번을 바꾼 뒤 「조회 및 분석」 또는 「구간 조회」로 볼 수 있습니다.</p>
             <div class="demo-examples">
-                <span>기본 구간:</span>
-                <span class="demo-chip">1110 ~ 1130</span>
-                <span class="demo-chip">1110 · 1반 10번</span>
-                <span class="demo-chip">1130 · 1반 30번</span>
+                <span>기본 조회:</span>
+                <span class="demo-chip">1101 · 단일 상세</span>
+                <span class="demo-chip">1110 ~ 1130 · 구간</span>
             </div>
         </div>
 
@@ -1111,13 +1110,9 @@ function applyDefaultSingleStudentId() {
     if (studentEl) studentEl.value = DEFAULT_SINGLE_STUDENT_ID;
 }
 
-function runDefaultRangePreview() {
+function runDefaultSinglePreview() {
     applyDefaultSingleStudentId();
-    const startEl = document.getElementById('startStudentId');
-    const endEl = document.getElementById('endStudentId');
-    if (startEl) startEl.value = DEFAULT_RANGE_START;
-    if (endEl) endEl.value = DEFAULT_RANGE_END;
-    const ok = searchStudentRange(DEFAULT_RANGE_START, DEFAULT_RANGE_END, { silent: true });
+    const ok = searchSingleStudent(DEFAULT_SINGLE_STUDENT_ID, { silent: true });
     if (ok) {
         requestAnimationFrame(function() {
             const container = document.getElementById('printContainer');
@@ -1635,7 +1630,7 @@ function processExcelFile(file) {
             const parsedData = parseWorkbookToStudents(workbook);
 
             if (applyParsedStudentData(parsedData, file.name, { isDemo: false, saveSession: true })) {
-                runDefaultRangePreview();
+                runDefaultSinglePreview();
             } else {
                 isFileUploaded = false;
                 studentData = [];
@@ -1673,7 +1668,7 @@ function setUploadState(statusText, isSuccess, fileName = "") {
             ? "예시 데이터 적용 중 (고교학점제 규정 시연)"
             : "성적 데이터 분석 완료! (고교학점제 규정 적용)";
         fileStatus.textContent = isDemoData
-            ? `▶ ${fileName} (${studentData.length}명) · 기본 구간 ${DEFAULT_RANGE_START}~${DEFAULT_RANGE_END} 미리보기`
+            ? `▶ ${fileName} (${studentData.length}명) · 기본 조회 ${DEFAULT_SINGLE_STUDENT_ID} 미리보기`
             : `▶ ${fileName} 등록 성공 (${studentData.length}명)`;
     } else {
         uploadBox.classList.remove('success');
@@ -1859,15 +1854,28 @@ function cloneReport(isRangeSearch) {
     return clone;
 }
 
-function searchSingleStudent() {
-    if (!isFileUploaded || studentData.length === 0) { alert("엑셀 성적 파일을 먼저 등록해주세요."); return; }
-    const studentId = document.getElementById('studentId').value.trim();
-    if (!studentId) { alert("학번을 입력해주세요."); return; }
-    if (!populateTemplate(studentId)) { alert("해당 학번의 학생을 찾을 수 없습니다."); return; }
+function searchSingleStudent(studentIdOverride, options) {
+    const opts = options || {};
+    if (!isFileUploaded || studentData.length === 0) {
+        if (!opts.silent) alert("엑셀 성적 파일을 먼저 등록해주세요.");
+        return false;
+    }
+    const studentEl = document.getElementById('studentId');
+    const studentId = (studentIdOverride != null ? String(studentIdOverride) : (studentEl ? studentEl.value.trim() : ''));
+    if (!studentId) {
+        if (!opts.silent) alert("학번을 입력해주세요.");
+        return false;
+    }
+    if (studentEl) studentEl.value = studentId;
+    if (!populateTemplate(studentId)) {
+        if (!opts.silent) alert("해당 학번의 학생을 찾을 수 없습니다.");
+        return false;
+    }
     const printContainer = document.getElementById('printContainer');
-    printContainer.innerHTML = ''; 
+    printContainer.innerHTML = '';
     printContainer.appendChild(cloneReport(false));
     showReportActionSection();
+    return true;
 }
 
 function searchStudentRange(startOverride, endOverride, options) {
@@ -2002,7 +2010,7 @@ document.getElementById('endStudentId').addEventListener('keydown', function(e) 
         const loaded = await loadBundledSchoolData();
         if (!loaded) loadDemoData();
     }
-    runDefaultRangePreview();
+    runDefaultSinglePreview();
     initAppFooter();
 })();
 </script>
