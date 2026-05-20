@@ -196,8 +196,8 @@
         .upload-box {
             flex: 1; min-width: 0;
             display: flex; align-items: center;
-            gap: 20px;
-            padding: calc(24px - 1.5mm) 26px; min-height: calc(132px - 13mm);
+            gap: 16px;
+            padding: calc(18px - 1mm) 22px; min-height: calc(132px - 18mm);
             background: linear-gradient(145deg, #f7fafd 0%, #eef4fa 100%);
             border: 2px dashed #a8bdd4; border-radius: var(--radius-lg); cursor: pointer;
             transition: border-color 0.25s var(--ease), background 0.25s var(--ease),
@@ -205,7 +205,7 @@
         }
         .upload-text-container {
             flex: 1; min-width: 0;
-            display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+            display: flex; flex-direction: column; align-items: flex-start; gap: 5px;
             text-align: left;
         }
         .upload-step,
@@ -229,7 +229,7 @@
         }
         .upload-box.success.drag-over { background: #d1fae5; }
         .upload-icon-wrap {
-            flex-shrink: 0; width: 72px; height: 72px; border-radius: 50%;
+            flex-shrink: 0; width: 64px; height: 64px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             background: #fff; border: 1px solid var(--school-border);
             box-shadow: var(--shadow-xs);
@@ -238,28 +238,28 @@
         .upload-box.success .upload-icon-wrap {
             border-color: var(--school-success); background: #fff;
         }
-        .upload-icon { width: 40px; height: 40px; color: var(--school-navy); }
+        .upload-icon { width: 34px; height: 34px; color: var(--school-navy); }
         .upload-box.success .upload-icon { color: var(--school-success); }
         .upload-step {
-            font-size: calc(11px + 4pt); font-weight: 800; color: var(--school-navy);
+            font-size: calc(10px + 2pt); font-weight: 800; color: var(--school-navy);
             letter-spacing: 0.04em;
         }
         .upload-step::before {
             content: '① '; color: var(--school-accent);
         }
         .upload-title {
-            font-size: calc(14px + 2pt); font-weight: 800; color: var(--school-navy-dark);
-            line-height: 1.35;
+            font-size: calc(13px + 1pt); font-weight: 800; color: var(--school-navy-dark);
+            line-height: 1.25;
         }
         .upload-title .upload-format {
-            display: inline-block; margin-left: 6px; padding: 2px 8px;
-            font-size: calc(11px + 2pt); font-weight: 700; color: var(--school-navy);
+            display: inline-block; margin-left: 6px; padding: 1px 7px;
+            font-size: calc(10px + 1pt); font-weight: 700; color: var(--school-navy);
             background: #fff; border: 1px solid #c5d0e0; border-radius: 6px;
             vertical-align: middle;
         }
         .upload-desc {
-            font-size: calc(12px + 2pt); color: var(--school-text); font-weight: 600;
-            line-height: 1.5; margin: 0;
+            font-size: calc(11px + 1pt); color: var(--school-text); font-weight: 600;
+            line-height: 1.35; margin: 0;
         }
         .upload-side-step {
             font-size: calc(11px + 4pt); font-weight: 800; color: var(--school-navy);
@@ -278,9 +278,9 @@
             flex-direction: column;
             align-items: stretch;
             justify-content: flex-start;
-            gap: 12px;
-            padding: calc(24px - 1.5mm) 26px;
-            min-height: calc(132px - 13mm);
+            gap: 6px;
+            padding: calc(18px - 1mm) 22px;
+            min-height: calc(132px - 18mm);
             background: linear-gradient(160deg, #f9fbfd 0%, #f0f5fb 100%);
             border: 1px solid var(--school-border-light);
             border-radius: var(--radius-lg);
@@ -294,16 +294,16 @@
             align-items: center;
             gap: 10px;
             flex-shrink: 0;
-            margin-top: -5pt;
-            font-size: calc(14px + 2pt);
+            margin-top: -3pt;
+            font-size: calc(13px + 1pt);
         }
         .upload-guide-head .template-icon-wrap {
-            width: 2.2em;
-            height: 2.2em;
+            width: 2em;
+            height: 2em;
         }
         .upload-guide-head .upload-guide-icon {
-            width: 1.2em;
-            height: 1.2em;
+            width: 1.15em;
+            height: 1.15em;
         }
         .template-icon-wrap {
             flex-shrink: 0;
@@ -322,39 +322,39 @@
         .upload-guide-title {
             flex: 1;
             min-width: 0;
-            font-size: calc(14px + 2pt);
+            font-size: calc(13px + 1pt);
             font-weight: 800;
             color: var(--school-navy-dark);
-            line-height: 1.35;
+            line-height: 1.25;
             text-align: left;
         }
         .upload-guide-body {
             width: 100%;
             margin-top: auto;
-            padding-top: 4px;
+            padding-top: 2px;
             text-align: left;
             align-self: stretch;
         }
         .upload-guide-desc {
             margin: 0;
-            font-size: 13px;
+            font-size: calc(11px + 0.5pt);
             color: var(--school-muted);
-            line-height: 1.55;
+            line-height: 1.38;
             text-align: left;
         }
         .upload-guide-list {
             margin: 0;
-            padding: 0 0 0 1.25em;
-            font-size: 12px;
+            padding: 0 0 0 1.15em;
+            font-size: calc(10px + 0.5pt);
             color: var(--school-muted);
-            line-height: 1.5;
+            line-height: 1.35;
             text-align: left;
             list-style-position: outside;
         }
         .upload-guide-list li {
             text-align: left;
         }
-        .upload-guide-list li + li { margin-top: 4px; }
+        .upload-guide-list li + li { margin-top: 2px; }
         @media (max-width: 720px) {
             .upload-row { flex-direction: column; align-items: stretch; }
             .upload-box,
