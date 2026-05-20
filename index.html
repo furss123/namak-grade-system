@@ -35,6 +35,7 @@
             background: var(--school-bg);
             color: var(--school-text);
             min-height: 100vh;
+            display: flex; flex-direction: column;
         }
 
         /* ===== 화면 UI ===== */
@@ -72,9 +73,10 @@
         .app-main { max-width: 980px; margin: 0 auto; padding: 24px 20px 24px; }
 
         .app-footer {
-            max-width: 980px; margin: 28px auto 40px; padding: 20px 28px;
+            width: 100%; max-width: 980px; margin: auto auto 0; padding: 20px 28px 28px;
             text-align: center; border-top: 1px solid var(--school-border);
             color: var(--school-muted); font-size: 0.75rem; line-height: 1.7;
+            flex-shrink: 0;
         }
         .app-footer-version {
             margin: 0 0 6px; font-weight: 700; color: var(--school-navy-light);
@@ -247,6 +249,22 @@
             width: 210mm; height: 296mm; margin: 0 auto 24px; box-sizing: border-box;
             background: #fff; border: 1px solid var(--school-border);
             box-shadow: var(--shadow-md); position: relative; overflow: hidden;
+            display: flex; flex-direction: column;
+        }
+        .page-footer {
+            margin-top: auto; flex-shrink: 0; padding: 3mm 0 0;
+            border-top: 1px solid #c5d0e0; text-align: center;
+            font-size: calc(8px + 1pt); color: #64748b; line-height: 1.45;
+        }
+        .page-footer-meta { margin: 0 0 2mm; font-weight: 500; }
+        .page-footer-num {
+            margin: 0; font-weight: 700; color: var(--school-navy);
+            font-size: calc(9px + 1pt); letter-spacing: 0.12em;
+        }
+        #printContainer .report-wrapper { counter-reset: report-page 0; }
+        #printContainer .page { counter-increment: report-page; }
+        #printContainer .page-footer-num::before {
+            content: "- " counter(report-page) " -";
         }
         .page::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4mm;
@@ -357,8 +375,12 @@
                 border: none; box-shadow: none; margin: 0;
                 width: 210mm; height: 296mm; page-break-after: always; page-break-inside: avoid;
             }
-            #printContainer .page.page-1 { padding: 30mm 12mm 8mm 12mm; }
-            #printContainer .page.page-2 { padding: 30mm 15mm 15mm 15mm; }
+            #printContainer .page.page-1 { padding: 30mm 12mm 6mm 12mm; }
+            #printContainer .page.page-2 { padding: 30mm 15mm 10mm 15mm; }
+            #printContainer .page-footer {
+                border-top-color: #94a3b8;
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
             #printContainer .page:last-child { page-break-after: avoid !important; }
         }
     </style>
@@ -470,11 +492,9 @@
         </div>
     </div>
 
-    <footer class="app-footer no-print">
-        <p class="app-footer-version">배포 버전 <span id="appVersionDisplay">—</span></p>
-        <p class="app-footer-copy" id="appCopyrightDisplay">—</p>
-    </footer>
     <div id="printContainer"></div>
+
+
 
     <div id="reportTemplate" class="report-wrapper">
         <div class="page page-1">
@@ -554,6 +574,10 @@
                 </tbody>
             </table>
             </div>
+            <footer class="page-footer">
+                <p class="page-footer-meta"></p>
+                <p class="page-footer-num" aria-label="페이지 번호"></p>
+            </footer>
         </div>
 
         <div class="page page-2">
@@ -566,19 +590,34 @@
                 </thead>
                 <tbody id="distTableBody"></tbody>
             </table>
+            <footer class="page-footer">
+                <p class="page-footer-meta"></p>
+                <p class="page-footer-num" aria-label="페이지 번호"></p>
+            </footer>
         </div>
     </div>
+
+    <footer class="app-footer no-print">
+        <p class="app-footer-version">배포 버전 <span id="appVersionDisplay">—</span></p>
+        <p class="app-footer-copy" id="appCopyrightDisplay">—</p>
+    </footer>
 
 <script>
 const APP_VERSION = '1.0.0';
 const APP_RELEASE_DATE = '2026-05-20';
 const APP_COPYRIGHT = '© 2026 남악고등학교. All rights reserved.';
 
+function getPageFooterMetaText() {
+    return '배포 버전 v' + APP_VERSION + ' (' + APP_RELEASE_DATE + ') · ' + APP_COPYRIGHT;
+}
+
 function initAppFooter() {
     const v = document.getElementById('appVersionDisplay');
     const c = document.getElementById('appCopyrightDisplay');
     if (v) v.textContent = 'v' + APP_VERSION + ' (' + APP_RELEASE_DATE + ')';
     if (c) c.textContent = APP_COPYRIGHT;
+    const meta = getPageFooterMetaText();
+    document.querySelectorAll('.page-footer-meta').forEach(function(el) { el.textContent = meta; });
 }
 
 let studentData = [];
@@ -939,6 +978,7 @@ function cloneReport(isRangeSearch) {
     }
     const elementsWithId = clone.querySelectorAll('[id]');
     elementsWithId.forEach(el => el.removeAttribute('id'));
+    initAppFooter();
     return clone;
 }
 
