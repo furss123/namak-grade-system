@@ -273,7 +273,7 @@
             justify-content: center; gap: 8px; width: 100%;
             padding: 12px 14px; border-radius: var(--radius-sm);
             background: #fff; border: 1px solid var(--school-navy-light);
-            color: var(--school-navy-dark); font-size: calc(11px + 2pt);
+            color: var(--school-navy-dark); font-size: calc(11px + 4pt);
             font-weight: 700; text-decoration: none; font-family: inherit;
             text-align: center; line-height: 1.3;
             box-shadow: var(--shadow-xs);
@@ -284,7 +284,7 @@
             gap: 2px; line-height: 1.3;
         }
         .template-download-ext {
-            font-size: calc(10px + 1pt); font-weight: 700; color: var(--school-navy-light);
+            font-size: calc(10px + 3pt); font-weight: 700; color: var(--school-navy-light);
         }
         .template-download-link:hover {
             background: #f0f6fc; border-color: var(--school-navy);
@@ -474,10 +474,11 @@
             grid-row: 3;
             align-self: stretch;
             width: 100%; margin: 0;
-            padding: 2mm 12mm 0;
-            border-top: 1px solid #e2e8f0; text-align: center;
+            padding: 0 12mm 0;
+            border-top: none; text-align: center;
             font-size: calc(8.5px + 1pt); color: var(--school-muted); line-height: 1.35;
             background: #fff; box-sizing: border-box;
+            transform: translateY(-2mm);
         }
         .page-footer-num {
             margin: 0; font-weight: 600; color: var(--school-navy-light);
@@ -500,12 +501,12 @@
         .page-doc-header h1 {
             position: absolute; left: 0; right: 0; margin: 0; padding: 0;
             border: none; text-align: center;
-            font-size: calc(19px + 1.5pt);
+            font-size: calc(19px + 4.5pt);
             font-weight: 700; color: var(--school-navy-dark);
             letter-spacing: -0.03em; line-height: 1.3;
             pointer-events: none;
         }
-        .page-2 .page-doc-header h1 { font-size: calc(18px + 1pt); }
+        .page-2 .page-doc-header h1 { font-size: calc(18px + 4pt); }
         #printContainer .report-wrapper { counter-reset: report-page 0; }
         #printContainer .page { counter-increment: report-page; }
         #printContainer .page-footer-num::before {
@@ -659,8 +660,9 @@
                 position: relative !important;
                 margin: 0 !important;
                 width: 100% !important;
-                padding: 2mm 12mm 0 !important;
-                border-top-color: #94a3b8 !important;
+                padding: 0 12mm 0 !important;
+                border-top: none !important;
+                transform: translateY(-2mm) !important;
                 background: #fff !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
