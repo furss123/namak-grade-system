@@ -264,47 +264,56 @@
 
         .stats-dashboard { display: none; }
         .stats-dashboard .stats-table-wrap {
-            overflow-x: auto; border-radius: var(--radius-md);
-            border: 1px solid var(--school-border);
-            box-shadow: var(--shadow-sm);
+            overflow-x: auto; border-radius: var(--radius-lg);
+            border: 1px solid #d4dde8;
+            box-shadow: 0 2px 12px rgba(15, 36, 64, 0.06);
             background: #fff;
         }
         .stats-table {
-            width: 100%; border-collapse: separate; border-spacing: 0;
-            font-size: calc(12px + 3pt); table-layout: fixed;
+            width: 100%; border-collapse: collapse; table-layout: fixed;
+            font-size: calc(12px + 5pt);
+        }
+        .stats-table th,
+        .stats-table td {
+            font-size: inherit;
+            border: 1px solid #e8edf4;
+            vertical-align: middle;
+            text-align: center;
         }
         .stats-table thead th {
             background: var(--school-navy-dark);
-            color: #fff; font-weight: 700; padding: 14px 10px;
-            font-size: calc(12px + 3pt);
-            border: 1px solid #0a1a2e; border-bottom: 3px solid var(--school-accent);
-            letter-spacing: 0.02em;
+            color: #fff; font-weight: 600;
+            padding: 15px 12px;
+            text-align: center;
+            border-color: #1a3352;
+            letter-spacing: -0.01em;
+            line-height: 1.35;
         }
-        .stats-table thead th:first-child { border-radius: var(--radius-md) 0 0 0; }
-        .stats-table thead th:last-child { border-radius: 0 var(--radius-md) 0 0; }
-        .stats-table td {
-            padding: 12px 10px; text-align: center; font-weight: 600;
-            border: 1px solid var(--school-border-light);
-            color: var(--school-text);
+        .stats-table thead th.stats-head-corner {
+            width: 15%;
+            font-weight: 700;
         }
-        .stats-table .stats-label {
-            background: #e8eef5; color: var(--school-navy-dark); font-weight: 700;
-            width: 16%; text-align: left; padding-left: 16px;
-            border-left: 3px solid var(--school-navy);
+        .stats-table tbody td.stats-row-label {
+            width: 15%; background: #f4f7fa;
+            color: var(--school-navy-dark); font-weight: 600;
+            text-align: center; padding: 14px 12px;
+            border-right: 1px solid #dce4ee;
         }
-        .stats-table tbody tr:nth-child(even) td:not(.stats-label) { background: #f8fafc; }
-        .stats-table tbody tr:nth-child(odd) td:not(.stats-label) { background: #fff; }
-        .stats-table tbody tr:hover td:not(.stats-label) { background: #eef4fa; }
-        .stats-table tr.stats-group-score .stats-label {
-            border-top: 2px solid var(--school-navy-light);
+        .stats-table tbody td.stats-val {
+            padding: 14px 12px; text-align: center;
+            font-weight: 500; color: var(--school-text);
+            background: #fff;
         }
-        .stats-table tr.stats-group-cut .stats-label {
-            border-top: 2px solid var(--school-accent);
+        .stats-table tbody tr:hover td { background: #f9fbfd; }
+        .stats-table tbody tr.stats-row-divider td {
+            border-top: 1px solid #c5d0de;
         }
-        .stats-table tr.stats-group-score .stats-val-max { color: #b45309; font-weight: 800; }
-        .stats-table tr.stats-group-score .stats-val-avg { color: var(--school-navy); font-weight: 800; }
-        .stats-table tr.stats-group-cut td:not(.stats-label) {
-            color: var(--school-navy-dark); font-weight: 700;
+        .stats-table tbody tr.stats-row-divider td.stats-row-label {
+            background: #eef2f7;
+        }
+        .stats-table .stats-val-avg,
+        .stats-table .stats-val-max {
+            font-weight: 700; color: var(--school-navy-dark);
         }
 
         .report-action-section {
@@ -583,18 +592,18 @@
             <table class="stats-table">
                 <thead>
                     <tr id="statsTableHead">
-                        <th class="stats-label">구분</th>
+                        <th class="stats-head-corner">구분</th>
                     </tr>
                 </thead>
                 <tbody id="statsTableBody">
-                    <tr id="statsRowUnit"><td class="stats-label">단위수</td></tr>
-                    <tr id="statsRowAvg" class="stats-group-score"><td class="stats-label">평균 점수</td></tr>
-                    <tr id="statsRowMax" class="stats-group-score"><td class="stats-label">최상위 점수</td></tr>
-                    <tr id="statsRowMin" class="stats-group-score"><td class="stats-label">최하위 점수</td></tr>
-                    <tr id="statsRowCut1" class="stats-group-cut"><td class="stats-label">1컷 (10%) 최저</td></tr>
-                    <tr id="statsRowCut2" class="stats-group-cut"><td class="stats-label">2컷 (34%) 최저</td></tr>
-                    <tr id="statsRowCut3" class="stats-group-cut"><td class="stats-label">3컷 (66%) 최저</td></tr>
-                    <tr id="statsRowCut4" class="stats-group-cut"><td class="stats-label">4컷 (90%) 최저</td></tr>
+                    <tr id="statsRowUnit"><td class="stats-row-label">단위수</td></tr>
+                    <tr id="statsRowAvg" class="stats-row-divider"><td class="stats-row-label">평균 점수</td></tr>
+                    <tr id="statsRowMax"><td class="stats-row-label">최상위 점수</td></tr>
+                    <tr id="statsRowMin"><td class="stats-row-label">최하위 점수</td></tr>
+                    <tr id="statsRowCut1" class="stats-row-divider"><td class="stats-row-label">1컷 최저 (10%)</td></tr>
+                    <tr id="statsRowCut2"><td class="stats-row-label">2컷 최저 (34%)</td></tr>
+                    <tr id="statsRowCut3"><td class="stats-row-label">3컷 최저 (66%)</td></tr>
+                    <tr id="statsRowCut4"><td class="stats-row-label">4컷 최저 (90%)</td></tr>
                 </tbody>
             </table>
             </div>
@@ -784,15 +793,15 @@ function displayGeneralStats() {
     
     const subjects = getSubjects(studentData[0]);
     
-    document.getElementById('statsTableHead').innerHTML = '<th class="stats-label">구분</th>';
-    document.getElementById('statsRowUnit').innerHTML = '<td class="stats-label">단위수</td>';
-    document.getElementById('statsRowAvg').innerHTML = '<td class="stats-label">평균 점수</td>';
-    document.getElementById('statsRowMax').innerHTML = '<td class="stats-label">최상위 점수</td>';
-    document.getElementById('statsRowMin').innerHTML = '<td class="stats-label">최하위 점수</td>';
-    document.getElementById('statsRowCut1').innerHTML = '<td class="stats-label">1컷 (10%) 최저</td>';
-    document.getElementById('statsRowCut2').innerHTML = '<td class="stats-label">2컷 (34%) 최저</td>';
-    document.getElementById('statsRowCut3').innerHTML = '<td class="stats-label">3컷 (66%) 최저</td>';
-    document.getElementById('statsRowCut4').innerHTML = '<td class="stats-label">4컷 (90%) 최저</td>';
+    document.getElementById('statsTableHead').innerHTML = '<th class="stats-head-corner">구분</th>';
+    document.getElementById('statsRowUnit').innerHTML = '<td class="stats-row-label">단위수</td>';
+    document.getElementById('statsRowAvg').innerHTML = '<td class="stats-row-label">평균 점수</td>';
+    document.getElementById('statsRowMax').innerHTML = '<td class="stats-row-label">최상위 점수</td>';
+    document.getElementById('statsRowMin').innerHTML = '<td class="stats-row-label">최하위 점수</td>';
+    document.getElementById('statsRowCut1').innerHTML = '<td class="stats-row-label">1컷 최저 (10%)</td>';
+    document.getElementById('statsRowCut2').innerHTML = '<td class="stats-row-label">2컷 최저 (34%)</td>';
+    document.getElementById('statsRowCut3').innerHTML = '<td class="stats-row-label">3컷 최저 (66%)</td>';
+    document.getElementById('statsRowCut4').innerHTML = '<td class="stats-row-label">4컷 최저 (90%)</td>';
 
     subjects.forEach(subject => {
         const th = document.createElement('th');
@@ -815,10 +824,10 @@ function displayGeneralStats() {
     document.getElementById('statsDashboard').style.display = 'block';
 }
 
-function appendStatsTd(rowId, text, className = '') {
+function appendStatsTd(rowId, text, className = 'stats-val') {
     const td = document.createElement('td');
     td.textContent = text;
-    if (className) td.className = className;
+    td.className = className ? 'stats-val ' + className : 'stats-val';
     document.getElementById(rowId).appendChild(td);
 }
 
