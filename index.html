@@ -5,24 +5,31 @@
     <meta charset="UTF-8">
     <title>남악고등학교 1학년 성적 조회 시스템</title>
     <link rel="icon" href="assets/namak-logo.png" type="image/png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <script src="verification/grade-engine.js"></script>
     <style>
         :root {
-            --school-navy: #1a365d;
-            --school-navy-dark: #0f2744;
-            --school-navy-light: #2c5282;
-            --school-accent: #c9a227;
-            --school-accent-soft: #f6efd8;
-            --school-bg: #eef2f7;
+            --school-navy: #1e3a5f;
+            --school-navy-dark: #0f2440;
+            --school-navy-light: #3d6b9e;
+            --school-accent: #c4a035;
+            --school-accent-soft: #faf6eb;
+            --school-bg: #edf1f6;
             --school-card: #ffffff;
-            --school-border: #d4dce8;
-            --school-text: #1e293b;
-            --school-muted: #64748b;
-            --school-success: #0d7a5c;
-            --shadow-sm: 0 1px 3px rgba(15, 39, 68, 0.08);
-            --shadow-md: 0 8px 24px rgba(15, 39, 68, 0.1);
-            --radius: 12px;
+            --school-border: #d8e0eb;
+            --school-border-light: #e8edf4;
+            --school-text: #1a2332;
+            --school-muted: #5c6b7e;
+            --school-success: #0f766e;
+            --shadow-xs: 0 1px 2px rgba(15, 36, 64, 0.05);
+            --shadow-sm: 0 2px 10px rgba(15, 36, 64, 0.07);
+            --shadow-md: 0 12px 36px rgba(15, 36, 64, 0.09);
+            --shadow-lg: 0 20px 50px rgba(15, 36, 64, 0.11);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --ease: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         @page { size: A4; margin: 0; }
@@ -30,27 +37,34 @@
         * { box-sizing: border-box; }
 
         body {
-            font-family: 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
-            font-size: 13px; line-height: 1.5; margin: 0; padding: 0;
-            background: var(--school-bg);
+            font-family: 'Pretendard', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+            font-size: 14px; line-height: 1.55; margin: 0; padding: 0;
+            background: linear-gradient(165deg, #e4eaf2 0%, #f0f3f8 40%, #e9eef5 100%);
             color: var(--school-text);
             min-height: 100vh;
             display: flex; flex-direction: column;
+            -webkit-font-smoothing: antialiased;
         }
 
         /* ===== 화면 UI ===== */
         .site-header {
-            background: linear-gradient(135deg, var(--school-navy-dark) 0%, var(--school-navy) 45%, var(--school-navy-light) 100%);
-            color: #fff; padding: 0; box-shadow: var(--shadow-md);
+            position: relative; color: #fff; padding: 0;
+            background: linear-gradient(128deg, var(--school-navy-dark) 0%, var(--school-navy) 42%, #2a5585 100%);
+            box-shadow: var(--shadow-md);
+        }
+        .site-header::after {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background: radial-gradient(ellipse 80% 120% at 100% 0%, rgba(196, 160, 53, 0.14), transparent 55%);
         }
         .site-header-inner {
-            max-width: 980px; margin: 0 auto; padding: 20px 28px;
-            display: flex; align-items: center; gap: 20px;
+            position: relative; z-index: 1;
+            max-width: 980px; margin: 0 auto; padding: 22px 28px 24px;
+            display: flex; align-items: center; gap: 22px;
         }
         .school-logo {
             width: 88px; height: 88px; border-radius: 50%;
             object-fit: contain; background: #fff; flex-shrink: 0;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.22), 0 0 0 3px rgba(255, 255, 255, 0.15);
         }
         .site-header-text {
             display: flex; flex-direction: column; justify-content: center;
@@ -65,17 +79,21 @@
             line-height: 1.35; text-align: left;
         }
         .header-badge {
-            margin-left: auto; padding: 6px 14px; border-radius: 999px;
-            background: rgba(201, 162, 39, 0.2); border: 1px solid rgba(201, 162, 39, 0.45);
-            font-size: 0.72rem; font-weight: 700; color: var(--school-accent-soft); white-space: nowrap;
+            margin-left: auto; padding: 8px 16px; border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.22);
+            font-size: 0.75rem; font-weight: 600; color: rgba(255, 255, 255, 0.95);
+            white-space: nowrap; backdrop-filter: blur(6px);
+            letter-spacing: 0.03em;
         }
 
-        .app-main { max-width: 980px; margin: 0 auto; padding: 24px 20px 24px; }
+        .app-main { max-width: 980px; margin: 0 auto; padding: 28px 20px 20px; width: 100%; }
 
         .app-footer {
-            width: 100%; max-width: 980px; margin: auto auto 0; padding: 20px 28px 28px;
-            text-align: center; border-top: 1px solid var(--school-border);
-            color: var(--school-muted); font-size: 0.75rem; line-height: 1.7;
+            width: 100%; max-width: 980px; margin: auto auto 0; padding: 22px 28px 32px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.55);
+            border-top: 1px solid var(--school-border-light);
+            color: var(--school-muted); font-size: 0.78rem; line-height: 1.75;
             flex-shrink: 0;
         }
         .app-footer-version {
@@ -86,50 +104,55 @@
         .app-footer-copy { margin: 0; font-weight: 500; }
 
         .search-container {
-            background: var(--school-card); border-radius: var(--radius);
-            border: 1px solid var(--school-border); box-shadow: var(--shadow-md);
+            background: var(--school-card); border-radius: var(--radius-lg);
+            border: 1px solid var(--school-border-light);
+            box-shadow: var(--shadow-md);
             overflow: hidden;
         }
 
-        .panel-section { padding: 22px 28px; border-bottom: 1px solid #e8edf4; }
+        .panel-section {
+            padding: 26px 30px;
+            border-bottom: 1px solid var(--school-border-light);
+        }
         .panel-section:last-child { border-bottom: none; }
+        .panel-section:nth-child(even) { background: linear-gradient(180deg, #fcfdfe 0%, #fff 100%); }
         .section-label {
-            display: flex; align-items: center; gap: 8px;
-            font-size: calc(0.82rem + 2pt); font-weight: 800; color: var(--school-navy);
-            text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 14px;
+            display: flex; align-items: center; gap: 10px;
+            font-size: calc(0.88rem + 2pt); font-weight: 700; color: var(--school-navy);
+            letter-spacing: -0.01em; margin-bottom: 16px;
         }
         .section-label::before {
-            content: ''; width: 4px; height: calc(14px + 2pt); border-radius: 2px;
-            background: linear-gradient(180deg, var(--school-accent), var(--school-navy-light));
+            content: ''; width: 3px; height: 1.1em; border-radius: 3px;
+            background: linear-gradient(180deg, var(--school-accent) 0%, var(--school-navy-light) 100%);
         }
 
         .upload-box {
             display: flex; align-items: center; gap: 24px;
             padding: 28px 32px; min-height: 132px;
-            background: linear-gradient(180deg, #f0f6fc 0%, #e8f0fa 100%);
-            border: 3px dashed var(--school-navy-light); border-radius: 14px; cursor: pointer;
-            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s, transform 0.15s;
-            box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.8);
+            background: linear-gradient(145deg, #f7fafd 0%, #eef4fa 100%);
+            border: 2px dashed #a8bdd4; border-radius: var(--radius-lg); cursor: pointer;
+            transition: border-color 0.25s var(--ease), background 0.25s var(--ease),
+                box-shadow 0.25s var(--ease), transform 0.2s var(--ease);
         }
         .upload-box:hover {
-            border-color: var(--school-navy); background: #eef4fb;
-            box-shadow: 0 0 0 4px rgba(44, 82, 130, 0.14), inset 0 0 0 1px rgba(255, 255, 255, 0.9);
+            border-color: var(--school-navy-light); background: #f0f6fc;
+            box-shadow: var(--shadow-sm), 0 0 0 4px rgba(61, 107, 158, 0.1);
         }
         .upload-box.drag-over {
-            border-color: var(--school-navy); background: #e0ecf8;
-            box-shadow: 0 0 0 5px rgba(26, 54, 93, 0.2);
-            transform: scale(1.01);
+            border-color: var(--school-navy); background: #e8f2fa;
+            box-shadow: var(--shadow-md), 0 0 0 4px rgba(30, 58, 95, 0.14);
+            transform: translateY(-1px);
         }
         .upload-box.success {
-            border-color: var(--school-success); border-style: solid;
-            background: linear-gradient(180deg, #ecfdf5 0%, #d1fae5 100%);
+            border: 2px solid #6ee7b7; border-style: solid;
+            background: linear-gradient(145deg, #f0fdf8 0%, #ecfdf5 100%);
         }
         .upload-box.success.drag-over { background: #d1fae5; }
         .upload-icon-wrap {
             flex-shrink: 0; width: 72px; height: 72px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            background: #fff; border: 2px solid #c5d0e0;
-            box-shadow: var(--shadow-sm);
+            background: #fff; border: 1px solid var(--school-border);
+            box-shadow: var(--shadow-xs);
         }
         .upload-box.success .upload-icon-wrap {
             border-color: var(--school-success); background: #fff;
@@ -160,51 +183,70 @@
         }
 
         .query-card {
-            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px;
-            padding: 16px 18px; margin-bottom: 14px;
+            background: #fff; border: 1px solid var(--school-border-light);
+            border-radius: var(--radius-md); padding: 18px 20px; margin-bottom: 14px;
+            box-shadow: var(--shadow-xs);
+            transition: box-shadow 0.2s var(--ease), border-color 0.2s var(--ease);
+        }
+        .query-card:hover {
+            border-color: var(--school-border);
+            box-shadow: var(--shadow-sm);
         }
         .query-card:last-child { margin-bottom: 0; }
         .query-card-title {
-            font-size: calc(12px + 2pt); font-weight: 700; color: var(--school-navy); margin-bottom: 10px;
+            font-size: calc(12px + 2pt); font-weight: 600; color: var(--school-navy);
+            margin-bottom: 12px; letter-spacing: -0.01em;
         }
         .input-area { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .input-area input {
-            flex: 1; min-width: 120px; padding: 11px 14px; font-size: 14px;
-            border: 1.5px solid var(--school-border); border-radius: 8px;
-            background: #fff; transition: border-color 0.2s, box-shadow 0.2s;
+            flex: 1; min-width: 120px; padding: 12px 16px; font-size: 14px;
+            font-family: inherit;
+            border: 1px solid var(--school-border); border-radius: var(--radius-sm);
+            background: #fafbfc; color: var(--school-text);
+            transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease);
         }
+        .input-area input::placeholder { color: #94a3b8; }
+        .input-area input:hover { background: #fff; border-color: #b8c5d6; }
         .input-area input:focus {
-            outline: none; border-color: var(--school-navy-light);
-            box-shadow: 0 0 0 3px rgba(44, 82, 130, 0.15);
+            outline: none; border-color: var(--school-navy-light); background: #fff;
+            box-shadow: 0 0 0 3px rgba(61, 107, 158, 0.12);
         }
-        .range-sep { font-size: 1.1rem; font-weight: 700; color: var(--school-muted); padding: 0 4px; }
+        .range-sep { font-size: 1rem; font-weight: 600; color: #94a3b8; padding: 0 2px; }
 
         .search-btn {
-            padding: 11px 20px; border: none; border-radius: 8px;
-            background: linear-gradient(180deg, var(--school-navy-light) 0%, var(--school-navy) 100%);
-            color: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+            padding: 12px 22px; border: none; border-radius: var(--radius-sm);
+            background: linear-gradient(180deg, #4a7ab0 0%, var(--school-navy) 100%);
+            color: #fff; font-size: 13px; font-weight: 600; cursor: pointer;
+            font-family: inherit;
             display: inline-flex; align-items: center; gap: 8px; white-space: nowrap;
-            box-shadow: var(--shadow-sm); transition: transform 0.15s, box-shadow 0.15s;
+            box-shadow: var(--shadow-xs);
+            transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), filter 0.2s;
         }
         .search-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(26, 54, 93, 0.25);
+            box-shadow: 0 6px 16px rgba(30, 58, 95, 0.22);
+            filter: brightness(1.03);
         }
+        .search-btn:active { transform: translateY(0); }
         .search-btn-range {
-            background: linear-gradient(180deg, #0d9488 0%, var(--school-success) 100%);
+            background: linear-gradient(180deg, #14b8a6 0%, var(--school-success) 100%);
         }
-        .search-btn-range:hover { box-shadow: 0 4px 12px rgba(13, 122, 92, 0.3); }
+        .search-btn-range:hover { box-shadow: 0 6px 16px rgba(15, 118, 110, 0.28); }
 
         .stats-dashboard { display: none; }
         .stats-dashboard .stats-table-wrap {
-            overflow-x: auto; border-radius: 8px; border: 1px solid var(--school-border);
+            overflow-x: auto; border-radius: var(--radius-md);
+            border: 1px solid var(--school-border-light);
+            box-shadow: var(--shadow-xs);
         }
         .stats-table { width: 100%; border-collapse: collapse; font-size: calc(12px + 1pt); table-layout: fixed; }
         .stats-table thead th {
-            background: linear-gradient(180deg, var(--school-navy) 0%, var(--school-navy-dark) 100%);
-            color: #fff; font-weight: 600; padding: 11px 8px; border: 1px solid var(--school-navy-dark);
+            background: linear-gradient(180deg, #2d5282 0%, var(--school-navy-dark) 100%);
+            color: #fff; font-weight: 600; padding: 12px 10px;
+            border: none; border-bottom: 2px solid var(--school-accent);
+            letter-spacing: 0.02em;
         }
-        .stats-table td { padding: 9px 8px; text-align: center; border: 1px solid #e2e8f0; }
+        .stats-table td { padding: 10px 8px; text-align: center; border: 1px solid var(--school-border-light); }
         .stats-table .stats-label {
             background: #f1f5f9; color: var(--school-navy); font-weight: 700; width: 15%;
         }
@@ -217,62 +259,74 @@
         .stats-table tr.stats-group-cut td:not(.stats-label) { background: #f5f3ff; font-weight: 600; color: #4c1d95; }
 
         .report-action-section {
-            display: none; max-width: 980px; margin: 20px auto 0;
-            padding: 20px 28px; background: var(--school-card);
-            border-radius: var(--radius); border: 1px solid var(--school-border);
+            display: none; max-width: 980px; margin: 24px auto 0;
+            padding: 24px 30px; background: var(--school-card);
+            border-radius: var(--radius-lg); border: 1px solid var(--school-border-light);
             box-shadow: var(--shadow-md);
         }
         .report-action-section .section-label {
-            justify-content: center; margin-bottom: 16px;
+            justify-content: center; margin-bottom: 18px;
         }
-        #printContainer { max-width: 980px; margin: 24px auto 0; }
-        .report-action-buttons { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+        .report-action-section .section-label::before { display: none; }
+        #printContainer {
+            max-width: 980px; margin: 28px auto 0; width: 100%;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        #printContainer .page {
+            border-radius: 2px;
+            box-shadow: var(--shadow-lg);
+        }
+        .report-action-buttons { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
         .print-btn, .reset-btn {
-            padding: 13px 32px; font-size: 14px; font-weight: 700; color: #fff;
-            border: none; border-radius: 8px; cursor: pointer;
+            padding: 14px 36px; font-size: 14px; font-weight: 600; color: #fff;
+            font-family: inherit;
+            border: none; border-radius: var(--radius-sm); cursor: pointer;
             display: inline-flex; align-items: center; gap: 8px;
-            transition: transform 0.15s, box-shadow 0.15s;
+            transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
         }
         .print-btn {
-            background: linear-gradient(180deg, var(--school-navy-light) 0%, var(--school-navy) 100%);
+            background: linear-gradient(180deg, #4a7ab0 0%, var(--school-navy) 100%);
             box-shadow: var(--shadow-sm);
         }
-        .print-btn:hover { transform: translateY(-1px); box-shadow: 0 4px 14px rgba(26, 54, 93, 0.3); }
-        .reset-btn { background: linear-gradient(180deg, #64748b 0%, #475569 100%); }
-        .reset-btn:hover { transform: translateY(-1px); }
+        .print-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(30, 58, 95, 0.28); }
+        .reset-btn {
+            background: linear-gradient(180deg, #94a3b8 0%, #64748b 100%);
+            box-shadow: var(--shadow-xs);
+        }
+        .reset-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
 
         /* ===== 인쇄 보고서 ===== */
         .report-wrapper { display: none; margin-top: 24px; page-break-after: always; }
         .report-wrapper:last-child { page-break-after: auto; }
 
         .page {
-            width: 210mm; height: 296mm; margin: 0 auto 24px; box-sizing: border-box;
-            background: #fff; border: 1px solid var(--school-border);
+            width: 210mm; height: 296mm; margin: 0 auto; box-sizing: border-box;
+            background: #fff; border: 1px solid var(--school-border-light);
             box-shadow: var(--shadow-md); position: relative; overflow: hidden;
         }
-        /* 꼬리말: 모든 페이지 동일 높이(하단 8mm)에 고정 */
         .page-footer {
             position: absolute; left: 12mm; right: 12mm; bottom: 8mm;
-            margin: 0; padding: 2.5mm 0 0;
-            border-top: 1px solid #c5d0e0; text-align: center;
-            font-size: calc(8px + 1pt); color: #64748b; line-height: 1.45;
-            min-height: 8mm; background: #fff;
+            margin: 0; padding: 2mm 0 0;
+            border-top: 1px solid #e2e8f0; text-align: center;
+            font-size: calc(8.5px + 1pt); color: var(--school-muted); line-height: 1.4;
+            min-height: 7mm; background: #fff;
         }
         .page.page-2 .page-footer { left: 15mm; right: 15mm; }
         .page-footer-num {
-            margin: 0; font-weight: 700; color: var(--school-navy);
-            font-size: calc(9px + 1pt); letter-spacing: 0.12em;
+            margin: 0; font-weight: 600; color: var(--school-navy-light);
+            font-size: calc(9px + 1pt); letter-spacing: 0.2em;
         }
         .page-footer-meta { display: none; }
         .page-letterhead {
-            display: flex; align-items: center; gap: 3.5mm;
-            margin: 0 0 4mm 0; padding-bottom: 2.5mm;
-            border-bottom: 1px solid #d4dce8;
+            display: flex; align-items: center; gap: 4mm;
+            margin: 0 0 5mm 0; padding-bottom: 3mm;
+            border-bottom: 1px solid #e2e8f0;
         }
         .page-logo {
-            width: 13mm; height: 13mm; object-fit: contain; flex-shrink: 0;
+            width: 14mm; height: 14mm; object-fit: contain; flex-shrink: 0;
             border-radius: 50%; background: #fff;
-            border: 1px solid #c5d0e0; box-shadow: 0 1px 3px rgba(15, 39, 68, 0.1);
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 4px rgba(15, 36, 64, 0.08);
         }
         .page-letterhead-text { min-width: 0; }
         .page-school-name {
@@ -289,26 +343,27 @@
             content: "- " counter(report-page) " -";
         }
         .page::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4mm;
-            background: linear-gradient(90deg, var(--school-navy-dark), var(--school-navy-light));
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3mm;
+            background: linear-gradient(90deg, var(--school-navy-dark) 0%, var(--school-navy) 50%, var(--school-accent) 100%);
         }
         .page.page-1 { padding: 26mm 12mm 20mm 12mm; }
         .page.page-2 { padding: 26mm 15mm 20mm 15mm; }
         .page-1 h1 {
-            text-align: center; color: var(--school-navy);
-            font-size: calc(21px + 1.5pt); font-weight: 800; letter-spacing: -0.02em;
-            margin: 0 0 3mm 0; padding-bottom: 2.5mm;
-            border-bottom: 2px solid var(--school-navy); text-decoration: none;
+            text-align: center; color: var(--school-navy-dark);
+            font-size: calc(21px + 1.5pt); font-weight: 700; letter-spacing: -0.03em;
+            margin: 0 0 4mm 0; padding-bottom: 3mm;
+            border-bottom: 1.5px solid var(--school-navy); text-decoration: none;
         }
         .page-2 h1 {
-            text-align: center; color: var(--school-navy);
-            font-size: calc(20px + 1pt); font-weight: 800; margin: 0 0 6mm 0;
-            padding-bottom: 2mm; border-bottom: 2px solid var(--school-navy); text-decoration: none;
+            text-align: center; color: var(--school-navy-dark);
+            font-size: calc(20px + 1pt); font-weight: 700; margin: 0 0 6mm 0;
+            padding-bottom: 2.5mm; border-bottom: 1.5px solid var(--school-navy); text-decoration: none;
         }
         .page-1 .student-info {
-            margin-bottom: 3mm; padding: 3mm 4mm;
-            background: #f0f4f9; border: 1px solid #c5d0e0; border-radius: 2px;
-            font-size: calc(12px + 1.5pt); font-weight: 700; color: var(--school-navy-dark);
+            margin-bottom: 3mm; padding: 3.5mm 5mm;
+            background: linear-gradient(180deg, #f5f8fc 0%, #eef3f9 100%);
+            border: 1px solid #e2e8f0; border-radius: 3px;
+            font-size: calc(12px + 1.5pt); font-weight: 600; color: var(--school-navy-dark);
         }
         .page-1 .report-block { margin-bottom: 10mm; }
         .page-1 .report-block.report-block-main { margin-bottom: 3mm; }
@@ -354,8 +409,8 @@
             font-weight: bold;
         }
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        th, td { border: 1px solid #334155; padding: 6px 4px; text-align: center; font-size: 11px; }
-        th { background-color: #e8eef5; }
+        th, td { border: 1px solid #cbd5e1; padding: 6px 4px; text-align: center; font-size: 11px; }
+        th { background-color: #f1f5f9; }
 
         .formula-compact-box {
             display: flex; flex-direction: column; gap: 6px;
@@ -476,7 +531,7 @@
         </section>
 
         <section class="panel-section stats-dashboard" id="statsDashboard">
-            <div class="section-label">1학년 중간고사 결과 기본 정보</div>
+            <div class="section-label">1학년 정기고사 결과 기본 정보</div>
             <div class="stats-table-wrap">
             <table class="stats-table">
                 <thead>
