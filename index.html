@@ -1087,11 +1087,17 @@
             background: #eef4fc !important;
             color: var(--school-navy-dark);
         }
+        .page-1 .report-block-formula {
+            display: flex;
+            justify-content: flex-start;
+        }
         .page-1 .formula-compact-box {
             margin: 0;
-            padding: 2.5mm 3.5mm;
+            width: fit-content;
+            max-width: 100%;
+            padding: 2mm 3mm;
             font-size: calc(8.5px + 0.5pt);
-            gap: 1.8mm;
+            gap: 1.5mm;
             font-weight: 600;
             background: #f8fafc;
             border: 1px solid #d4dde8;
@@ -1099,9 +1105,17 @@
             border-radius: 5px;
         }
         .page-1 .formula-compact-box .formula-text-row {
+            display: inline-flex;
             flex-wrap: wrap;
-            gap: 2mm 4mm;
-            justify-content: space-between;
+            align-items: center;
+            gap: 2mm 3mm;
+            justify-content: flex-start;
+            width: fit-content;
+            max-width: 100%;
+        }
+        .page-1 .formula-compact-box .formula-label {
+            white-space: nowrap;
+            color: var(--school-navy-dark);
         }
         .page-1 .formula-compact-box .goal-text {
             font-weight: 700;
@@ -1110,6 +1124,7 @@
             padding: 1px 5px;
             border-radius: 3px;
             font-size: calc(8.5px + 0.5pt);
+            white-space: nowrap;
         }
         .page-1 .formula-compact-box .goal-note {
             font-size: calc(8px + 0.5pt);
@@ -1512,8 +1527,8 @@
             <div class="report-block report-block-formula">
             <div class="formula-compact-box">
                 <div class="formula-text-row">
-                    <div><strong>※ 윗등급 차:</strong> 상위 등급 컷과의 차이</div>
-                    <div class="goal-text">목표 = 원점수 + (윗등급 차×2) <span class="goal-note">[최대 1등급컷+3]</span></div>
+                    <span class="formula-label"><strong>※ 윗등급 차:</strong> 상위 등급 컷과의 차이</span>
+                    <span class="goal-text">목표 = 원점수 + (윗등급 차×2) <span class="goal-note">[최대 1등급컷+3]</span></span>
                 </div>
                 <div class="grade-graph-container">
                     <div class="g-bar-1">1등급</div>
@@ -1567,7 +1582,7 @@
             <section class="report-zone report-zone-univ-ref">
             <div class="report-block report-block-univ-ref">
             <h3>주요 대학 학생부교과 등급 기준 안내 (참고용 커트라인)</h3>
-            <p class="univ-ref-note">※ 교과 평균등급(내신) 기준 · 입시 연도·전형·학과별 상이 · 상담 참고자료</p>
+            <p class="univ-ref-note">※ 2022 개정 5등급제(1등급 10%·2등급 34%·3등급 66%·4등급 90%) · 교과 등급 참고 · 전형·학과별 상이</p>
             <div class="report-panel">
             <table class="univ-ref-table">
                 <thead>
@@ -1580,18 +1595,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr><th class="univ-name">서울대</th><td class="ref-tier-s">1.10 이내</td><td class="ref-tier-s">1.05 이내</td><td class="ref-tier-s">1.00 이내</td><td>최상위</td></tr>
-                    <tr><th class="univ-name">연세대</th><td class="ref-tier-s">1.35 이내</td><td class="ref-tier-s">1.30 이내</td><td class="ref-tier-s">1.05 이내</td><td>SKY</td></tr>
-                    <tr><th class="univ-name">고려대</th><td class="ref-tier-s">1.40 이내</td><td class="ref-tier-s">1.35 이내</td><td class="ref-tier-s">1.10 이내</td><td>SKY</td></tr>
-                    <tr><th class="univ-name">성균관대</th><td class="ref-tier-a">1.55 이내</td><td class="ref-tier-a">1.50 이내</td><td class="ref-tier-s">1.25 이내</td><td>상위</td></tr>
-                    <tr><th class="univ-name">한양대</th><td class="ref-tier-a">1.60 이내</td><td class="ref-tier-a">1.55 이내</td><td class="ref-tier-a">1.30 이내</td><td>상위</td></tr>
-                    <tr><th class="univ-name">서강대</th><td class="ref-tier-a">1.65 이내</td><td class="ref-tier-a">1.60 이내</td><td>—</td><td>상위</td></tr>
-                    <tr><th class="univ-name">중앙대</th><td class="ref-tier-a">1.65 이내</td><td class="ref-tier-a">1.60 이내</td><td class="ref-tier-a">1.35 이내</td><td>중상위</td></tr>
-                    <tr><th class="univ-name">경희대</th><td class="ref-tier-b">1.75 이내</td><td class="ref-tier-b">1.70 이내</td><td class="ref-tier-a">1.40 이내</td><td>중상위</td></tr>
-                    <tr><th class="univ-name">이화여대</th><td class="ref-tier-a">1.60 이내</td><td>—</td><td class="ref-tier-a">1.35 이내</td><td>인문 강세</td></tr>
-                    <tr><th class="univ-name">한국외대</th><td class="ref-tier-a">1.65 이내</td><td>—</td><td>—</td><td>어학·인문</td></tr>
-                    <tr><th class="univ-name">건국대(서울)</th><td class="ref-tier-b">1.70 이내</td><td class="ref-tier-b">1.65 이내</td><td>—</td><td>중상위</td></tr>
-                    <tr><th class="univ-name">동국대</th><td class="ref-tier-b">1.75 이내</td><td class="ref-tier-b">1.70 이내</td><td>—</td><td>중위권</td></tr>
+                    <tr><th class="univ-name">서울대</th><td class="ref-tier-s">1등급</td><td class="ref-tier-s">1등급</td><td class="ref-tier-s">1등급</td><td>최상위</td></tr>
+                    <tr><th class="univ-name">연세대</th><td class="ref-tier-s">1~2등급</td><td class="ref-tier-s">1~2등급</td><td class="ref-tier-s">1등급</td><td>SKY</td></tr>
+                    <tr><th class="univ-name">고려대</th><td class="ref-tier-s">1~2등급</td><td class="ref-tier-s">1~2등급</td><td class="ref-tier-s">1~2등급</td><td>SKY</td></tr>
+                    <tr><th class="univ-name">성균관대</th><td class="ref-tier-a">2등급 이내</td><td class="ref-tier-a">2등급 이내</td><td class="ref-tier-s">1~2등급</td><td>상위</td></tr>
+                    <tr><th class="univ-name">한양대</th><td class="ref-tier-a">2등급 이내</td><td class="ref-tier-a">2등급 이내</td><td class="ref-tier-a">1~2등급</td><td>상위</td></tr>
+                    <tr><th class="univ-name">서강대</th><td class="ref-tier-a">2등급 이내</td><td class="ref-tier-a">2등급 이내</td><td>—</td><td>상위</td></tr>
+                    <tr><th class="univ-name">중앙대</th><td class="ref-tier-a">2~3등급</td><td class="ref-tier-a">2~3등급</td><td class="ref-tier-a">2등급 이내</td><td>중상위</td></tr>
+                    <tr><th class="univ-name">경희대</th><td class="ref-tier-b">3등급 이내</td><td class="ref-tier-b">3등급 이내</td><td class="ref-tier-a">2~3등급</td><td>중상위</td></tr>
+                    <tr><th class="univ-name">이화여대</th><td class="ref-tier-a">2등급 이내</td><td>—</td><td class="ref-tier-a">2등급 이내</td><td>인문 강세</td></tr>
+                    <tr><th class="univ-name">한국외대</th><td class="ref-tier-a">2~3등급</td><td>—</td><td>—</td><td>어학·인문</td></tr>
+                    <tr><th class="univ-name">건국대(서울)</th><td class="ref-tier-b">3등급 이내</td><td class="ref-tier-b">3등급 이내</td><td>—</td><td>중상위</td></tr>
+                    <tr><th class="univ-name">동국대</th><td class="ref-tier-b">3등급 이내</td><td class="ref-tier-b">3등급 이내</td><td>—</td><td>중위권</td></tr>
                 </tbody>
             </table>
             </div>
