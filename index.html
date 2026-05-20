@@ -754,6 +754,13 @@
         .page-top-accent-navy { background: #0f2440; }
         .page-top-accent-mid { background: #1e3a5f; }
         .page-top-accent-gold { background: #c4a035; }
+        .page-1 {
+            --rpt-font-base: calc(9.5px + 0.5pt);
+            --rpt-font-sm: calc(8.5px + 0.5pt);
+            --rpt-font-h: calc(10px + 1pt);
+            --rpt-font-caption: calc(8px + 0.5pt);
+            --rpt-cell-pad: 2.5px 3px;
+        }
         .page-1 .page-body.report-page-one {
             display: flex;
             flex-direction: column;
@@ -775,7 +782,7 @@
             background: linear-gradient(180deg, #f7fafd 0%, #eef3f9 100%);
             border: 1px solid #d4dde8;
             border-radius: 5px;
-            font-size: calc(10.5px + 1pt);
+            font-size: var(--rpt-font-base);
             font-weight: 600;
             color: var(--school-navy-dark);
             display: flex;
@@ -789,7 +796,7 @@
             border-radius: 999px;
             background: #fff;
             border: 1px solid #c5d4e4;
-            font-size: calc(10px + 0.5pt);
+            font-size: var(--rpt-font-sm);
             font-weight: 700;
             color: var(--school-navy);
             white-space: nowrap;
@@ -807,7 +814,7 @@
         .page-1 .report-block h3,
         .page-1 .report-section-title {
             margin: 0 0 1.6mm 0;
-            font-size: calc(9.5px + 1pt);
+            font-size: var(--rpt-font-h);
             font-weight: 700;
             color: var(--school-navy-dark);
             padding: 0 0 0 8px;
@@ -829,8 +836,8 @@
         }
         .page-1 .report-block th,
         .page-1 .report-block td {
-            padding: 2.5px 3px;
-            font-size: calc(9.5px + 0.5pt);
+            padding: var(--rpt-cell-pad);
+            font-size: var(--rpt-font-base);
             line-height: 1.28;
             border-color: #dce4ee;
         }
@@ -849,7 +856,7 @@
             width: 22%;
         }
         .page-1 .report-block-maxcut h3 {
-            font-size: calc(9.5px + 1pt);
+            font-size: var(--rpt-font-h);
         }
         .page-1 #rowMax th.row-label,
         .page-1 #rowMax td {
@@ -943,7 +950,7 @@
             background: linear-gradient(165deg, #fafbfd 0%, #eef4fa 100%);
             border: 1px solid #d4dde8;
             border-radius: 5px;
-            font-size: calc(10px + 1pt);
+            font-size: var(--rpt-font-base);
             line-height: 1.45;
             color: var(--school-navy-dark);
         }
@@ -956,7 +963,7 @@
         .page-1 .report-radar-insight .insight-line > strong {
             flex-shrink: 0;
             min-width: 2.6em;
-            font-size: calc(11px + 1.5pt);
+            font-size: var(--rpt-font-h);
             font-weight: 800;
             color: var(--school-navy-dark);
         }
@@ -969,7 +976,7 @@
         .page-1 .report-grade-goal-panel .panel-caption {
             margin: 0;
             padding: 1.8mm 3mm;
-            font-size: calc(8px + 0.5pt);
+            font-size: var(--rpt-font-caption);
             font-weight: 700;
             color: var(--school-navy);
             background: #f4f7fa;
@@ -983,8 +990,8 @@
         }
         .page-1 .report-grade-goal-table th,
         .page-1 .report-grade-goal-table td {
-            padding: 2px 3px;
-            font-size: calc(8.5px + 0.5pt);
+            padding: var(--rpt-cell-pad);
+            font-size: var(--rpt-font-sm);
             line-height: 1.28;
             text-align: center;
             border: 1px solid #e8edf4;
@@ -1039,12 +1046,12 @@
             font-weight: 800;
         }
         .page-1 .report-block-univ-ref h3 {
-            font-size: calc(9px + 1pt);
+            font-size: var(--rpt-font-h);
         }
         .page-1 .univ-ref-note,
         .page-1 .univ-ref-scale-note {
             margin: 0 0 1.2mm 0;
-            font-size: calc(7.5px + 0.5pt);
+            font-size: var(--rpt-font-caption);
             color: var(--school-muted);
             font-weight: 600;
             line-height: 1.35;
@@ -1060,7 +1067,7 @@
             flex-wrap: wrap;
             gap: 2mm 4mm;
             margin: 0 0 1.4mm 0;
-            font-size: calc(7.5px + 0.5pt);
+            font-size: var(--rpt-font-caption);
             font-weight: 600;
             color: var(--school-navy-dark);
         }
@@ -1074,8 +1081,8 @@
         }
         .page-1 .univ-ref-table th,
         .page-1 .univ-ref-table td {
-            padding: 2px 2px;
-            font-size: calc(7.2px + 0.5pt);
+            padding: var(--rpt-cell-pad);
+            font-size: var(--rpt-font-caption);
             line-height: 1.3;
             text-align: center;
             vertical-align: middle;
@@ -1097,9 +1104,9 @@
         }
         .page-1 .univ-ref-table tbody td.ref-note-cell {
             text-align: left;
-            font-size: calc(6.8px + 0.5pt);
+            font-size: var(--rpt-font-caption);
             line-height: 1.28;
-            padding: 2px 3px;
+            padding: var(--rpt-cell-pad);
             color: var(--school-navy-dark);
         }
         .page-1 .univ-ref-table tbody tr:nth-child(even) td:not(.ref-note-cell) {
@@ -1112,7 +1119,7 @@
             gap: 1px;
         }
         .page-1 .univ-ref-mark {
-            font-size: calc(8px + 0.5pt);
+            font-size: var(--rpt-font-caption);
             line-height: 1;
         }
         .page-1 .univ-ref-grade {
@@ -1120,7 +1127,7 @@
             letter-spacing: -0.02em;
         }
         .page-1 .univ-ref-sub {
-            font-size: calc(6.5px + 0.5pt);
+            font-size: var(--rpt-font-caption);
             font-weight: 600;
             color: #64748b;
         }
@@ -1130,7 +1137,7 @@
         .page-1 .univ-ref-disclaimer {
             margin: 1.6mm 0 0;
             padding: 2mm 2.5mm;
-            font-size: calc(7px + 0.5pt);
+            font-size: var(--rpt-font-caption);
             line-height: 1.4;
             color: var(--school-muted);
             font-weight: 600;
@@ -1145,56 +1152,84 @@
             color: var(--school-navy-dark);
         }
         .page-1 .report-block-formula {
-            display: flex;
-            justify-content: flex-start;
+            width: 100%;
         }
         .page-1 .formula-compact-box {
             margin: 0;
-            width: fit-content;
-            max-width: 100%;
-            padding: 2mm 3mm;
-            font-size: calc(8.5px + 0.5pt);
-            gap: 1.5mm;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 2.5mm 3.5mm;
+            font-size: var(--rpt-font-sm);
+            gap: 2mm;
             font-weight: 600;
             background: #f8fafc;
             border: 1px solid #d4dde8;
             border-left: 3px solid var(--school-navy);
             border-radius: 5px;
+            box-shadow: 0 1px 0 rgba(15, 36, 64, 0.04);
         }
         .page-1 .formula-compact-box .formula-text-row {
-            display: inline-flex;
+            display: flex;
             flex-wrap: wrap;
             align-items: center;
+            justify-content: space-between;
             gap: 2mm 3mm;
-            justify-content: flex-start;
-            width: fit-content;
-            max-width: 100%;
+            width: 100%;
         }
         .page-1 .formula-compact-box .formula-label {
-            white-space: nowrap;
             color: var(--school-navy-dark);
+            font-size: var(--rpt-font-sm);
         }
         .page-1 .formula-compact-box .goal-text {
             font-weight: 700;
             color: #9a3412;
             background: #fff7ed;
-            padding: 1px 5px;
+            padding: 1.5px 6px;
             border-radius: 3px;
-            font-size: calc(8.5px + 0.5pt);
-            white-space: nowrap;
+            font-size: var(--rpt-font-sm);
+            text-align: right;
         }
         .page-1 .formula-compact-box .goal-note {
-            font-size: calc(8px + 0.5pt);
+            font-size: var(--rpt-font-caption);
             color: #64748b;
             font-weight: 500;
         }
         .page-1 .grade-graph-container {
-            height: calc(12px + 1pt);
-            line-height: calc(12px + 1pt);
-            font-size: calc(7.5px + 0.5pt);
+            display: flex;
+            width: 100%;
+            min-height: calc(14px + 1.5pt);
+            line-height: 1.2;
+            font-size: var(--rpt-font-caption);
+            font-weight: 700;
             border-radius: 3px;
             overflow: hidden;
+            color: #fff;
+            text-align: center;
         }
+        .page-1 .grade-graph-container > div {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            flex-direction: row;
+            flex-wrap: wrap;
+            padding: 1px 2px;
+            white-space: nowrap;
+        }
+        .page-1 .grade-graph-container .g-bar-1,
+        .page-1 .grade-graph-container .g-bar-5 {
+            font-size: 0.9em;
+        }
+        .page-1 .grade-graph-container .g-bar-pct {
+            font-size: 0.95em;
+            font-weight: 600;
+            opacity: 0.95;
+        }
+        .page-1 .grade-graph-container .g-bar-1 { width: 10%; background: #c62828; }
+        .page-1 .grade-graph-container .g-bar-2 { width: 24%; background: #e65100; }
+        .page-1 .grade-graph-container .g-bar-3 { width: 32%; background: #2e7d32; }
+        .page-1 .grade-graph-container .g-bar-4 { width: 24%; background: #1565c0; }
+        .page-1 .grade-graph-container .g-bar-5 { width: 10%; background: #546e7a; }
         .page-1 .my-score-row td { background: #e8f2fc !important; }
 
         h1 { text-align: center; font-weight: 700; }
@@ -1590,11 +1625,11 @@
                     <span class="goal-text">목표 = 원점수 + (윗등급 차×2) <span class="goal-note">[최대 1등급컷+3]</span></span>
                 </div>
                 <div class="grade-graph-container">
-                    <div class="g-bar-1">1등급</div>
-                    <div class="g-bar-2">2등급</div>
-                    <div class="g-bar-3">3등급</div>
-                    <div class="g-bar-4">4등급</div>
-                    <div class="g-bar-5">5등급</div>
+                    <div class="g-bar-1">1등급 <span class="g-bar-pct">(10%)</span></div>
+                    <div class="g-bar-2">2등급 <span class="g-bar-pct">(34%)</span></div>
+                    <div class="g-bar-3">3등급 <span class="g-bar-pct">(66%)</span></div>
+                    <div class="g-bar-4">4등급 <span class="g-bar-pct">(90%)</span></div>
+                    <div class="g-bar-5">5등급 <span class="g-bar-pct">(100%)</span></div>
                 </div>
             </div>
             </div>
