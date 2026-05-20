@@ -776,13 +776,19 @@
             flex-direction: column;
             gap: 2.4mm;
         }
+        .page-1 .report-panel-student {
+            padding: 0;
+        }
         .page-1 .student-info {
             margin: 0;
-            padding: 0.5mm 4.5mm;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 0 4.5mm;
+            line-height: 1;
             background: linear-gradient(180deg, #f7fafd 0%, #eef3f9 100%);
-            border: 1px solid #d4dde8;
-            border-radius: 5px;
-            font-size: calc(var(--rpt-font-base) + 3pt);
+            border: none;
+            border-radius: 0;
+            font-size: calc(var(--rpt-font-base) + 4pt);
             font-weight: 600;
             color: var(--school-navy-dark);
             display: flex;
@@ -792,11 +798,12 @@
         }
         .page-1 .student-info .avg-grade-pill {
             flex-shrink: 0;
-            padding: 0.5mm 3.5mm;
+            padding: 0 3.5mm;
+            line-height: 1;
             border-radius: 999px;
             background: #fff;
             border: 1px solid #c5d4e4;
-            font-size: calc(var(--rpt-font-sm) + 3pt);
+            font-size: calc(var(--rpt-font-sm) + 4pt);
             font-weight: 700;
             color: var(--school-navy);
             white-space: nowrap;
@@ -941,32 +948,6 @@
             gap: 2mm;
             min-width: 0;
         }
-        .page-1 .report-radar-insight {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            gap: 3mm;
-            padding: 3.5mm 4mm;
-            background: linear-gradient(165deg, #fafbfd 0%, #eef4fa 100%);
-            border: 1px solid #d4dde8;
-            border-radius: 5px;
-            font-size: var(--rpt-font-base);
-            line-height: 1.45;
-            color: var(--school-navy-dark);
-        }
-        .page-1 .report-radar-insight .insight-line {
-            display: flex;
-            align-items: baseline;
-            flex-wrap: wrap;
-            gap: 2mm 3mm;
-        }
-        .page-1 .report-radar-insight .insight-line > strong {
-            flex-shrink: 0;
-            min-width: 2.6em;
-            font-size: var(--rpt-font-h);
-            font-weight: 800;
-            color: var(--school-navy-dark);
-        }
         .page-1 .report-grade-goal-panel {
             border: 1px solid #d4dde8;
             border-radius: 5px;
@@ -1032,18 +1013,6 @@
             background: #f8fafc;
             color: #94a3b8;
             font-weight: 600;
-        }
-        .page-1 .report-radar-insight .insight-strong,
-        .page-1 .report-radar-insight .insight-weak {
-            font-size: calc(12px + 2pt);
-            font-weight: 800;
-            letter-spacing: -0.02em;
-        }
-        .page-1 .report-radar-insight .insight-strong { color: #b45309; }
-        .page-1 .report-radar-insight .insight-weak { color: #1d4ed8; }
-        .page-1 .report-radar-insight .insight-grade-list {
-            font-size: calc(12px + 2pt);
-            font-weight: 800;
         }
         .page-1 .report-block-univ-ref h3 {
             font-size: var(--rpt-font-h);
@@ -1151,85 +1120,6 @@
             background: #eef4fc !important;
             color: var(--school-navy-dark);
         }
-        .page-1 .report-block-formula {
-            width: 100%;
-        }
-        .page-1 .formula-compact-box {
-            margin: 0;
-            width: 100%;
-            box-sizing: border-box;
-            padding: 2.5mm 3.5mm;
-            font-size: var(--rpt-font-sm);
-            gap: 2mm;
-            font-weight: 600;
-            background: #f8fafc;
-            border: 1px solid #d4dde8;
-            border-left: 3px solid var(--school-navy);
-            border-radius: 5px;
-            box-shadow: 0 1px 0 rgba(15, 36, 64, 0.04);
-        }
-        .page-1 .formula-compact-box .formula-text-row {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 2mm 3mm;
-            width: 100%;
-        }
-        .page-1 .formula-compact-box .formula-label {
-            color: var(--school-navy-dark);
-            font-size: var(--rpt-font-sm);
-        }
-        .page-1 .formula-compact-box .goal-text {
-            font-weight: 700;
-            color: #9a3412;
-            background: #fff7ed;
-            padding: 1.5px 6px;
-            border-radius: 3px;
-            font-size: var(--rpt-font-sm);
-            text-align: right;
-        }
-        .page-1 .formula-compact-box .goal-note {
-            font-size: var(--rpt-font-caption);
-            color: #64748b;
-            font-weight: 500;
-        }
-        .page-1 .grade-graph-container {
-            display: flex;
-            width: 100%;
-            min-height: calc(14px + 1.5pt);
-            line-height: 1.2;
-            font-size: var(--rpt-font-caption);
-            font-weight: 700;
-            border-radius: 3px;
-            overflow: hidden;
-            color: #fff;
-            text-align: center;
-        }
-        .page-1 .grade-graph-container > div {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 2px;
-            flex-direction: row;
-            flex-wrap: wrap;
-            padding: 1px 2px;
-            white-space: nowrap;
-        }
-        .page-1 .grade-graph-container .g-bar-1,
-        .page-1 .grade-graph-container .g-bar-5 {
-            font-size: 0.9em;
-        }
-        .page-1 .grade-graph-container .g-bar-pct {
-            font-size: 0.95em;
-            font-weight: 600;
-            opacity: 0.95;
-        }
-        .page-1 .grade-graph-container .g-bar-1 { width: 10%; background: #c62828; }
-        .page-1 .grade-graph-container .g-bar-2 { width: 24%; background: #e65100; }
-        .page-1 .grade-graph-container .g-bar-3 { width: 32%; background: #2e7d32; }
-        .page-1 .grade-graph-container .g-bar-4 { width: 24%; background: #1565c0; }
-        .page-1 .grade-graph-container .g-bar-5 { width: 10%; background: #546e7a; }
         .page-1 .my-score-row td { background: #e8f2fc !important; }
 
         h1 { text-align: center; font-weight: 700; }
@@ -1240,20 +1130,6 @@
         table { width: 100%; border-collapse: collapse; table-layout: fixed; }
         th, td { border: 1px solid #cbd5e1; padding: 6px 4px; text-align: center; font-size: 11px; }
         th { background-color: #f1f5f9; }
-
-        .formula-compact-box {
-            display: flex; flex-direction: column; gap: 6px;
-        }
-        .formula-text-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px; }
-        .grade-graph-container {
-            display: flex; width: 100%; overflow: hidden; font-weight: bold;
-            color: white; text-align: center;
-        }
-        .g-bar-1 { width: 10%; background: #c62828; }
-        .g-bar-2 { width: 24%; background: #e65100; }
-        .g-bar-3 { width: 32%; background: #2e7d32; }
-        .g-bar-4 { width: 24%; background: #1565c0; }
-        .g-bar-5 { width: 10%; background: #546e7a; }
 
         .row-label { background-color: #f1f5f9; width: 90px; font-weight: bold; }
         .symbol-up { color: #b91c1c; font-weight: bold; font-size: calc(14px + 1pt); width: 60px; }
@@ -1391,9 +1267,7 @@
             }
             #printContainer .report-panel,
             #printContainer .student-info,
-            #printContainer .formula-compact-box,
-            #printContainer .report-radar-chart,
-            #printContainer .report-radar-insight {
+            #printContainer .report-radar-chart {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
@@ -1408,14 +1282,7 @@
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
-            #printContainer .grade-graph-container,
-            #printContainer .g-bar-1,
-            #printContainer .g-bar-2,
-            #printContainer .g-bar-3,
-            #printContainer .g-bar-4,
-            #printContainer .g-bar-5,
             #printContainer .report-radar-chart svg,
-            #printContainer .report-radar-insight,
             #printContainer .report-grade-goal-table .grade-badge,
             #printContainer .report-grade-goal-table .goal-cell,
             #printContainer .univ-ref-table thead th,
@@ -1592,9 +1459,11 @@
                 <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
                 <h1>2026학년도 정기고사 결과 보고서</h1>
             </div>
+            <div class="report-panel report-panel-student">
             <div class="student-info">
                 <div id="infoStudentText">학생 정보 로딩중...</div>
                 <div class="avg-grade-pill">평균등급 <span id="infoAvgGrade">0.00</span></div>
+            </div>
             </div>
             </section>
 
@@ -1618,21 +1487,6 @@
             </div>
             </div>
 
-            <div class="report-block report-block-formula">
-            <div class="formula-compact-box">
-                <div class="formula-text-row">
-                    <span class="formula-label"><strong>※ 윗등급 차:</strong> 상위 등급 컷과의 차이</span>
-                    <span class="goal-text">목표 = 원점수 + (윗등급 차×2) <span class="goal-note">[최대 1등급컷+3]</span></span>
-                </div>
-                <div class="grade-graph-container">
-                    <div class="g-bar-1">1등급 <span class="g-bar-pct">(10%)</span></div>
-                    <div class="g-bar-2">2등급 <span class="g-bar-pct">(34%)</span></div>
-                    <div class="g-bar-3">3등급 <span class="g-bar-pct">(66%)</span></div>
-                    <div class="g-bar-4">4등급 <span class="g-bar-pct">(90%)</span></div>
-                    <div class="g-bar-5">5등급 <span class="g-bar-pct">(100%)</span></div>
-                </div>
-            </div>
-            </div>
             </section>
 
             <section class="report-zone report-zone-aux">
@@ -1657,13 +1511,12 @@
 
             <section class="report-zone report-zone-radar">
             <div class="report-block report-block-radar">
-            <h3>과목별 등급 · 강점·약점 · 목표점수</h3>
+            <h3>과목별 등급 · 강점·약점 · 목표점수를 한눈에 보기</h3>
             <div class="report-radar-layout">
                 <div class="report-radar-chart">
                     <svg id="gradeRadarChart" viewBox="0 0 240 240" role="img" aria-label="과목별 등급 레이더 차트"></svg>
                 </div>
                 <div class="report-radar-side">
-                    <div class="report-radar-insight" id="gradeRadarInsight"></div>
                     <div class="report-grade-goal-panel">
                         <p class="panel-caption">한 등급 올리기 목표점수 (원점수 + 윗등급 차×2)</p>
                         <div id="gradeRadarSummary"></div>
@@ -2978,9 +2831,8 @@ function populateTemplate(studentIdStr, options) {
 
 function renderStudentGradeRadar(subjectRows) {
     const svgEl = document.getElementById('gradeRadarChart');
-    const insightEl = document.getElementById('gradeRadarInsight');
     const summaryEl = document.getElementById('gradeRadarSummary');
-    if (!svgEl || !insightEl || !subjectRows.length) return;
+    if (!svgEl || !subjectRows.length) return;
 
     const NS = 'http://www.w3.org/2000/svg';
     const cx = 120;
@@ -3075,23 +2927,6 @@ function renderStudentGradeRadar(subjectRows) {
         row.subject + ' ' + row.grade + '등급' + (row.goal.hasGoal ? ' 목표' + row.goal.display : '')
     ).join(', ');
     svgEl.appendChild(title);
-
-    const minG = Math.min.apply(null, subjectRows.map((x) => x.grade));
-    const maxG = Math.max.apply(null, subjectRows.map((x) => x.grade));
-    const strong = subjectRows.filter((x) => x.grade === minG);
-    const weak = subjectRows.filter((x) => x.grade === maxG);
-    const fmtGrade = (arr) => arr.map((x) => x.subject + '(' + x.grade + '등급)').join(', ');
-
-    let insightHtml = '';
-    if (minG === maxG) {
-        insightHtml +=
-            '<div class="insight-line">과목별 등급 <strong class="insight-grade-list">' + minG + '등급</strong>으로 동일</div>';
-    } else {
-        insightHtml +=
-            '<div class="insight-line"><strong>강점</strong> <span class="insight-strong">' + fmtGrade(strong) + '</span></div>' +
-            '<div class="insight-line"><strong>약점</strong> <span class="insight-weak">' + fmtGrade(weak) + '</span></div>';
-    }
-    insightEl.innerHTML = insightHtml;
 
     if (summaryEl) {
         const table = document.createElement('table');
@@ -3223,10 +3058,8 @@ function resetMainTables() {
     document.getElementById('rowCut3').innerHTML = '<th class="row-label">3등급</th>'; 
     document.getElementById('rowCut4').innerHTML = '<th class="row-label">4등급</th>';
     const radarSvg = document.getElementById('gradeRadarChart');
-    const radarInsight = document.getElementById('gradeRadarInsight');
     const radarSummary = document.getElementById('gradeRadarSummary');
     if (radarSvg) radarSvg.innerHTML = '';
-    if (radarInsight) radarInsight.innerHTML = '';
     if (radarSummary) radarSummary.innerHTML = '';
     const distTitle = document.getElementById('distPageTitle');
     if (distTitle) distTitle.textContent = '학생 주변 성적분포';
