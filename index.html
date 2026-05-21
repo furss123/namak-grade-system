@@ -2261,11 +2261,15 @@
             justify-content: center;
             gap: 8px;
         }
-        .page-scroll-nav,
-        .page-action-nav {
-            display: contents;
+        .page-chrome-nav {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
-        .page-action-nav[hidden] {
+        #pdfActionBtn,
+        .page-action-pdf {
             display: none !important;
         }
         .page-scroll-btn,
@@ -2880,7 +2884,7 @@
     </div>
 
     <aside class="page-chrome-actions no-print" aria-label="페이지 도구">
-        <nav class="page-scroll-nav" aria-label="페이지 이동">
+        <nav class="page-chrome-nav" id="pageChromeNav" aria-label="페이지 도구">
             <button type="button" class="page-scroll-btn" id="scrollToTopBtn" aria-label="맨 위로 이동">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" />
@@ -2893,15 +2897,13 @@
                 </svg>
                 <span>맨 아래</span>
             </button>
-        </nav>
-        <div class="page-action-nav" id="reportActionNav" hidden aria-label="결과 출력">
-            <button type="button" class="page-action-btn page-action-print" id="printActionBtn" onclick="printSelectedReport()" aria-label="결과 인쇄하기">
+            <button type="button" class="page-action-btn page-action-print" id="printActionBtn" hidden onclick="printSelectedReport()" aria-label="결과 인쇄하기">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 9V4h12v5M6 18H4v2h16v-2h-2M6 14h12v-4H6v4z" />
                 </svg>
                 <span>인쇄</span>
             </button>
-        </div>
+        </nav>
     </aside>
 
     <footer id="siteFooterRoot" class="site-footer app-footer no-print" role="contentinfo">
@@ -4213,13 +4215,13 @@ function setUploadState(statusText, isSuccess, fileName = "") {
 }
 
 function showPrintFloatActions() {
-    const nav = document.getElementById('reportActionNav');
-    if (nav) nav.hidden = false;
+    const printBtn = document.getElementById('printActionBtn');
+    if (printBtn) printBtn.hidden = false;
 }
 
 function hidePrintFloatActions() {
-    const nav = document.getElementById('reportActionNav');
-    if (nav) nav.hidden = true;
+    const printBtn = document.getElementById('printActionBtn');
+    if (printBtn) printBtn.hidden = true;
 }
 
 /** 대학 AI — ① Worker(선택) ② DDG(팝업 없음) ③ Puter/Perplexity(버튼 1회 로그인) */
