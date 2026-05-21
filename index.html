@@ -1031,6 +1031,9 @@
             flex-direction: column;
             gap: var(--space-5);
         }
+        #printContainer .report-wrapper {
+            display: block !important;
+        }
         body.pdf-exporting {
             overflow: hidden;
         }
@@ -1090,7 +1093,7 @@
             display: none;
             position: fixed;
             inset: 0;
-            z-index: 100000;
+            z-index: 99998;
             background: color-mix(in srgb, var(--theme-bg-page) 88%, transparent);
             align-items: center;
             justify-content: center;
@@ -1173,43 +1176,50 @@
             background: linear-gradient(155deg, #475569 0%, #334155 100%);
             border-color: #94a3b8;
         }
+        html[data-theme="dark"] .upload-box {
+            border-left-color: var(--school-navy-light);
+        }
         html[data-theme="dark"] .upload-box.success {
             border-style: solid;
-            border-color: #166534;
-            border-left-color: #22c55e;
-            background: rgba(34, 197, 94, 0.12);
+            border-color: var(--theme-border);
+            border-left: 3px solid #22c55e;
+            background: var(--upload-panel-bg);
             box-shadow: var(--shadow-xs);
         }
         html[data-theme="dark"] .upload-box.success .upload-icon-wrap {
-            background: rgba(34, 197, 94, 0.18);
-            border-color: #166534;
+            background: var(--theme-bg-muted);
+            border-color: var(--theme-border);
         }
         html[data-theme="dark"] .upload-box.success .upload-icon {
-            color: #86efac;
+            color: #6ee7b7;
         }
         html[data-theme="dark"] .upload-box.success:hover {
-            background: rgba(34, 197, 94, 0.18);
-            border-color: #15803d;
+            background: linear-gradient(155deg, #3d4f66 0%, #334155 100%);
+            border-color: #64748b;
+            border-left-color: #22c55e;
+            box-shadow: var(--shadow-sm), 0 0 0 3px rgba(61, 107, 158, 0.15);
         }
         html[data-theme="dark"] .upload-box.success.drag-over {
-            background: rgba(34, 197, 94, 0.22);
-            border-color: #22c55e;
+            background: linear-gradient(155deg, #475569 0%, #334155 100%);
+            border-color: #94a3b8;
+            border-left-color: #22c55e;
+            transform: translateY(-1px);
         }
         html[data-theme="dark"] .upload-box.success .upload-title {
-            color: #86efac;
+            color: var(--theme-text-muted);
         }
         html[data-theme="dark"] .upload-box.success .upload-desc {
             color: var(--theme-text-muted);
         }
         html[data-theme="dark"] .upload-box.success .upload-desc .upload-cta-mark {
-            color: var(--theme-text);
+            color: #93c5fd;
         }
-        html[data-theme="dark"] .upload-box.success:hover .upload-desc,
-        html[data-theme="dark"] .upload-box.success:hover .upload-desc .upload-cta-mark {
-            color: var(--theme-text);
+        html[data-theme="dark"] .upload-box.success:hover .upload-desc {
+            color: var(--theme-text-muted);
         }
         html[data-theme="dark"] .upload-box.success:hover .upload-desc .upload-cta-mark {
-            text-decoration-color: rgba(226, 232, 240, 0.35);
+            color: #93c5fd;
+            text-decoration-color: rgba(147, 197, 253, 0.45);
         }
         html[data-theme="dark"] .upload-example-notice {
             color: #fca5a5;
@@ -5510,8 +5520,13 @@ function appendReportsToPrintContainer(studentIds, printOpts) {
         printContainer.appendChild(cloneReportForPrint(printOpts));
     });
     syncScreenFooterAfterReports();
-    requestAnimationFrame(function() {
-        fitReportPagesInRoot(printContainer);
+    return new Promise(function(resolve) {
+        requestAnimationFrame(function() {
+            fitReportPagesInRoot(printContainer);
+            requestAnimationFrame(function() {
+                requestAnimationFrame(resolve);
+            });
+        });
     });
 }
 
@@ -5556,7 +5571,7 @@ function prepareSelectedReportForOutput() {
         alert('먼저 학생을 조회해 주세요.');
         return false;
     }
-    appendReportsToPrintContainer(studentIds, getPrintOptions());
+    prepareSelectedReportForOutput._layoutPromise = appendReportsToPrintContainer(studentIds, getPrintOptions());
     return true;
 }
 
@@ -5650,7 +5665,10 @@ function preparePdfCaptureLayout(printContainer) {
 /** appendReportsToPrintContainer의 rAF 레이아웃(fit) 완료 후 캡처 */
 function waitForPrintContainerLayout() {
     const printContainer = document.getElementById('printContainer');
-    return preparePdfCaptureLayout(printContainer);
+    const layoutReady = prepareSelectedReportForOutput._layoutPromise || Promise.resolve();
+    return layoutReady.then(function() {
+        return preparePdfCaptureLayout(printContainer);
+    });
 }
 
 function getPdfCaptureRoot(printContainer) {
@@ -5659,6 +5677,66 @@ function getPdfCaptureRoot(printContainer) {
     if (wrappers.length === 1) return wrappers[0];
     if (printContainer.querySelector('.page')) return printContainer;
     return printContainer.children.length ? printContainer : null;
+}
+
+/** html2canvas clone: scale/transform이 빈 캔버스를 만드는 경우 방지 */
+function pdfHtml2canvasOnclone(doc, clonedNode) {
+    if (!clonedNode || !clonedNode.querySelectorAll) return;
+    clonedNode.querySelectorAll('.page-body').forEach(function(body) {
+        body.classList.remove('page-body-fit');
+        body.style.transform = 'none';
+        body.style.width = '100%';
+        body.style.maxWidth = '100%';
+    });
+    clonedNode.querySelectorAll('.page').forEach(function(page) {
+        page.style.transform = 'none';
+        page.style.overflow = 'visible';
+    });
+}
+
+function getPdfPageCaptureSize(pageEl) {
+    const rect = pageEl.getBoundingClientRect();
+    const captureW = Math.max(
+        PDF_CAPTURE_WIDTH_PX,
+        Math.ceil(pageEl.offsetWidth || rect.width || 0)
+    );
+    const captureH = Math.max(
+        Math.round(PDF_CAPTURE_WIDTH_PX * 297 / 210),
+        Math.ceil(pageEl.offsetHeight || rect.height || 0)
+    );
+    return { captureW: captureW, captureH: captureH };
+}
+
+function assertPdfPagesMeasurable(pages) {
+    if (!pages.length) {
+        throw new Error('저장할 보고서 페이지가 없습니다.');
+    }
+    pages.forEach(function(pageEl, idx) {
+        const size = getPdfPageCaptureSize(pageEl);
+        if (size.captureW < 50 || size.captureH < 50) {
+            throw new Error('페이지 ' + (idx + 1) + ' 크기를 읽을 수 없습니다. PDF 캡처 레이아웃이 준비되지 않았습니다.');
+        }
+        const body = pageEl.querySelector('.page-body');
+        if (body && !String(body.innerHTML || '').trim()) {
+            throw new Error('페이지 ' + (idx + 1) + ' 내용이 비어 있습니다.');
+        }
+    });
+}
+
+function buildPdfHtml2canvasOptions(captureW, captureH) {
+    return {
+        scale: 1.5,
+        useCORS: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        scrollX: 0,
+        scrollY: 0,
+        width: captureW,
+        height: captureH,
+        windowWidth: captureW,
+        windowHeight: captureH,
+        onclone: pdfHtml2canvasOnclone
+    };
 }
 
 var pdfExportInProgress = false;
@@ -5699,41 +5777,51 @@ function setPdfExportOverlayVisible(visible) {
     }
 }
 
-/** html2pdf 캡처·저장 (다음 태스크로 지연해 로딩 UI가 먼저 그려지게 함) */
-function runHtml2PdfSave(printContainer, filename) {
-    const captureRoot = getPdfCaptureRoot(printContainer);
-    if (!captureRoot) return Promise.reject(new Error('PDF capture root missing'));
-    const captureWidth = Math.max(
-        PDF_CAPTURE_WIDTH_PX,
-        Math.ceil(captureRoot.scrollWidth || captureRoot.getBoundingClientRect().width || PDF_CAPTURE_WIDTH_PX)
-    );
-    return ensureHtml2PdfLoaded().then(function() {
-        return new Promise(function(resolve, reject) {
-            setTimeout(function() {
-                html2pdf()
-                    .set({
-                        margin: 0,
-                        filename: filename,
-                        image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: {
-                            scale: 1.5,
-                            useCORS: true,
-                            logging: false,
-                            scrollX: 0,
-                            scrollY: 0,
-                            windowWidth: captureWidth,
-                            width: captureWidth
-                        },
-                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                        pagebreak: { mode: ['css', 'legacy'], before: '.page + .page' }
-                    })
-                    .from(captureRoot)
-                    .save()
-                    .then(resolve)
-                    .catch(reject);
-            }, 0);
+/**
+ * PDF 저장: 각 .page를 html2canvas로 캡처 후 jsPDF에 페이지별로 합침.
+ * (html2pdf 단일 루트 캡처는 다중 A4·transform 레이아웃에서 빈 PDF가 나는 경우가 있음)
+ */
+async function runHtml2PdfSave(printContainer, filename) {
+    if (!printContainer) throw new Error('PDF capture container missing');
+    const pages = Array.from(printContainer.querySelectorAll('.page'));
+    assertPdfPagesMeasurable(pages);
+    await ensureHtml2PdfLoaded();
+
+    const A4_W_MM = 210;
+    const A4_H_MM = 297;
+    const jsPdfOpts = { unit: 'mm', format: 'a4', orientation: 'portrait' };
+    let pdfDoc = null;
+
+    for (let i = 0; i < pages.length; i++) {
+        const pageEl = pages[i];
+        const size = getPdfPageCaptureSize(pageEl);
+        const worker = html2pdf().set({
+            margin: 0,
+            filename: filename,
+            image: { type: 'jpeg', quality: 0.95 },
+            html2canvas: buildPdfHtml2canvasOptions(size.captureW, size.captureH),
+            jsPDF: jsPdfOpts
         });
-    });
+
+        if (i === 0) {
+            pdfDoc = await worker.from(pageEl).toPdf();
+        } else {
+            const canvas = await html2pdf()
+                .set({
+                    margin: 0,
+                    image: { type: 'jpeg', quality: 0.95 },
+                    html2canvas: buildPdfHtml2canvasOptions(size.captureW, size.captureH),
+                    jsPDF: jsPdfOpts
+                })
+                .from(pageEl)
+                .toCanvas();
+            pdfDoc.addPage();
+            pdfDoc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, A4_W_MM, A4_H_MM);
+        }
+    }
+
+    if (!pdfDoc) throw new Error('PDF 문서 생성 실패');
+    pdfDoc.save(filename);
 }
 
 /**
@@ -5759,8 +5847,9 @@ async function saveReportAsPdf() {
         window.scrollTo(0, 0);
         printContainer.classList.add('pdf-export-capture');
         const filename = getReportPdfFilename();
+        await waitForPrintContainerLayout();
         await yieldToPaint();
-        await preparePdfCaptureLayout(printContainer);
+        setPdfExportOverlayVisible(false);
         await yieldToPaint();
         await runHtml2PdfSave(printContainer, filename);
     } catch (err) {
