@@ -1004,11 +1004,12 @@
             --rpt-cell-pad-x: 3px;
             --rpt-cell-pad-y: calc(2.5px + 1mm);
             --rpt-cell-pad: var(--rpt-cell-pad-y) var(--rpt-cell-pad-x);
+            --report-p1-section-gap: calc(var(--report-zone-gap) + 7mm);
         }
         .page-1 .page-body.report-page-one {
             display: flex;
             flex-direction: column;
-            gap: var(--report-zone-gap);
+            gap: var(--report-p1-section-gap);
             overflow: hidden;
             min-height: 0;
         }
@@ -1017,7 +1018,7 @@
             flex-direction: column;
             align-items: stretch;
             justify-content: flex-start;
-            gap: var(--report-zone-gap);
+            gap: var(--report-p1-section-gap);
             flex: 1 1 auto;
             min-height: 0;
             width: 100%;
@@ -1043,7 +1044,7 @@
             flex-shrink: 0;
         }
         .page-1 .report-zone-head .report-zone-maxcut {
-            margin-top: 0;
+            margin-top: 7mm;
         }
         /* 1페이지 선택 항목 수(과목별·한눈에)에 따른 비율 */
         .page-1.p1-opt-count-1 {
