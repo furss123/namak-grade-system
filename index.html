@@ -2976,6 +2976,9 @@ function ensureGlobalChromeOutsideTemplate() {
     const template = document.getElementById('reportTemplate');
     const chromeActions = document.querySelector('.page-chrome-actions.no-print');
     const siteRoot = document.getElementById('siteFooterRoot');
+    document.querySelectorAll('#pdfActionBtn, .page-action-pdf').forEach(function(el) {
+        el.remove();
+    });
     if (chromeActions && template && template.contains(chromeActions)) {
         document.body.appendChild(chromeActions);
     }
