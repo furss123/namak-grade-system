@@ -1897,27 +1897,31 @@
         }
         .page-action-split {
             display: flex;
-            flex-direction: row;
+            flex-direction: column;
             align-items: stretch;
             align-self: stretch;
-            width: calc(var(--page-chrome-btn-w) * 2 + 6px);
-            min-width: calc(var(--page-chrome-btn-w) * 2 + 6px);
-            gap: 6px;
+            width: var(--page-chrome-btn-w);
+            min-width: var(--page-chrome-btn-w);
+            gap: 0;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            box-shadow: 0 4px 14px rgba(30, 58, 95, 0.18);
         }
         .page-action-split[hidden] {
             display: none !important;
         }
         .page-action-btn {
             flex: 1 1 50%;
-            min-width: 0;
+            min-height: 0;
+            height: 50%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 4px;
-            padding: 10px 4px;
-            border: 1px solid rgba(30, 58, 95, 0.22);
-            border-radius: var(--radius-md);
+            gap: 3px;
+            padding: 6px 4px;
+            border: none;
+            border-radius: 0;
             font-family: inherit;
             font-size: var(--text-xs);
             font-weight: 700;
@@ -1925,46 +1929,52 @@
             letter-spacing: -0.02em;
             white-space: nowrap;
             cursor: pointer;
-            box-shadow: 0 4px 14px rgba(30, 58, 95, 0.18);
-            backdrop-filter: blur(6px);
-            transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), filter 0.2s var(--ease);
+            box-shadow: none;
+            backdrop-filter: none;
+            transition: filter 0.2s var(--ease), background 0.2s var(--ease);
         }
         .page-action-btn svg {
             width: 18px;
             height: 18px;
             flex-shrink: 0;
         }
+        .page-action-btn span {
+            text-align: center;
+        }
         .page-action-btn:hover {
             filter: brightness(1.06);
-            box-shadow: 0 6px 18px rgba(30, 58, 95, 0.24);
-            transform: translateY(-1px);
         }
         .page-action-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 8px rgba(30, 58, 95, 0.16);
+            filter: brightness(0.96);
         }
         .page-action-btn:focus-visible {
             outline: 2px solid var(--school-navy-light);
-            outline-offset: 2px;
+            outline-offset: -2px;
+            z-index: 1;
         }
         .page-action-btn:disabled {
             opacity: 0.65;
             cursor: wait;
-            transform: none;
+            filter: none;
         }
         .page-action-print {
             color: #fff;
             background: linear-gradient(180deg, #4a7ab0 0%, var(--school-navy) 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.22);
+        }
+        .page-action-print:hover {
+            filter: brightness(1.08);
         }
         .page-action-pdf {
-            color: var(--school-navy-dark);
-            background: linear-gradient(180deg, #fffdf6 0%, var(--school-accent-soft) 100%);
-            border-color: rgba(196, 160, 53, 0.45);
-            box-shadow: 0 4px 14px rgba(196, 160, 53, 0.18);
+            color: #fff;
+            background: linear-gradient(180deg, #e53935 0%, #c62828 100%);
         }
         .page-action-pdf:hover {
-            border-color: var(--school-accent);
-            box-shadow: 0 6px 18px rgba(196, 160, 53, 0.26);
+            background: linear-gradient(180deg, #d32f2f 0%, #b71c1c 100%);
+            filter: brightness(0.96);
+        }
+        .page-action-pdf:focus-visible {
+            outline-color: #ffcdd2;
         }
         @media (max-width: 720px) {
             .page-chrome-actions {
@@ -1972,9 +1982,8 @@
                 --page-chrome-btn-w: 52px;
             }
             .page-action-split {
-                width: calc(var(--page-chrome-btn-w) * 2 + 4px);
-                min-width: calc(var(--page-chrome-btn-w) * 2 + 4px);
-                gap: 4px;
+                width: var(--page-chrome-btn-w);
+                min-width: var(--page-chrome-btn-w);
             }
             .page-scroll-btn,
             .page-action-btn {
@@ -2508,9 +2517,10 @@
                 <span>인쇄</span>
             </button>
             <button type="button" class="page-action-btn page-action-pdf" id="pdfActionBtn" onclick="saveReportAsPdf()" aria-label="PDF로 저장하기">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M14 2v6h6M12 18v-6M9 15h6" />
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" opacity="0.35"/>
+                    <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
+                    <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 2v6h6"/>
                 </svg>
                 <span>PDF 저장</span>
             </button>
