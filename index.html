@@ -902,32 +902,57 @@
             margin-top: 2mm;
         }
         .page-1 .report-page-one-split {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2.6mm;
-            align-items: start;
+            display: flex;
+            flex-direction: column;
+            gap: var(--p1-stack-gap, 2.6mm);
             flex: 1;
             min-height: 0;
-        }
-        .page-1 .report-page-one-split.is-single-col {
-            grid-template-columns: 1fr;
-        }
-        .page-1 .report-page-one-split.has-score-only .report-zone-score,
-        .page-1 .report-page-one-split.has-radar-only .report-zone-radar {
             width: 100%;
         }
         .page-1 .report-page-one-split .report-zone-score,
         .page-1 .report-page-one-split .report-zone-radar {
+            flex: 1 1 0;
+            min-height: 0;
             min-width: 0;
+            width: 100%;
         }
         .page-1 .report-zone {
-            flex-shrink: 0;
             min-width: 0;
         }
         .page-1 .report-zone-head {
             display: flex;
             flex-direction: column;
             gap: 2.4mm;
+            flex-shrink: 0;
+        }
+        /* 1페이지 선택 항목 수(과목별·한눈에)에 따른 비율 */
+        .page-1.p1-opt-count-1 {
+            --rpt-font-base: calc(10px + 0.5pt);
+            --rpt-font-sm: calc(9px + 0.5pt);
+            --rpt-font-h: calc(11px + 1pt);
+            --rpt-cell-pad: 3px 4px;
+            --p1-stack-gap: 3.2mm;
+            --radar-panel-h: 52mm;
+        }
+        .page-1.p1-opt-count-2 {
+            --rpt-font-base: calc(8.5px + 0.5pt);
+            --rpt-font-sm: calc(7.8px + 0.5pt);
+            --rpt-font-h: calc(9.5px + 1pt);
+            --rpt-cell-pad: 2px 3px;
+            --p1-stack-gap: 2.2mm;
+            --radar-panel-h: 36mm;
+        }
+        .page-1.p1-opt-count-1 .report-block-main,
+        .page-1.p1-opt-count-1 .report-block-radar {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .page-1.p1-opt-count-1 .report-zone-score .report-panel,
+        .page-1.p1-opt-count-1 .report-block-radar .report-radar-layout {
+            flex: 1;
+            min-height: 0;
         }
         .page-1 .report-panel-student {
             padding: 0;
@@ -969,6 +994,18 @@
             display: flex;
             flex-direction: column;
             gap: 2mm;
+        }
+        .page-1 .report-zone-radar {
+            display: flex;
+            flex-direction: column;
+            gap: 2mm;
+            min-height: 0;
+        }
+        .page-1 .report-block-radar {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
         }
         .page-1 .report-block { margin: 0; flex-shrink: 0; }
         .page-1 .report-block h3,
@@ -1030,18 +1067,62 @@
         .page-2 .page-body.report-page-two {
             display: flex;
             flex-direction: column;
-            gap: 3mm;
+            gap: var(--p2-stack-gap, 3mm);
             min-height: 0;
+            flex: 1;
         }
         .page-2 .report-zone-dist,
         .page-2 .report-zone-univ-ref {
-            flex-shrink: 0;
+            flex: 1 1 0;
+            min-height: 0;
             min-width: 0;
+            display: flex;
+            flex-direction: column;
         }
-        .page-2.layout-p2-dist-only .report-zone-dist,
-        .page-2.layout-p2-univ-only .report-zone-univ-ref {
+        .page-2.p2-opt-count-1 {
+            --p2-font-base: calc(10px + 0.5pt);
+            --p2-stack-gap: 3mm;
+        }
+        .page-2.p2-opt-count-1 #distributionTable th,
+        .page-2.p2-opt-count-1 #distributionTable td,
+        .page-2.p2-opt-count-1 .univ-ref-table th,
+        .page-2.p2-opt-count-1 .univ-ref-table td {
+            font-size: var(--p2-font-base);
+            padding: 4px 3px;
+        }
+        .page-2.p2-opt-count-1 .report-zone-dist .report-panel,
+        .page-2.p2-opt-count-1 .report-block-univ-ref {
             flex: 1;
             min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .page-2.p2-opt-count-1 .report-zone-dist .report-panel,
+        .page-2.p2-opt-count-1 .report-block-univ-ref .report-panel {
+            flex: 1;
+            min-height: 0;
+        }
+        .page-2.p2-opt-count-2 {
+            --p2-font-base: calc(8.5px + 0.5pt);
+            --p2-stack-gap: 2.2mm;
+        }
+        .page-2.p2-opt-count-2 #distributionTable th,
+        .page-2.p2-opt-count-2 #distributionTable td,
+        .page-2.p2-opt-count-2 .univ-ref-table th,
+        .page-2.p2-opt-count-2 .univ-ref-table td {
+            font-size: var(--p2-font-base);
+            padding: 3px 2px;
+            line-height: 1.22;
+        }
+        .page-2.p2-opt-count-2 .page-doc-header h1 {
+            font-size: calc(13px + 3pt);
+        }
+        .page-2.p2-opt-count-2 .report-block-univ-ref h3 {
+            margin-bottom: 1mm;
+        }
+        .page-2.p2-opt-count-2 .univ-ref-legend {
+            margin-bottom: 1.5mm;
+            padding: 1.5mm 2mm;
         }
         .page-2 .page-doc-header h1 {
             font-size: calc(15px + 4pt);
@@ -1107,16 +1188,12 @@
         .page-2 .dist-student-name.dist-name-size-sm { font-size: calc(8.5px + 0.5pt); }
         .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 0.5pt); }
         .page-1 .report-radar-layout {
-            --radar-panel-h: 50mm;
+            --radar-panel-h: 44mm;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
-            align-items: start;
-        }
-        /* 1페이지 5:5(과목별+한눈에): 오른쪽 칸에서 차트·목표점수 세로 배치 */
-        .page-1 .report-page-one-split.has-both-cols .report-radar-layout {
-            grid-template-columns: 1fr;
-            --radar-panel-h: 42mm;
+            align-items: stretch;
+            width: 100%;
         }
         .page-1 .report-radar-chart {
             display: flex;
@@ -1135,9 +1212,21 @@
         .page-1 .report-radar-chart svg {
             width: 100%;
             max-width: 100%;
-            max-height: 44mm;
+            max-height: var(--radar-panel-h);
             height: auto;
             overflow: visible;
+        }
+        .page-1 .page-body.report-page-one.page-body-fit {
+            transform: scale(var(--page-fit-scale, 1));
+            transform-origin: top center;
+            width: calc(100% / var(--page-fit-scale, 1));
+            box-sizing: border-box;
+        }
+        .page-2 .page-body.report-page-two.page-body-fit {
+            transform: scale(var(--page-fit-scale, 1));
+            transform-origin: top center;
+            width: calc(100% / var(--page-fit-scale, 1));
+            box-sizing: border-box;
         }
         .page-1 .report-radar-side {
             display: flex;
@@ -4419,6 +4508,40 @@ function renderStudentGradeRadar(subjectRows) {
     }
 }
 
+function applyReportPageFitScale(pageEl) {
+    if (!pageEl) return;
+    const body = pageEl.querySelector('.page-body');
+    if (!body) return;
+    body.classList.remove('page-body-fit');
+    pageEl.style.setProperty('--page-fit-scale', '1');
+    body.style.transform = '';
+    body.style.width = '';
+
+    const accent = pageEl.querySelector('.page-top-accent');
+    const footer = pageEl.querySelector('.page-footer');
+    const bodyStyle = getComputedStyle(body);
+    const padY = (parseFloat(bodyStyle.paddingTop) || 0) + (parseFloat(bodyStyle.paddingBottom) || 0);
+    const avail = pageEl.clientHeight
+        - (accent ? accent.offsetHeight : 0)
+        - (footer ? footer.offsetHeight : 0)
+        - padY;
+    if (avail <= 0) return;
+
+    const contentH = body.scrollHeight;
+    if (contentH <= avail + 2) return;
+
+    const scale = Math.max(0.76, Math.min(1, avail / contentH));
+    pageEl.style.setProperty('--page-fit-scale', scale.toFixed(4));
+    body.classList.add('page-body-fit');
+}
+
+function fitReportPagesInRoot(root) {
+    if (!root) return;
+    root.querySelectorAll('.page-1, .page-2').forEach(function(pageEl) {
+        applyReportPageFitScale(pageEl);
+    });
+}
+
 function cloneReportForPrint(printOpts) {
     const opts = printOpts || { score: true, radar: true, dist: true, univ: true };
     const template = document.getElementById('reportTemplate');
@@ -4435,6 +4558,7 @@ function cloneReportForPrint(printOpts) {
     if (!showPage1) {
         if (page1) page1.remove();
     } else if (page1) {
+        page1.classList.remove('p1-opt-count-1', 'p1-opt-count-2');
         if (!opts.score) {
             const scoreZone = clone.querySelector('.report-zone-score');
             if (scoreZone) scoreZone.remove();
@@ -4446,23 +4570,18 @@ function cloneReportForPrint(printOpts) {
         if (split) {
             const hasScore = !!split.querySelector('.report-zone-score');
             const hasRadar = !!split.querySelector('.report-zone-radar');
-            split.classList.remove('is-single-col', 'has-score-only', 'has-radar-only', 'has-both-cols');
             if (!hasScore && !hasRadar) {
                 split.remove();
-            } else if (hasScore && hasRadar) {
-                split.classList.add('has-both-cols');
-            } else if (hasScore) {
-                split.classList.add('is-single-col', 'has-score-only');
-            } else if (hasRadar) {
-                split.classList.add('is-single-col', 'has-radar-only');
             }
         }
+        const p1OptCount = (opts.score ? 1 : 0) + (opts.radar ? 1 : 0);
+        if (p1OptCount > 0) page1.classList.add('p1-opt-count-' + p1OptCount);
     }
 
     if (!showPage2) {
         if (page2) page2.remove();
     } else if (page2) {
-        page2.classList.remove('layout-p2-dist-only', 'layout-p2-univ-only', 'layout-p2-both');
+        page2.classList.remove('p2-opt-count-1', 'p2-opt-count-2', 'layout-p2-dist-only', 'layout-p2-univ-only', 'layout-p2-both');
         if (!opts.dist) {
             const distZone = clone.querySelector('.report-zone-dist');
             if (distZone) distZone.remove();
@@ -4471,6 +4590,8 @@ function cloneReportForPrint(printOpts) {
             const univZone = clone.querySelector('.report-zone-univ-ref');
             if (univZone) univZone.remove();
         }
+        const p2OptCount = (opts.dist ? 1 : 0) + (opts.univ ? 1 : 0);
+        if (p2OptCount > 0) page2.classList.add('p2-opt-count-' + p2OptCount);
         if (opts.dist && opts.univ) page2.classList.add('layout-p2-both');
         else if (opts.dist) page2.classList.add('layout-p2-dist-only');
         else if (opts.univ) page2.classList.add('layout-p2-univ-only');
@@ -4502,6 +4623,9 @@ function appendReportsToPrintContainer(studentIds, printOpts) {
         printContainer.appendChild(cloneReportForPrint(printOpts));
     });
     syncScreenFooterAfterReports();
+    requestAnimationFrame(function() {
+        fitReportPagesInRoot(printContainer);
+    });
 }
 
 function printSelectedReport() {
