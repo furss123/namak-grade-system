@@ -1,5 +1,5 @@
 /**
- * 2022 개정 교육과정 5등급제 · 동점자 처리 엔진
+ * 2022 개정 교육과정 5등급제 · 9등급제(상대평가) · 동점자 처리 엔진
  * index.html processAllGrades() 와 동일 규칙
  */
 (function (root, factory) {
@@ -35,6 +35,20 @@
         let n = Number(score);
         if (isNaN(n)) n = 0;
         return Math.round(n * 100) / 100;
+    }
+
+    /** 9등급제: 중간석차 백분율 → 등급 (누적 4·11·23·40·60·77·89·96·100%) */
+    function grade9FromIntermediatePercent(percent) {
+        const p = Number(percent);
+        if (p <= 4) return 1;
+        if (p <= 11) return 2;
+        if (p <= 23) return 3;
+        if (p <= 40) return 4;
+        if (p <= 60) return 5;
+        if (p <= 77) return 6;
+        if (p <= 89) return 7;
+        if (p <= 96) return 8;
+        return 9;
     }
 
     function processAllGrades(studentData) {
@@ -98,6 +112,7 @@
                 }
 
                 const rankStr = tieCount > 1 ? `${highestRank}(${tieCount})` : `${highestRank}`;
+                const grade9 = grade9FromIntermediatePercent(intermediateRankPercent);
 
                 for (let k = i; k < j; k++) {
                     const studentId = rawScores[k].id;
@@ -110,6 +125,7 @@
                         interRank: intermediateRank.toFixed(1),
                         intermediateRankPercent: Math.round(intermediateRankPercent * 1000) / 1000,
                         grade,
+                        grade9,
                         step,
                         highestRank,
                         lowestRank,
@@ -140,5 +156,5 @@
         return { processedGradesCache, subjectStatsCache, cutLimits };
     }
 
-    return { getSubjects, roundScore, processAllGrades, META_KEYS };
+    return { getSubjects, roundScore, grade9FromIntermediatePercent, processAllGrades, META_KEYS };
 });

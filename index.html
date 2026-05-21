@@ -3142,7 +3142,7 @@ function populateTemplate(studentIdStr, options) {
         appendTd('rowUnit', unit);
         appendTd('rowScore', pData.score.toFixed(2));
         appendTd('rowRank', pData.rankStr);
-        appendTd('rowGrade', pData.grade);
+        appendTd('rowGrade', pData.grade + (pData.grade9 != null ? '(' + pData.grade9 + ')' : ''));
         appendTd('rowDiffUp', diffUp);
         appendTd('rowDiffDown', diffDown);
         const maxScore = stats.allScoresSorted && stats.allScoresSorted.length
