@@ -372,6 +372,24 @@
         .upload-box.success.drag-over {
             background: linear-gradient(155deg, #ecf9f4 0%, #dff3eb 100%);
         }
+        .upload-box.success .upload-desc {
+            font-weight: 700;
+            color: #2f4a63;
+            letter-spacing: -0.01em;
+        }
+        .upload-box.success .upload-desc .upload-cta-mark {
+            font-weight: 800;
+            color: var(--school-navy-dark);
+            letter-spacing: -0.02em;
+        }
+        .upload-box.success:hover .upload-desc {
+            color: var(--school-navy-dark);
+        }
+        .upload-box.success:hover .upload-desc .upload-cta-mark {
+            text-decoration: underline;
+            text-decoration-color: rgba(30, 58, 95, 0.28);
+            text-underline-offset: 2px;
+        }
         @media (max-width: 720px) {
             .upload-row {
                 flex-direction: column;
@@ -2886,10 +2904,10 @@ function setUploadState(statusText, isSuccess, fileName = "") {
         uploadTitle.textContent = isDemoData
             ? "예시 데이터 적용 중 (고교학점제 규정 시연)"
             : "성적 데이터 분석 완료! (고교학점제 규정 적용)";
-        const countLabel = `${studentData.length}명`;
-        fileStatus.textContent = isDemoData
-            ? `▶ ${fileName} (${countLabel}) · 기본 조회 ${DEFAULT_SINGLE_STUDENT_ID} 미리보기`
-            : `▶ ${fileName} · 등록 성공 (${countLabel})`;
+        const countLabel = studentData.length + '명';
+        fileStatus.innerHTML = isDemoData
+            ? '▶ ' + escapeRecHtml(fileName) + ' · 기본 조회 <span class="upload-cta-mark">' + escapeRecHtml(DEFAULT_SINGLE_STUDENT_ID) + ' 미리보기</span>'
+            : '▶ ' + escapeRecHtml(fileName) + ' · 등록 성공 <span class="upload-cta-mark">(' + countLabel + ')</span>';
     } else {
         uploadBox.classList.remove('success');
         uploadTitle.innerHTML = getDefaultUploadTitleHtml();
