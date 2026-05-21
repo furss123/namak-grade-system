@@ -1083,6 +1083,29 @@
             font-weight: 800;
             width: auto;
         }
+        .page-2 #distributionTable .my-score-row td.row-label {
+            vertical-align: middle;
+            padding: 3px 4px;
+            line-height: 1.15;
+        }
+        .page-2 .dist-student-name {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
+            max-width: 100%;
+            font-weight: 700;
+            line-height: 1.15;
+            text-align: center;
+        }
+        .page-2 .dist-student-name .dist-name-line {
+            display: block;
+            white-space: nowrap;
+        }
+        .page-2 .dist-student-name.dist-name-size-md { font-size: calc(10px + 0.5pt); }
+        .page-2 .dist-student-name.dist-name-size-sm { font-size: calc(8.5px + 0.5pt); }
+        .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 0.5pt); }
         .page-1 .report-radar-layout {
             --radar-panel-h: 50mm;
             display: grid;
@@ -4046,10 +4069,71 @@ function computeSubjectGoal(pData, stats) {
     return { display: text, short: finalGoal.toFixed(1), hasGoal: true, value: finalGoal };
 }
 
+function normalizeDistStudentName(name) {
+    return String(name || '').trim().replace(/\s*학생\s*$/u, '').trim();
+}
+
+/** 공백 단위(어구) 유지하며 최대 2줄로 균형 배분 */
+function balanceNameWordsIntoLines(words, maxLines) {
+    if (!words.length) return [[]];
+    if (words.length === 1 || maxLines <= 1) return [words];
+    const line1 = [];
+    const line2 = [];
+    let len1 = 0;
+    let len2 = 0;
+    words.forEach(function(w) {
+        const wLen = w.length;
+        const add1 = len1 + (line1.length ? 1 : 0) + wLen;
+        const add2 = len2 + (line2.length ? 1 : 0) + wLen;
+        if (!line1.length || add1 <= add2) {
+            line1.push(w);
+            len1 = add1;
+        } else {
+            line2.push(w);
+            len2 = add2;
+        }
+    });
+    const lines = [line1, line2].filter(function(l) { return l.length; });
+    return lines.length ? lines : [words];
+}
+
+function pickDistStudentNameSizeClass(lines, totalChars, maxLineChars) {
+    if (lines.length >= 2 && (maxLineChars > 18 || totalChars > 26)) return 'dist-name-size-xs';
+    if (lines.length >= 2 || maxLineChars > 14 || totalChars > 18) return 'dist-name-size-sm';
+    if (totalChars > 14) return 'dist-name-size-sm';
+    return 'dist-name-size-md';
+}
+
+function buildDistStudentNameHtml(name) {
+    const raw = normalizeDistStudentName(name);
+    if (!raw) return '—';
+    const words = raw.split(/\s+/).filter(Boolean);
+    const lines = balanceNameWordsIntoLines(words, 2);
+    const maxLineChars = Math.max.apply(null, lines.map(function(l) { return l.join(' ').length; }));
+    const sizeClass = pickDistStudentNameSizeClass(lines, raw.length, maxLineChars);
+    const html = lines.map(function(line) {
+        return '<span class="dist-name-line">' + escapeRecHtml(line.join(' ')) + '</span>';
+    }).join('');
+    return '<span class="dist-student-name ' + sizeClass + '">' + html + '</span>';
+}
+
+function fitDistStudentNameLabel(wrap) {
+    if (!wrap) return;
+    const sizes = ['dist-name-size-md', 'dist-name-size-sm', 'dist-name-size-xs'];
+    sizes.forEach(function(c) { wrap.classList.remove(c); });
+    for (let i = 0; i < sizes.length; i++) {
+        wrap.classList.add(sizes[i]);
+        const lineCount = wrap.querySelectorAll('.dist-name-line').length;
+        const lh = parseFloat(getComputedStyle(wrap).lineHeight) || 14;
+        if (lineCount <= 2 && wrap.scrollHeight <= lh * 2.35 + 2) break;
+    }
+}
+
 function populateDistributionTable(studentIdStr, subjects, studentName) {
     const DIST_NEARBY = 10;
+    const displayName = normalizeDistStudentName(studentName);
     const distTitle = document.getElementById('distPageTitle');
-    if (distTitle) distTitle.textContent = `${studentName} · 상하위 10명 성적분포`;
+    if (distTitle) distTitle.textContent = `${displayName} · 상하위 10명 성적분포`;
 
     const distBody = document.getElementById('distTableBody');
     if (!distBody) return;
@@ -4080,20 +4164,28 @@ function populateDistributionTable(studentIdStr, subjects, studentName) {
     const distNote = document.getElementById('distTableNote');
     if (distNote) {
         distNote.textContent =
-            '(※ 동일 점수는 괄호 안 인원으로 표시 · ' + studentName +
-            ' 학생 기준 위로 오름차순, 아래로 내림차순 · 상·하위 ' + DIST_NEARBY + '구간)';
+            '(※ 동일 점수는 괄호 안 인원으로 표시 · ' + displayName +
+            ' 기준 위로 오름차순, 아래로 내림차순 · 상·하위 ' + DIST_NEARBY + '구간)';
     }
 
     const myTr = document.createElement('tr');
     myTr.className = 'my-score-row';
-    myTr.innerHTML = '<td class="row-label">' + studentName + ' 학생</td>';
+    const labelTd = document.createElement('td');
+    labelTd.className = 'row-label';
+    labelTd.innerHTML = buildDistStudentNameHtml(studentName);
+    myTr.appendChild(labelTd);
     subjects.forEach((subject) => {
         const pData = processedGradesCache[studentIdStr][subject];
         const scoreText = pData.score.toFixed(2);
         const cell = pData.tieCount > 1 ? scoreText + ' (' + pData.tieCount + ')' : scoreText;
-        myTr.innerHTML += '<td>' + cell + '</td>';
+        const td = document.createElement('td');
+        td.textContent = cell;
+        myTr.appendChild(td);
     });
     distBody.appendChild(myTr);
+    requestAnimationFrame(function() {
+        fitDistStudentNameLabel(labelTd.querySelector('.dist-student-name'));
+    });
 
     for (let i = 0; i < DIST_NEARBY; i++) {
         const tr = document.createElement('tr');
