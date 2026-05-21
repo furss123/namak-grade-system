@@ -128,7 +128,9 @@
             margin-top: 0;
         }
         #printContainer .report-document-footer,
-        #printContainer .batch-end-footer {
+        #printContainer .batch-end-footer,
+        #printContainer .report-wrapper > footer.site-footer,
+        #printContainer .report-wrapper > nav.page-scroll-nav {
             display: none !important;
         }
         .site-footer-inner {
@@ -1924,6 +1926,7 @@
             </div>
             </section>
             </div>
+            </div>
             <footer class="page-footer">
                 <p class="page-footer-num" aria-label="페이지 번호"></p>
             </footer>
@@ -2031,7 +2034,20 @@ function fillAppFooterElement(footerEl) {
     if (c) c.innerHTML = getAppFooterCopyrightHtml();
 }
 
+function ensureGlobalChromeOutsideTemplate() {
+    const template = document.getElementById('reportTemplate');
+    const nav = document.querySelector('nav.page-scroll-nav.no-print');
+    const siteRoot = document.getElementById('siteFooterRoot');
+    if (nav && template && template.contains(nav)) {
+        document.body.appendChild(nav);
+    }
+    if (siteRoot && siteRoot.parentElement !== document.body) {
+        document.body.appendChild(siteRoot);
+    }
+}
+
 function initAppFooter() {
+    ensureGlobalChromeOutsideTemplate();
     fillAppFooterElement(document.getElementById('siteFooterRoot'));
     stripCopyrightFromPageFooters(document.getElementById('reportTemplate'));
 }
@@ -2039,10 +2055,15 @@ function initAppFooter() {
 /** 저작권·버전: 화면 최하단 고정 1줄만 (#siteFooterRoot). 보고서·인쇄 영역 중복 제거 */
 function syncScreenFooterAfterReports() {
     const siteRoot = document.getElementById('siteFooterRoot');
+    if (siteRoot && siteRoot.parentElement !== document.body) {
+        document.body.appendChild(siteRoot);
+    }
     if (siteRoot) siteRoot.classList.remove('is-hidden-for-reports');
     const printContainer = document.getElementById('printContainer');
     if (!printContainer) return;
-    printContainer.querySelectorAll('.report-document-footer, .batch-end-footer').forEach(function(el) {
+    printContainer.querySelectorAll(
+        '.report-document-footer, .batch-end-footer, .report-wrapper > footer.site-footer, .report-wrapper > nav.page-scroll-nav'
+    ).forEach(function(el) {
         el.remove();
     });
     stripCopyrightFromPageFooters(printContainer);
@@ -4349,6 +4370,9 @@ function cloneReportForPrint(printOpts) {
 
     const elementsWithId = clone.querySelectorAll('[id]');
     elementsWithId.forEach(function(el) { el.removeAttribute('id'); });
+    clone.querySelectorAll('footer.site-footer, nav.page-scroll-nav, script').forEach(function(el) {
+        el.remove();
+    });
     stripCopyrightFromPageFooters(clone);
     return clone;
 }
