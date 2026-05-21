@@ -118,11 +118,13 @@
             border-top: 1px solid var(--school-border);
             box-shadow: 0 -2px 10px rgba(15, 36, 64, 0.05);
         }
-        #siteFooterRoot.is-hidden-for-batch { display: none !important; }
+        #siteFooterRoot.is-hidden-for-reports { display: none !important; }
+        #printContainer .report-document-footer,
         #printContainer .batch-end-footer {
             margin-top: 12px;
             border-radius: var(--radius-md);
             max-width: 100%;
+            flex-shrink: 0;
         }
         .site-footer-inner {
             flex: 1; width: 100%;
@@ -825,7 +827,13 @@
             margin: 0; font-weight: 600; color: var(--school-navy-light);
             font-size: calc(9px + 1pt); letter-spacing: 0.2em;
         }
-        .page-footer-meta { display: none; }
+        .page-footer-meta,
+        .page-footer .site-footer-inner,
+        .page-footer .site-footer-bar,
+        .page-footer .app-footer-copy,
+        .page-footer .app-footer-version {
+            display: none !important;
+        }
         .page-doc-header {
             position: relative;
             display: flex; align-items: center; justify-content: flex-start;
@@ -1553,9 +1561,13 @@
             }
             body * { visibility: hidden; }
             #printContainer, #printContainer * { visibility: visible; }
-            .site-header, .app-layout, .site-footer, .app-footer, .no-print,
-            #siteFooterRoot, .batch-end-footer, #reportActionSection,
+            .site-header, .app-layout, .no-print,
+            #siteFooterRoot, #reportActionSection,
             #reportTemplate { display: none !important; visibility: hidden !important; }
+            #printContainer .report-document-footer,
+            #printContainer .report-document-footer * {
+                visibility: visible !important;
+            }
             #printContainer {
                 display: block !important;
                 position: absolute; left: 0; top: 0; width: 100%;
@@ -1599,6 +1611,26 @@
                 border-top: 1px solid #e8edf4 !important;
                 transform: none !important;
                 background: #fff !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            #printContainer .page-footer .site-footer-inner,
+            #printContainer .page-footer .site-footer-bar,
+            #printContainer .page-footer .app-footer-copy,
+            #printContainer .page-footer .app-footer-version,
+            #printContainer .page-footer-meta {
+                display: none !important;
+                visibility: hidden !important;
+            }
+            #printContainer .report-document-footer,
+            #printContainer .batch-end-footer {
+                display: flex !important;
+                visibility: visible !important;
+                page-break-before: auto;
+                break-before: auto;
+                margin-top: 8px !important;
+                border-top: 1px solid var(--school-border) !important;
+                box-shadow: none !important;
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
@@ -2012,11 +2044,12 @@ function fillAppFooterElement(footerEl) {
 
 function initAppFooter() {
     fillAppFooterElement(document.getElementById('siteFooterRoot'));
+    stripCopyrightFromPageFooters(document.getElementById('reportTemplate'));
 }
 
 function buildAppFooterElement() {
     const footer = document.createElement('footer');
-    footer.className = 'site-footer app-footer no-print batch-end-footer';
+    footer.className = 'site-footer app-footer report-document-footer batch-end-footer';
     footer.setAttribute('role', 'contentinfo');
     footer.innerHTML =
         '<div class="site-footer-inner">' +
@@ -2029,19 +2062,37 @@ function buildAppFooterElement() {
     return footer;
 }
 
-/** 반 전체 조회 시 푸터는 보고서 목록 맨 아래 1회만, 인쇄 제외 */
+/** 저작권·버전 푸터: 보고서 목록 맨 아래 1회만 (화면·인쇄 공통) */
 function syncScreenFooterAfterReports(studentCount) {
     const siteRoot = document.getElementById('siteFooterRoot');
     const printContainer = document.getElementById('printContainer');
     if (printContainer) {
-        printContainer.querySelectorAll('.batch-end-footer').forEach(function(el) { el.remove(); });
+        printContainer.querySelectorAll('.report-document-footer, .batch-end-footer').forEach(function(el) {
+            el.remove();
+        });
     }
-    if (studentCount > 1) {
-        if (siteRoot) siteRoot.classList.add('is-hidden-for-batch');
+    const reportCount = printContainer
+        ? printContainer.querySelectorAll('.report-wrapper').length
+        : 0;
+    const hasReports = studentCount > 0 && reportCount > 0;
+    if (hasReports) {
+        if (siteRoot) siteRoot.classList.add('is-hidden-for-reports');
         if (printContainer) printContainer.appendChild(buildAppFooterElement());
     } else if (siteRoot) {
-        siteRoot.classList.remove('is-hidden-for-batch');
+        siteRoot.classList.remove('is-hidden-for-reports');
     }
+}
+
+function stripCopyrightFromPageFooters(root) {
+    if (!root) return;
+    root.querySelectorAll('.page-footer').forEach(function(pf) {
+        pf.querySelectorAll('.site-footer-inner, .site-footer-bar, .app-footer-copy, .app-footer-version, .page-footer-meta')
+            .forEach(function(el) { el.remove(); });
+        var kept = pf.querySelector('.page-footer-num');
+        if (!kept) {
+            pf.innerHTML = '<p class="page-footer-num" aria-label="페이지 번호"></p>';
+        }
+    });
 }
 
 let studentData = [];
@@ -4333,6 +4384,7 @@ function cloneReportForPrint(printOpts) {
 
     const elementsWithId = clone.querySelectorAll('[id]');
     elementsWithId.forEach(function(el) { el.removeAttribute('id'); });
+    stripCopyrightFromPageFooters(clone);
     return clone;
 }
 
