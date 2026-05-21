@@ -2258,14 +2258,15 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            justify-content: center;
             gap: 8px;
         }
         .page-scroll-nav,
         .page-action-nav {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
+            display: contents;
+        }
+        .page-action-nav[hidden] {
+            display: none !important;
         }
         .page-scroll-btn,
         .page-action-btn {
@@ -2318,9 +2319,6 @@
             outline: 2px solid var(--school-navy-light);
             outline-offset: 2px;
         }
-        .page-action-nav[hidden] {
-            display: none !important;
-        }
         .page-action-btn {
             border: none;
             box-shadow: 0 4px 14px rgba(30, 58, 95, 0.18);
@@ -2355,43 +2353,6 @@
         }
         .page-action-print:hover {
             filter: brightness(1.08);
-        }
-        .page-action-pdf {
-            position: relative;
-            color: #fff;
-            background: linear-gradient(180deg, #e53935 0%, #c62828 100%);
-        }
-        .page-action-pdf:hover {
-            background: linear-gradient(180deg, #d32f2f 0%, #b71c1c 100%);
-            filter: brightness(0.96);
-        }
-        .page-action-pdf:focus-visible {
-            outline-color: #ffcdd2;
-        }
-        .page-action-pdf.is-loading .page-action-pdf-label,
-        .page-action-pdf.is-loading svg {
-            visibility: hidden;
-        }
-        .page-action-pdf.is-loading .pdf-spinner {
-            display: block;
-        }
-        .pdf-spinner {
-            display: none;
-            width: 22px;
-            height: 22px;
-            border: 2px solid rgba(255, 255, 255, 0.35);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: pdf-btn-spin 0.7s linear infinite;
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            margin-left: -11px;
-            margin-top: -11px;
-            flex-shrink: 0;
-        }
-        @keyframes pdf-btn-spin {
-            to { transform: rotate(360deg); }
         }
         @media (max-width: 720px) {
             .page-chrome-actions {
@@ -2939,15 +2900,6 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 9V4h12v5M6 18H4v2h16v-2h-2M6 14h12v-4H6v4z" />
                 </svg>
                 <span>인쇄</span>
-            </button>
-            <button type="button" class="page-action-btn page-action-pdf" id="pdfActionBtn" onclick="saveReportAsPdf()" aria-label="PDF로 저장하기">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" aria-hidden="true">
-                    <path fill="currentColor" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z" opacity="0.35"/>
-                    <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
-                    <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 2v6h6"/>
-                </svg>
-                <span class="page-action-pdf-label">PDF 저장</span>
-                <span class="pdf-spinner" aria-hidden="true"></span>
             </button>
         </div>
     </aside>
