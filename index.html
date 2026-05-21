@@ -1066,10 +1066,10 @@
             --p1-stack-gap: var(--report-zone-gap);
         }
         .page-1.p1-opt-count-1 .report-radar-layout {
-            --radar-graph-h: 75mm;
+            --radar-graph-h: calc(75mm * 1.2);
         }
         .page-1.p1-opt-count-2 .report-radar-layout {
-            --radar-graph-h: 57mm;
+            --radar-graph-h: calc(57mm * 1.2);
         }
         .page-1.p1-opt-count-1 .report-block-main,
         .page-1.p1-opt-count-1 .report-block-radar {
@@ -1166,6 +1166,10 @@
             letter-spacing: -0.01em;
             box-sizing: border-box;
         }
+        .page-1 .report-block h3 .report-h3-label {
+            flex: 1;
+            min-width: 0;
+        }
         .page-1 .report-block-maxcut > h3,
         .page-1 .report-block-main > .report-section-title,
         .page-1 .report-block-radar > h3 {
@@ -1204,7 +1208,7 @@
         .page-1 .report-block-maxcut .report-panel td,
         .page-1 .report-block-main .report-panel th,
         .page-1 .report-block-main .report-panel td {
-            font-size: calc(var(--rpt-font-base) + 1pt);
+            font-size: calc(var(--rpt-font-base) + 2pt);
         }
         .page-1 .report-block thead th {
             background: var(--school-navy-dark);
@@ -1260,7 +1264,9 @@
             --p2-stack-gap: 3mm;
         }
         .page-2.p2-opt-count-1 #distributionTable th,
-        .page-2.p2-opt-count-1 #distributionTable td,
+        .page-2.p2-opt-count-1 #distributionTable td {
+            font-size: calc(10px + 2.5pt);
+        }
         .page-2.p2-opt-count-1 .univ-ref-table th,
         .page-2.p2-opt-count-1 .univ-ref-table td {
             font-size: var(--p2-font-base);
@@ -1283,7 +1289,9 @@
             --p2-stack-gap: 2.2mm;
         }
         .page-2.p2-opt-count-2 #distributionTable th,
-        .page-2.p2-opt-count-2 #distributionTable td,
+        .page-2.p2-opt-count-2 #distributionTable td {
+            font-size: calc(8.5px + 2.5pt);
+        }
         .page-2.p2-opt-count-2 .univ-ref-table th,
         .page-2.p2-opt-count-2 .univ-ref-table td {
             font-size: var(--p2-font-base);
@@ -1306,7 +1314,7 @@
         .page-2 .dist-table-note {
             margin: 0;
             text-align: right;
-            font-size: calc(9px + 1.5pt);
+            font-size: calc(9px + 2.5pt);
             color: var(--school-muted);
             font-weight: 600;
             line-height: 1.35;
@@ -1324,7 +1332,7 @@
         .page-2 #distributionTable th,
         .page-2 #distributionTable td {
             padding: 4px 3px;
-            font-size: calc(10px + 1.5pt);
+            font-size: calc(10px + 2.5pt);
             line-height: 1.3;
             border-color: #dce4ee;
         }
@@ -1336,7 +1344,7 @@
         }
         .page-2 #distributionTable .symbol-up,
         .page-2 #distributionTable .symbol-down {
-            font-size: calc(12px + 1.5pt);
+            font-size: calc(12px + 2.5pt);
             font-weight: 800;
             width: auto;
         }
@@ -1344,6 +1352,7 @@
             vertical-align: middle;
             padding: 3px 4px;
             line-height: 1.15;
+            font-weight: 700;
         }
         .page-2 .dist-student-name {
             display: inline-flex;
@@ -1364,8 +1373,8 @@
         .page-2 .dist-student-name.dist-name-size-sm { font-size: calc(8.5px + 1.5pt); }
         .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 1.5pt); }
         .page-1 .report-radar-layout {
-            --radar-chart-pad-y: 3mm;
-            --radar-graph-h: 69mm;
+            --radar-chart-pad-y: 6mm;
+            --radar-graph-h: calc(69mm * 1.2);
             --radar-panel-h: calc(var(--radar-graph-h) + 2 * var(--radar-chart-pad-y));
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1415,8 +1424,8 @@
             max-height: var(--radar-panel-h);
         }
         .page-1 .report-grade-goal-panel {
-            --goal-font-caption: calc(var(--rpt-font-caption) + 2pt);
-            --goal-font-cell: calc(var(--rpt-font-sm) + 2pt);
+            --goal-font-caption: calc(var(--rpt-font-caption) + 4pt);
+            --goal-font-cell: calc(var(--rpt-font-sm) + 4pt);
             --goal-cell-pad-y: 3.7mm;
             display: flex;
             flex-direction: column;
@@ -2144,7 +2153,7 @@
                         <div class="print-options-grid">
                             <label class="print-opt-label" for="printOptDist">
                                 <input type="checkbox" id="printOptDist" checked>
-                                <span>상하위 10명 성적 분포</span>
+                                <span>상·하위 10명 성적 분포</span>
                             </label>
                             <label class="print-opt-label print-opt-hidden" for="printOptUniv" hidden>
                                 <input type="checkbox" id="printOptUniv">
@@ -2214,7 +2223,7 @@
             </div>
             </div>
             <div class="report-zone report-zone-maxcut report-block report-block-maxcut">
-            <h3>최고 점수 및 등급 컷 (<span class="total-count">-</span>명)</h3>
+            <h3><span class="report-h3-label">최고 점수 및 등급 컷 (<span class="total-count">-</span>명)</span></h3>
             <div class="report-panel">
             <table id="maxCutTable">
                 <thead>
@@ -2293,7 +2302,7 @@
             <section class="report-zone report-zone-dist">
             <div class="page-doc-header">
                 <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
-                <h1 id="distPageTitle">상하위 10명 성적 분포</h1>
+                <h1 id="distPageTitle">상·하위 10명 성적 분포</h1>
             </div>
             <p id="distTableNote" class="dist-table-note">(※ 동일 점수는 괄호 안 인원으로 표시)</p>
             <div class="report-panel">
@@ -4510,7 +4519,7 @@ function populateDistributionTable(studentIdStr, subjects, studentName) {
     const DIST_NEARBY = 10;
     const displayName = normalizeDistStudentName(studentName);
     const distTitle = document.getElementById('distPageTitle');
-    if (distTitle) distTitle.textContent = `${displayName} · 상하위 10명 성적 분포`;
+    if (distTitle) distTitle.textContent = '상·하위 10명 성적 분포';
 
     const distBody = document.getElementById('distTableBody');
     if (!distBody) return;
@@ -4549,7 +4558,7 @@ function populateDistributionTable(studentIdStr, subjects, studentName) {
     myTr.className = 'my-score-row';
     const labelTd = document.createElement('td');
     labelTd.className = 'row-label';
-    labelTd.innerHTML = buildDistStudentNameHtml(studentName);
+    labelTd.textContent = '나의 점수';
     myTr.appendChild(labelTd);
     subjects.forEach((subject) => {
         const pData = processedGradesCache[studentIdStr][subject];
@@ -4560,9 +4569,6 @@ function populateDistributionTable(studentIdStr, subjects, studentName) {
         myTr.appendChild(td);
     });
     distBody.appendChild(myTr);
-    requestAnimationFrame(function() {
-        fitDistStudentNameLabel(labelTd.querySelector('.dist-student-name'));
-    });
 
     for (let i = 0; i < DIST_NEARBY; i++) {
         const tr = document.createElement('tr');
@@ -4751,14 +4757,14 @@ function renderStudentGradeRadar(subjectRows) {
         const nameSpan = document.createElementNS(NS, 'tspan');
         nameSpan.setAttribute('x', String(labPt.x));
         nameSpan.setAttribute('dy', '-0.55em');
-        nameSpan.setAttribute('font-size', '14');
+        nameSpan.setAttribute('font-size', '16');
         nameSpan.setAttribute('font-weight', '700');
         nameSpan.textContent = row.subject;
 
         const gradeSpan = document.createElementNS(NS, 'tspan');
         gradeSpan.setAttribute('x', String(labPt.x));
         gradeSpan.setAttribute('dy', '1.15em');
-        gradeSpan.setAttribute('font-size', '15.5');
+        gradeSpan.setAttribute('font-size', '17.5');
         gradeSpan.setAttribute('font-weight', '800');
         gradeSpan.textContent = row.grade + '등급';
 
@@ -5012,7 +5018,7 @@ function resetMainTables() {
     if (radarSvg) radarSvg.innerHTML = '';
     if (radarSummary) radarSummary.innerHTML = '';
     const distTitle = document.getElementById('distPageTitle');
-    if (distTitle) distTitle.textContent = '상하위 10명 성적 분포';
+    if (distTitle) distTitle.textContent = '상·하위 10명 성적 분포';
     const distBody = document.getElementById('distTableBody');
     if (distBody) distBody.innerHTML = '';
     const distNote = document.getElementById('distTableNote');
