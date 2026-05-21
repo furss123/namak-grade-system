@@ -1747,7 +1747,7 @@
             </div>
 
             <div class="query-card query-card-print">
-                <div class="query-card-title">인쇄 항목 선택</div>
+                <div class="query-card-title">학생별 인쇄 항목 선택</div>
                 <div class="print-options-pages">
                     <div class="print-options-page-col">
                         <p class="print-options-page-label">1페이지</p>
@@ -1767,7 +1767,7 @@
                         <div class="print-options-grid">
                             <label class="print-opt-label" for="printOptDist">
                                 <input type="checkbox" id="printOptDist" checked>
-                                <span>자신의 성적 상·하위 각 10명 성적 분포</span>
+                                <span>상하위 10명 성적분포</span>
                             </label>
                             <label class="print-opt-label" for="printOptUniv">
                                 <input type="checkbox" id="printOptUniv" checked>
@@ -1942,7 +1942,7 @@
             <section class="report-zone report-zone-dist">
             <div class="page-doc-header">
                 <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
-                <h1 id="distPageTitle">학생 주변 성적분포</h1>
+                <h1 id="distPageTitle">상하위 10명 성적분포</h1>
             </div>
             <p id="distTableNote" class="dist-table-note">(※ 동일 점수는 괄호 안 인원으로 표시)</p>
             <div class="report-panel">
@@ -2153,6 +2153,10 @@ function applyParsedStudentData(parsedData, fileName, options = {}) {
     processAllGrades();
     setUploadState('데이터 분석 완료!', true, fileName);
     displayGeneralStats();
+    if (options.resetUi) {
+        clearPrintContainer();
+        hideReportActionSection();
+    }
     if (options.saveSession) saveSessionData(fileName, !!options.resetUi);
     return true;
 }
@@ -2214,14 +2218,6 @@ function initPageScrollNav() {
     const bottomBtn = document.getElementById('scrollToBottomBtn');
     if (topBtn) topBtn.addEventListener('click', scrollToPageTop);
     if (bottomBtn) bottomBtn.addEventListener('click', scrollToPageBottom);
-}
-
-function runDefaultSinglePreview(options) {
-    const opts = options || {};
-    applyDefaultSingleStudentId();
-    const ok = searchSingleStudent(DEFAULT_SINGLE_STUDENT_ID, { silent: true });
-    if (ok && opts.scroll) scrollToReportStart();
-    return ok;
 }
 
 // 전역 캐시: 계산 부하를 줄이고 무결성을 보장하기 위해 업로드 직후 모든 등급과 석차를 미리 계산해 저장합니다.
@@ -3165,7 +3161,6 @@ async function processExcelFiles(fileList) {
             resetUi: true,
             subjectUnitMap
         })) {
-            runDefaultSinglePreview({ scroll: false });
             return true;
         }
     } catch (error) {
@@ -4044,7 +4039,7 @@ function computeSubjectGoal(pData, stats) {
 function populateDistributionTable(studentIdStr, subjects, studentName) {
     const DIST_NEARBY = 10;
     const distTitle = document.getElementById('distPageTitle');
-    if (distTitle) distTitle.textContent = `${studentName} 학생 주변 성적분포`;
+    if (distTitle) distTitle.textContent = `${studentName} · 상하위 10명 성적분포`;
 
     const distBody = document.getElementById('distTableBody');
     if (!distBody) return;
@@ -4492,7 +4487,7 @@ function resetMainTables() {
     if (radarSvg) radarSvg.innerHTML = '';
     if (radarSummary) radarSummary.innerHTML = '';
     const distTitle = document.getElementById('distPageTitle');
-    if (distTitle) distTitle.textContent = '학생 주변 성적분포';
+    if (distTitle) distTitle.textContent = '상하위 10명 성적분포';
     const distBody = document.getElementById('distTableBody');
     if (distBody) distBody.innerHTML = '';
     const distNote = document.getElementById('distTableNote');
@@ -4569,9 +4564,7 @@ document.getElementById('studentId').addEventListener('input', function() {
     initAppFooter();
     initUnivAiWorkerUrlInput();
     await registerDdgServiceWorker();
-    if (!restoreAppViewFromSession(savedUi)) {
-        runDefaultSinglePreview({ scroll: false });
-    }
+    restoreAppViewFromSession(savedUi);
     initPageScrollNav();
     if (!savedUi || !savedUi.scrollY) {
         requestAnimationFrame(function() {
