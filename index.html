@@ -1043,19 +1043,45 @@
             display: none !important;
         }
         body.pdf-exporting #printContainer.pdf-export-capture {
-            display: flex !important;
+            display: block !important;
             visibility: visible !important;
+            opacity: 1 !important;
             position: fixed;
             left: 0;
             top: 0;
-            right: 0;
             z-index: 99999;
             max-width: none;
-            width: 100%;
+            width: 210mm;
             margin: 0;
             padding: 0;
             background: #fff;
             pointer-events: none;
+            overflow: visible;
+        }
+        body.pdf-exporting #printContainer.pdf-export-capture .report-wrapper {
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            margin: 0;
+            width: 210mm;
+            max-width: 210mm;
+        }
+        body.pdf-exporting #printContainer.pdf-export-capture .page {
+            display: grid !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            width: 210mm !important;
+            height: 297mm !important;
+            min-height: 297mm !important;
+            max-height: 297mm !important;
+            margin: 0 auto;
+            box-shadow: none;
+            overflow: hidden;
+        }
+        body.pdf-exporting #printContainer.pdf-export-capture .page-body.page-body-fit {
+            transform: none !important;
+            width: 100% !important;
+            max-width: 100% !important;
         }
         body.pdf-exporting .pdf-export-overlay {
             display: flex !important;
@@ -5588,15 +5614,51 @@ function ensureHtml2PdfLoaded() {
     return html2pdfLoadPromise;
 }
 
-/** appendReportsToPrintContainer의 rAF 레이아웃(fit) 완료 후 캡처 */
-function waitForPrintContainerLayout() {
-    return new Promise(function(resolve) {
-        requestAnimationFrame(function() {
+var PDF_CAPTURE_WIDTH_PX = 794;
+
+function waitForImagesInRoot(root) {
+    if (!root) return Promise.resolve();
+    const imgs = root.querySelectorAll('img');
+    const pending = [];
+    imgs.forEach(function(img) {
+        if (!img.complete) pending.push(img);
+    });
+    if (!pending.length) return Promise.resolve();
+    return Promise.all(pending.map(function(img) {
+        return new Promise(function(resolve) {
+            img.addEventListener('load', resolve, { once: true });
+            img.addEventListener('error', resolve, { once: true });
+        });
+    }));
+}
+
+/** PDF 캡처용: 보이는 레이아웃에서 페이지 맞춤·이미지 로드 대기 */
+function preparePdfCaptureLayout(printContainer) {
+    if (!printContainer) return Promise.resolve();
+    fitReportPagesInRoot(printContainer);
+    return waitForImagesInRoot(printContainer).then(function() {
+        return new Promise(function(resolve) {
             requestAnimationFrame(function() {
-                setTimeout(resolve, 100);
+                requestAnimationFrame(function() {
+                    setTimeout(resolve, 80);
+                });
             });
         });
     });
+}
+
+/** appendReportsToPrintContainer의 rAF 레이아웃(fit) 완료 후 캡처 */
+function waitForPrintContainerLayout() {
+    const printContainer = document.getElementById('printContainer');
+    return preparePdfCaptureLayout(printContainer);
+}
+
+function getPdfCaptureRoot(printContainer) {
+    if (!printContainer) return null;
+    const wrappers = printContainer.querySelectorAll('.report-wrapper');
+    if (wrappers.length === 1) return wrappers[0];
+    if (printContainer.querySelector('.page')) return printContainer;
+    return printContainer.children.length ? printContainer : null;
 }
 
 var pdfExportInProgress = false;
@@ -5639,6 +5701,12 @@ function setPdfExportOverlayVisible(visible) {
 
 /** html2pdf 캡처·저장 (다음 태스크로 지연해 로딩 UI가 먼저 그려지게 함) */
 function runHtml2PdfSave(printContainer, filename) {
+    const captureRoot = getPdfCaptureRoot(printContainer);
+    if (!captureRoot) return Promise.reject(new Error('PDF capture root missing'));
+    const captureWidth = Math.max(
+        PDF_CAPTURE_WIDTH_PX,
+        Math.ceil(captureRoot.scrollWidth || captureRoot.getBoundingClientRect().width || PDF_CAPTURE_WIDTH_PX)
+    );
     return ensureHtml2PdfLoaded().then(function() {
         return new Promise(function(resolve, reject) {
             setTimeout(function() {
@@ -5647,11 +5715,19 @@ function runHtml2PdfSave(printContainer, filename) {
                         margin: 0,
                         filename: filename,
                         image: { type: 'jpeg', quality: 0.98 },
-                        html2canvas: { scale: 1.5, useCORS: true, logging: false },
+                        html2canvas: {
+                            scale: 1.5,
+                            useCORS: true,
+                            logging: false,
+                            scrollX: 0,
+                            scrollY: 0,
+                            windowWidth: captureWidth,
+                            width: captureWidth
+                        },
                         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                        pagebreak: { mode: ['avoid-all', 'css', 'legacy'], before: '.page + .page' }
+                        pagebreak: { mode: ['css', 'legacy'], before: '.page + .page' }
                     })
-                    .from(printContainer)
+                    .from(captureRoot)
                     .save()
                     .then(resolve)
                     .catch(reject);
@@ -5684,7 +5760,7 @@ async function saveReportAsPdf() {
         printContainer.classList.add('pdf-export-capture');
         const filename = getReportPdfFilename();
         await yieldToPaint();
-        await waitForPrintContainerLayout();
+        await preparePdfCaptureLayout(printContainer);
         await yieldToPaint();
         await runHtml2PdfSave(printContainer, filename);
     } catch (err) {
