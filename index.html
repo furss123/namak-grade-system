@@ -959,6 +959,39 @@
             background: #fff;
             pointer-events: none;
         }
+        body.pdf-exporting .pdf-export-overlay {
+            display: flex !important;
+        }
+        .pdf-export-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            background: rgba(255, 255, 255, 0.85);
+            align-items: center;
+            justify-content: center;
+            pointer-events: all;
+        }
+        .pdf-export-overlay-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+        .pdf-export-overlay-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(30, 58, 95, 0.2);
+            border-top-color: var(--school-navy, #1e3a5f);
+            border-radius: 50%;
+            animation: pdf-btn-spin 0.7s linear infinite;
+        }
+        .pdf-export-overlay-msg {
+            margin: 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--school-navy, #1e3a5f);
+        }
         #printContainer .page {
             border-radius: var(--radius-sm);
             box-shadow: var(--shadow-lg);
@@ -1877,7 +1910,7 @@
             --page-chrome-btn-w: 54px;
             --page-chrome-btn-h: calc(72px - 2mm);
             position: fixed;
-            right: max(12px, calc((100vw - var(--content-max)) / 2 - var(--page-chrome-btn-w) - 34px));
+            right: max(12px, calc((100vw - var(--content-max)) / 2 - var(--page-chrome-btn-w) - 34px + 3mm));
             top: 50%;
             transform: translateY(-50%);
             z-index: 900;
@@ -2021,7 +2054,7 @@
         }
         @media (max-width: 720px) {
             .page-chrome-actions {
-                right: 10px;
+                right: calc(10px + 3mm);
                 --page-chrome-btn-w: 52px;
                 --page-chrome-btn-h: calc(68px - 2mm);
             }
@@ -5311,44 +5344,75 @@ function setPdfBtnLoading(loading) {
     }
 }
 
+function setPdfExportOverlayVisible(visible) {
+    const overlay = document.getElementById('pdfExportOverlay');
+    if (!overlay) return;
+    if (visible) {
+        overlay.removeAttribute('hidden');
+        overlay.setAttribute('aria-hidden', 'false');
+    } else {
+        overlay.setAttribute('hidden', '');
+        overlay.setAttribute('aria-hidden', 'true');
+    }
+}
+
+/** html2pdf 캡처·저장 (다음 태스크로 지연해 로딩 UI가 먼저 그려지게 함) */
+function runHtml2PdfSave(printContainer, filename) {
+    return ensureHtml2PdfLoaded().then(function() {
+        return new Promise(function(resolve, reject) {
+            setTimeout(function() {
+                html2pdf()
+                    .set({
+                        margin: 0,
+                        filename: filename,
+                        image: { type: 'jpeg', quality: 0.98 },
+                        html2canvas: { scale: 1.5, useCORS: true, logging: false },
+                        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                        pagebreak: { mode: ['avoid-all', 'css', 'legacy'], before: '.page + .page' }
+                    })
+                    .from(printContainer)
+                    .save()
+                    .then(resolve)
+                    .catch(reject);
+            }, 0);
+        });
+    });
+}
+
 /**
  * PDF 저장: html2pdf로 브라우저 다운로드(Save As). 인쇄 대화상자(window.print)는 사용하지 않음.
  */
 async function saveReportAsPdf() {
     if (pdfExportInProgress) return;
-    if (!prepareSelectedReportForOutput()) return;
-    const printContainer = document.getElementById('printContainer');
-    if (!printContainer || !printContainer.children.length) {
-        alert('저장할 보고서가 없습니다.');
-        return;
-    }
-    pdfExportInProgress = true;
     setPdfBtnLoading(true);
-    document.body.classList.add('pdf-exporting');
-    window.scrollTo(0, 0);
-    printContainer.classList.add('pdf-export-capture');
-    const filename = getReportPdfFilename();
+    await yieldToPaint();
+    await new Promise(function(resolve) { setTimeout(resolve, 50); });
+    let printContainer = null;
     try {
+        if (!prepareSelectedReportForOutput()) return;
+        printContainer = document.getElementById('printContainer');
+        if (!printContainer || !printContainer.children.length) {
+            alert('저장할 보고서가 없습니다.');
+            return;
+        }
+        pdfExportInProgress = true;
+        await yieldToPaint();
+        document.body.classList.add('pdf-exporting');
+        setPdfExportOverlayVisible(true);
+        window.scrollTo(0, 0);
+        printContainer.classList.add('pdf-export-capture');
+        const filename = getReportPdfFilename();
         await yieldToPaint();
         await waitForPrintContainerLayout();
-        await ensureHtml2PdfLoaded();
-        await html2pdf()
-            .set({
-                margin: 0,
-                filename: filename,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true, logging: false },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                pagebreak: { mode: ['css', 'legacy'], before: '.page + .page' }
-            })
-            .from(printContainer)
-            .save();
+        await yieldToPaint();
+        await runHtml2PdfSave(printContainer, filename);
     } catch (err) {
         console.warn('PDF 저장 실패:', err);
         alert('PDF를 저장할 수 없습니다. PDF 라이브러리 로드 실패이거나 생성 중 오류가 발생했습니다.\n네트워크 연결을 확인한 뒤 다시 시도해 주세요.');
     } finally {
         document.body.classList.remove('pdf-exporting');
-        printContainer.classList.remove('pdf-export-capture');
+        setPdfExportOverlayVisible(false);
+        if (printContainer) printContainer.classList.remove('pdf-export-capture');
         pdfExportInProgress = false;
         setPdfBtnLoading(false);
     }
@@ -5529,6 +5593,13 @@ document.getElementById('studentId').addEventListener('input', function() {
     }
 })();
 </script>
+
+<div id="pdfExportOverlay" class="pdf-export-overlay no-print" role="status" aria-live="polite" aria-hidden="true" hidden>
+    <div class="pdf-export-overlay-inner">
+        <span class="pdf-export-overlay-spinner" aria-hidden="true"></span>
+        <p class="pdf-export-overlay-msg">PDF 생성 중…</p>
+    </div>
+</div>
 
 </body>
 </html>
