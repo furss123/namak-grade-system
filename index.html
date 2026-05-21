@@ -1069,7 +1069,7 @@
             --rpt-cell-pad-x: 3px;
             --rpt-cell-pad-y: calc(2.5px + 1mm);
             --rpt-cell-pad: var(--rpt-cell-pad-y) var(--rpt-cell-pad-x);
-            --report-p1-section-gap: calc(var(--report-zone-gap) + 7mm);
+            --report-p1-section-gap: calc(var(--report-zone-gap) + 4mm);
         }
         .page-1 .page-body.report-page-one {
             display: flex;
@@ -1851,12 +1851,7 @@
             margin: var(--report-block-gap) 0 0;
             width: 100%;
         }
-        .page-1 .score-grade-manual {
-            display: grid;
-            grid-template-columns: max-content max-content minmax(0, 1fr);
-            align-items: center;
-            column-gap: 3mm;
-            row-gap: 1.2mm;
+        .page-1 .score-grade-manual-block {
             margin: 0;
             padding: 1.6mm 2.5mm;
             width: 100%;
@@ -1868,6 +1863,18 @@
             background: #f8fafc;
             border: 1px solid #e8edf4;
             border-radius: 5px;
+        }
+        .page-1 .score-grade-manual-row {
+            display: grid;
+            grid-template-columns: max-content max-content minmax(0, 1fr);
+            align-items: center;
+            column-gap: 3mm;
+            row-gap: 1.2mm;
+        }
+        .page-1 .score-grade-manual-row + .score-grade-manual-row {
+            margin-top: 1.2mm;
+            padding-top: 1.2mm;
+            border-top: 1px solid #e8edf4;
         }
         .page-1 .score-grade-manual-label {
             grid-column: 1;
@@ -2474,20 +2481,22 @@
             </div>
             </div>
             <div class="score-grade-manuals">
-            <div class="score-grade-manual" role="note" aria-label="석차 표기 안내">
-                <span class="score-grade-manual-label">석차 표기</span>
-                <span class="score-grade-manual-sample" aria-hidden="true"><span class="g5">6</span><span class="g9">(3)</span></span>
-                <div class="score-grade-manual-desc">
-                    <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 석차</span>
-                    <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 동석차</span>
+            <div class="score-grade-manual-block" role="note" aria-label="석차·등급 표기 안내">
+                <div class="score-grade-manual-row">
+                    <span class="score-grade-manual-label">석차 표기</span>
+                    <span class="score-grade-manual-sample" aria-hidden="true"><span class="g5">6</span><span class="g9">(3)</span></span>
+                    <div class="score-grade-manual-desc">
+                        <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 석차</span>
+                        <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 동석차</span>
+                    </div>
                 </div>
-            </div>
-            <div class="score-grade-manual" role="note" aria-label="등급 표기 안내">
-                <span class="score-grade-manual-label">등급 표기</span>
-                <span class="score-grade-manual-sample" aria-hidden="true"><span class="g5">3</span><span class="g9">(4)</span></span>
-                <div class="score-grade-manual-desc">
-                    <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 고교학점제 5등급제</span>
-                    <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 9등급제 상대평가(중간석차·누적백분율)</span>
+                <div class="score-grade-manual-row">
+                    <span class="score-grade-manual-label">등급 표기</span>
+                    <span class="score-grade-manual-sample" aria-hidden="true"><span class="g5">3</span><span class="g9">(4)</span></span>
+                    <div class="score-grade-manual-desc">
+                        <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 고교학점제 5등급제</span>
+                        <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 9등급제 상대평가(중간석차·누적백분율)</span>
+                    </div>
                 </div>
             </div>
             </div>
