@@ -1814,7 +1814,7 @@
         }
         .page-1 .score-grade-manual-row {
             display: grid;
-            grid-template-columns: max-content max-content minmax(0, 1fr);
+            grid-template-columns: max-content minmax(0, 1fr);
             align-items: center;
             column-gap: 3mm;
             row-gap: 1.2mm;
@@ -1835,26 +1835,8 @@
             letter-spacing: -0.02em;
             white-space: nowrap;
         }
-        .page-1 .score-grade-manual-sample {
-            grid-column: 2;
-            padding: 0.4mm 2.2mm;
-            border-radius: 3px;
-            background: #eef4fc;
-            border: 1px solid #c5d4e4;
-            font-weight: 800;
-            color: var(--school-navy-dark);
-            letter-spacing: 0.02em;
-            white-space: nowrap;
-        }
-        .page-1 .score-grade-manual-sample .g5 {
-            color: var(--school-navy-dark);
-        }
-        .page-1 .score-grade-manual-sample .g9 {
-            color: #64748b;
-            font-weight: 700;
-        }
         .page-1 .score-grade-manual-desc {
-            grid-column: 3;
+            grid-column: 2;
             display: flex;
             flex-wrap: wrap;
             align-items: center;
@@ -2419,7 +2401,6 @@
             <div class="score-grade-manual-block" role="note" aria-label="석차·등급·윗등급 차 안내">
                 <div class="score-grade-manual-row">
                     <span class="score-grade-manual-label">석차 표기</span>
-                    <span class="score-grade-manual-sample" aria-hidden="true"><span class="g5">6</span><span class="g9">(3)</span></span>
                     <div class="score-grade-manual-desc">
                         <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 석차</span>
                         <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 동석차</span>
@@ -2427,7 +2408,6 @@
                 </div>
                 <div class="score-grade-manual-row" role="note" aria-label="등급 표기 안내">
                     <span class="score-grade-manual-label">등급 표기</span>
-                    <span class="score-grade-manual-sample" aria-hidden="true"><span class="g5">3</span><span class="g9">(4)</span></span>
                     <div class="score-grade-manual-desc">
                         <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 고교학점제 5등급제</span>
                         <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 9등급제 상대평가(중간석차·누적백분율)</span>
