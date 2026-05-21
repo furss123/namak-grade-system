@@ -1090,6 +1090,17 @@
         body.pdf-exporting .pdf-export-overlay {
             display: flex !important;
         }
+        #pdfCaptureSandbox {
+            position: fixed;
+            left: -20000px;
+            top: 0;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
         .pdf-export-overlay {
             display: none;
             position: fixed;
@@ -5927,7 +5938,19 @@ function buildPdfHtml2canvasOptions(captureW, captureH) {
     };
 }
 
-/** html2canvas용: overflow/transform 영향을 피하기 위해 대상 document body에 고정 배치한 클론 */
+function getPdfCaptureSandbox(targetDoc) {
+    const doc = targetDoc || document;
+    let sandbox = doc.getElementById('pdfCaptureSandbox');
+    if (!sandbox) {
+        sandbox = doc.createElement('div');
+        sandbox.id = 'pdfCaptureSandbox';
+        sandbox.setAttribute('aria-hidden', 'true');
+        doc.body.appendChild(sandbox);
+    }
+    return sandbox;
+}
+
+/** html2canvas용: 화면 밖 샌드박스에 클론 배치 (본문 UI는 그대로 유지) */
 function createPdfCaptureClone(pageEl, captureW, captureH, targetDoc) {
     const doc = targetDoc || pageEl.ownerDocument || document;
     const clone = pageEl.ownerDocument === doc
@@ -5941,10 +5964,9 @@ function createPdfCaptureClone(pageEl, captureW, captureH, targetDoc) {
         body.style.maxWidth = '100%';
     });
     clone.style.cssText = [
-        'position:fixed',
+        'position:absolute',
         'left:0',
         'top:0',
-        'z-index:100000',
         'width:' + captureW + 'px',
         'height:' + captureH + 'px',
         'min-height:' + captureH + 'px',
@@ -5960,7 +5982,7 @@ function createPdfCaptureClone(pageEl, captureW, captureH, targetDoc) {
         'visibility:visible',
         'opacity:1'
     ].join(';');
-    doc.body.appendChild(clone);
+    getPdfCaptureSandbox(doc).appendChild(clone);
     return clone;
 }
 
@@ -6093,22 +6115,12 @@ async function savePdfDocument(pdfDoc, filename) {
     pdfDoc.save(filename);
 }
 
-/** 메인 화면에서 캡처·저장 (팝업 창 없음) */
+/** 메인 화면 백그라운드 캡처·저장 (화면 가림·전체 오버레이 없음) */
 async function runPdfExportInMainDocument(printContainer, filename) {
     if (!printContainer) throw new Error('PDF capture container missing');
-    const hadCaptureClass = printContainer.classList.contains('pdf-export-capture');
-    printContainer.classList.add('pdf-export-capture');
-    document.body.classList.add('pdf-exporting');
-    setPdfExportOverlayVisible(true);
-    try {
-        await ensurePdfLibsLoaded();
-        await preparePdfCaptureLayout(printContainer);
-        await runHtml2PdfSave(printContainer, filename, null);
-    } finally {
-        document.body.classList.remove('pdf-exporting');
-        if (!hadCaptureClass) printContainer.classList.remove('pdf-export-capture');
-        setPdfExportOverlayVisible(false);
-    }
+    await ensurePdfLibsLoaded();
+    await preparePdfCaptureLayout(printContainer);
+    await runHtml2PdfSave(printContainer, filename, null);
 }
 
 /** 메인 화면은 그대로 두고 팝업 창에서만 PDF 캡처·저장 */
