@@ -17,7 +17,8 @@
     <link rel="icon" href="assets/namak-logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-    <script defer id="html2pdfBundle" src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
+    <script defer id="html2canvasLib" src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous"></script>
+    <script defer id="jspdfLib" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous"></script>
     <script src="verification/grade-engine.js"></script>
     <style>
         :root {
@@ -1239,6 +1240,9 @@
         html[data-theme="dark"] .section-label,
         html[data-theme="dark"] .stats-grade-dist-heading {
             color: #cbd5e1;
+        }
+        html[data-theme="dark"] .stats-grade-dist-subject {
+            color: var(--theme-text);
         }
         html[data-theme="dark"] .stats-table tbody td.stats-row-label {
             color: #e2e8f0;
@@ -5580,53 +5584,65 @@ function printSelectedReport() {
     window.print();
 }
 
-function isHtml2PdfAvailable() {
-    return typeof html2pdf === 'function';
+function isPdfLibsAvailable() {
+    return typeof html2canvas === 'function' && window.jspdf && typeof window.jspdf.jsPDF === 'function';
 }
 
-var html2pdfLoadPromise = null;
+var pdfLibsLoadPromise = null;
 
-/** html2pdf.js CDN 로드 대기·재시도 (0.10.2, jsDelivr) */
-function ensureHtml2PdfLoaded() {
-    if (isHtml2PdfAvailable()) return Promise.resolve();
-    if (html2pdfLoadPromise) return html2pdfLoadPromise;
-    html2pdfLoadPromise = new Promise(function(resolve, reject) {
-        var bundle = document.getElementById('html2pdfBundle');
-        function finishOk() {
-            if (isHtml2PdfAvailable()) resolve();
-            else reject(new Error('html2pdf not defined'));
+/** html2canvas + jsPDF CDN 로드 대기 */
+function ensurePdfLibsLoaded() {
+    if (isPdfLibsAvailable()) return Promise.resolve();
+    if (pdfLibsLoadPromise) return pdfLibsLoadPromise;
+    pdfLibsLoadPromise = new Promise(function(resolve, reject) {
+        var pending = 0;
+        var failed = false;
+        function checkDone() {
+            if (failed) return;
+            if (pending > 0) return;
+            if (isPdfLibsAvailable()) resolve();
+            else reject(new Error('PDF libraries not defined'));
         }
-        function finishErr() {
-            reject(new Error('html2pdf script load failed'));
-        }
-        function injectRetry() {
-            if (document.getElementById('html2pdfBundleRetry')) return;
-            var retry = document.createElement('script');
-            retry.id = 'html2pdfBundleRetry';
-            retry.crossOrigin = 'anonymous';
-            retry.src = 'https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js';
-            retry.onload = finishOk;
-            retry.onerror = finishErr;
-            document.head.appendChild(retry);
-        }
-        if (bundle) {
-            bundle.addEventListener('load', finishOk, { once: true });
-            bundle.addEventListener('error', injectRetry, { once: true });
-            if (isHtml2PdfAvailable()) {
-                finishOk();
+        function watchScript(id, fallbackSrc) {
+            var el = document.getElementById(id);
+            function onLoad() { pending = Math.max(0, pending - 1); checkDone(); }
+            function onError() {
+                if (failed) return;
+                if (document.getElementById(id + 'Retry')) {
+                    failed = true;
+                    reject(new Error('PDF script load failed: ' + id));
+                    return;
+                }
+                var retry = document.createElement('script');
+                retry.id = id + 'Retry';
+                retry.crossOrigin = 'anonymous';
+                retry.src = fallbackSrc;
+                retry.onload = onLoad;
+                retry.onerror = function() {
+                    failed = true;
+                    reject(new Error('PDF script load failed: ' + id));
+                };
+                document.head.appendChild(retry);
+            }
+            if (!el) {
+                onError();
                 return;
             }
-            if (document.readyState === 'complete') {
-                injectRetry();
-            }
-            return;
+            pending++;
+            el.addEventListener('load', onLoad, { once: true });
+            el.addEventListener('error', onError, { once: true });
+            if (id === 'html2canvasLib' && typeof html2canvas === 'function') onLoad();
+            if (id === 'jspdfLib' && window.jspdf) onLoad();
         }
-        injectRetry();
+        watchScript('html2canvasLib', 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js');
+        watchScript('jspdfLib', 'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js');
+        if (document.readyState === 'complete') checkDone();
+        else window.addEventListener('load', checkDone, { once: true });
     }).catch(function(err) {
-        html2pdfLoadPromise = null;
+        pdfLibsLoadPromise = null;
         throw err;
     });
-    return html2pdfLoadPromise;
+    return pdfLibsLoadPromise;
 }
 
 var PDF_CAPTURE_WIDTH_PX = 794;
@@ -5725,7 +5741,7 @@ function assertPdfPagesMeasurable(pages) {
 
 function buildPdfHtml2canvasOptions(captureW, captureH) {
     return {
-        scale: 1.5,
+        scale: 2,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
@@ -5737,6 +5753,81 @@ function buildPdfHtml2canvasOptions(captureW, captureH) {
         windowHeight: captureH,
         onclone: pdfHtml2canvasOnclone
     };
+}
+
+/** html2canvas용: 화면 밖·overflow/transform 영향을 피하기 위해 body에 고정 배치한 클론 */
+function createPdfCaptureClone(pageEl, captureW, captureH) {
+    const clone = pageEl.cloneNode(true);
+    pdfHtml2canvasOnclone(document, clone);
+    clone.querySelectorAll('.page-body').forEach(function(body) {
+        body.classList.remove('page-body-fit');
+        body.style.transform = 'none';
+        body.style.width = '100%';
+        body.style.maxWidth = '100%';
+    });
+    clone.style.cssText = [
+        'position:fixed',
+        'left:0',
+        'top:0',
+        'z-index:100000',
+        'width:' + captureW + 'px',
+        'height:' + captureH + 'px',
+        'min-height:' + captureH + 'px',
+        'max-height:' + captureH + 'px',
+        'margin:0',
+        'padding:0',
+        'transform:none',
+        'overflow:visible',
+        'background:#fff',
+        'box-shadow:none',
+        'border:none',
+        'display:grid',
+        'visibility:visible',
+        'opacity:1'
+    ].join(';');
+    document.body.appendChild(clone);
+    return clone;
+}
+
+function removePdfCaptureClone(clone) {
+    if (clone && clone.parentNode) clone.parentNode.removeChild(clone);
+}
+
+function alertPdfCaptureDiagnostic(pageIndex, size, canvas) {
+    const msg = [
+        'PDF 캡처에 실패했습니다.',
+        '페이지: ' + (pageIndex + 1),
+        '요소 크기: ' + size.captureW + '×' + size.captureH,
+        '캔버스: ' + (canvas ? canvas.width + '×' + canvas.height : '없음'),
+        'pdf-exporting: ' + document.body.classList.contains('pdf-exporting')
+    ].join('\n');
+    alert(msg);
+}
+
+async function capturePageToCanvas(pageEl, pageIndex) {
+    const size = getPdfPageCaptureSize(pageEl);
+    const clone = createPdfCaptureClone(pageEl, size.captureW, size.captureH);
+    await yieldToPaint();
+    await new Promise(function(resolve) { setTimeout(resolve, 40); });
+    let canvas;
+    try {
+        canvas = await html2canvas(clone, buildPdfHtml2canvasOptions(size.captureW, size.captureH));
+    } finally {
+        removePdfCaptureClone(clone);
+    }
+    if (!canvas || canvas.width < 10 || canvas.height < 10) {
+        alertPdfCaptureDiagnostic(pageIndex, size, canvas);
+        throw new Error('PDF canvas capture empty (page ' + (pageIndex + 1) + ')');
+    }
+    return { canvas: canvas, size: size };
+}
+
+function capturePageToPdf(pdfDoc, canvas, pageIndex) {
+    const A4_W_MM = 210;
+    const A4_H_MM = 297;
+    const img = canvas.toDataURL('image/jpeg', 0.92);
+    if (pageIndex > 0) pdfDoc.addPage();
+    pdfDoc.addImage(img, 'JPEG', 0, 0, A4_W_MM, A4_H_MM);
 }
 
 var pdfExportInProgress = false;
@@ -5779,53 +5870,27 @@ function setPdfExportOverlayVisible(visible) {
 
 /**
  * PDF 저장: 각 .page를 html2canvas로 캡처 후 jsPDF에 페이지별로 합침.
- * (html2pdf 단일 루트 캡처는 다중 A4·transform 레이아웃에서 빈 PDF가 나는 경우가 있음)
+ * (html2pdf.js 래퍼의 toCanvas/toPdf는 이 환경에서 빈 결과를 반환함)
  */
 async function runHtml2PdfSave(printContainer, filename) {
     if (!printContainer) throw new Error('PDF capture container missing');
     const pages = Array.from(printContainer.querySelectorAll('.page'));
     assertPdfPagesMeasurable(pages);
-    await ensureHtml2PdfLoaded();
+    await ensurePdfLibsLoaded();
 
-    const A4_W_MM = 210;
-    const A4_H_MM = 297;
-    const jsPdfOpts = { unit: 'mm', format: 'a4', orientation: 'portrait' };
-    let pdfDoc = null;
+    const jsPDF = window.jspdf.jsPDF;
+    const pdfDoc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
 
     for (let i = 0; i < pages.length; i++) {
-        const pageEl = pages[i];
-        const size = getPdfPageCaptureSize(pageEl);
-        const worker = html2pdf().set({
-            margin: 0,
-            filename: filename,
-            image: { type: 'jpeg', quality: 0.95 },
-            html2canvas: buildPdfHtml2canvasOptions(size.captureW, size.captureH),
-            jsPDF: jsPdfOpts
-        });
-
-        if (i === 0) {
-            pdfDoc = await worker.from(pageEl).toPdf();
-        } else {
-            const canvas = await html2pdf()
-                .set({
-                    margin: 0,
-                    image: { type: 'jpeg', quality: 0.95 },
-                    html2canvas: buildPdfHtml2canvasOptions(size.captureW, size.captureH),
-                    jsPDF: jsPdfOpts
-                })
-                .from(pageEl)
-                .toCanvas();
-            pdfDoc.addPage();
-            pdfDoc.addImage(canvas.toDataURL('image/jpeg', 0.95), 'JPEG', 0, 0, A4_W_MM, A4_H_MM);
-        }
+        const captured = await capturePageToCanvas(pages[i], i);
+        capturePageToPdf(pdfDoc, captured.canvas, i);
     }
 
-    if (!pdfDoc) throw new Error('PDF 문서 생성 실패');
     pdfDoc.save(filename);
 }
 
 /**
- * PDF 저장: html2pdf로 브라우저 다운로드(Save As). 인쇄 대화상자(window.print)는 사용하지 않음.
+ * PDF 저장: html2canvas + jsPDF로 브라우저 다운로드. 인쇄 대화상자(window.print)는 사용하지 않음.
  */
 async function saveReportAsPdf() {
     if (pdfExportInProgress) return;
