@@ -1,0 +1,9 @@
+name = "namak-univ-ai"
+main = "univ-ai.js"
+compatibility_date = "2024-01-01"
+
+# 무료 Groq API 키: https://console.groq.com/keys
+# npx wrangler secret put GROQ_API_KEY
+
+[vars]
+# GROQ_MODEL = "llama-3.1-8b-instant"

@@ -727,6 +727,53 @@
             box-shadow: var(--shadow-xs);
         }
         .reset-btn:hover { transform: translateY(-2px); box-shadow: var(--shadow-sm); }
+        .univ-ai-config {
+            margin-bottom: 16px;
+            padding: 12px 14px;
+            background: #f8fafc;
+            border: 1px solid var(--school-border-light);
+            border-radius: var(--radius-sm);
+        }
+        .univ-ai-config-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--school-navy-light);
+            margin-bottom: 6px;
+        }
+        .univ-ai-config-input {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 8px 10px;
+            font-size: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-family: inherit;
+        }
+        .univ-ai-config-hint {
+            margin: 8px 0 0;
+            font-size: 11px;
+            color: #64748b;
+            line-height: 1.45;
+        }
+        .univ-ai-puter-btn {
+            padding: 14px 24px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            font-family: inherit;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(180deg, #6366f1 0%, #4f46e5 100%);
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
+        }
+        .univ-ai-puter-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(79, 70, 229, 0.28); }
+        .univ-ai-puter-btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
         /* ===== 인쇄 보고서 ===== */
         .report-wrapper { display: none; margin-top: 24px; page-break-after: always; }
@@ -1465,7 +1512,7 @@
             body * { visibility: hidden; }
             #printContainer, #printContainer * { visibility: visible; }
             .site-header, .app-layout, .site-footer, .app-footer, .no-print,
-            #siteFooterRoot, .batch-end-footer,
+            #siteFooterRoot, .batch-end-footer, #reportActionSection,
             #reportTemplate { display: none !important; visibility: hidden !important; }
             #printContainer {
                 display: block !important;
@@ -1692,7 +1739,15 @@
 
     <div id="reportActionSection" class="report-action-section">
         <div class="section-label">보고서 출력 · 초기화</div>
+        <div class="univ-ai-config">
+            <label class="univ-ai-config-label" for="univAiWorkerUrl">Cloudflare Worker URL (선택, Groq 등 무료 API)</label>
+            <input type="url" id="univAiWorkerUrl" class="univ-ai-config-input" placeholder="https://univ-ai.your-subdomain.workers.dev" autocomplete="off">
+            <p class="univ-ai-config-hint">비우면 DuckDuckGo AI(팝업 없음)로 자동 분석합니다. Worker 배포 방법은 <code>cloudflare-worker/README.md</code> 참고.</p>
+        </div>
         <div class="report-action-buttons">
+            <button type="button" class="univ-ai-puter-btn" id="univRefPerplexityBtn" onclick="runPerplexityUnivAnalysis()">
+                Perplexity 고급 분석 (1회 로그인)
+            </button>
             <button type="button" class="print-btn" onclick="printSelectedReport()">
                 <svg style="width:20px; height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
@@ -1730,7 +1785,7 @@
             <div class="report-panel report-panel-student">
             <div class="student-info">
                 <div id="infoStudentText">학생 정보 로딩중...</div>
-                <div class="avg-grade-pill">평균등급 <span id="infoAvgGrade">0.00</span></div>
+                <div class="avg-grade-pill">평균등급 <span id="infoAvgGrade" class="info-avg-grade">0.00</span></div>
             </div>
             </div>
             </section>
@@ -1823,7 +1878,7 @@
                         <th>추천 사유</th>
                     </tr>
                 </thead>
-                <tbody id="univRefTableBody"></tbody>
+                <tbody id="univRefTableBody" class="univ-ref-table-body"></tbody>
             </table>
             </div>
             <p class="univ-ref-disclaimer">본 표는 AI 참고용 상담 자료입니다. 수능최저·모집인원 변경 여부는 반드시 각 대학 입학처 공식 모집요강에서 최종 확인하세요.</p>
@@ -3074,18 +3129,37 @@ function hideReportActionSection() {
     document.getElementById('reportActionSection').style.display = 'none';
 }
 
-/** DuckDuckGo AI Chat — 로그인 팝업 없음 · Service Worker 프록시 · 30초 · 캐시 · 폴백 */
+/** 대학 AI — ① Worker(선택) ② DDG(팝업 없음) ③ Puter/Perplexity(버튼 1회 로그인) */
 const DDG_AI_MODEL = 'claude-3-haiku-20240307';
+const PERPLEXITY_MODEL = 'perplexity/sonar';
 const UNIV_AI_TOTAL_MS = 30000;
 const UNIV_AI_CHAT_MS = 26000;
 const UNIV_AI_STATUS_MS = 4000;
-const UNIV_AI_CACHE_KEY = 'univRefAiCache_v4';
+const UNIV_AI_CACHE_KEY = 'univRefAiCache_v5';
+const UNIV_AI_WORKER_URL_KEY = 'univAiWorkerUrl';
 const UNIV_REF_PROGRESS_LEN = 326.726;
+const UNIV_REF_LOADING_HTML =
+    '<tr><td colspan="5" class="univ-ref-loading-cell">' +
+    '<div class="univ-ref-progress-wrap" role="status" aria-live="polite">' +
+    '<div class="univ-ref-progress-ring-host">' +
+    '<svg class="univ-ref-progress-ring" viewBox="0 0 120 120" aria-hidden="true">' +
+    '<circle class="univ-ref-progress-track" cx="60" cy="60" r="52"></circle>' +
+    '<circle class="univ-ref-progress-bar" cx="60" cy="60" r="52"></circle>' +
+    '</svg>' +
+    '<span class="univ-ref-progress-pct">0%</span>' +
+    '</div>' +
+    '<span class="univ-ref-progress-label">분석 준비 중…</span>' +
+    '</div></td></tr>';
+
 let ddgVqdCache = null;
 let ddgSwReady = false;
+let puterScriptPromise = null;
+let puterUnivAiGuestAuthPromise = null;
 let univRefAiMemoryCache = {};
 let univRefProgressTimer = null;
 let univRefProgressValue = 0;
+let activeUnivRefGradeKey = null;
+const univRefFetchPromises = {};
 
 function getAppBasePath() {
     const path = window.location.pathname || '/';
@@ -3127,26 +3201,106 @@ async function ddgFetchVqd(forceRefresh) {
     return vqd;
 }
 
-async function parseDdgSseResponse(res, onProgress) {
-    const text = await res.text();
-    let full = '';
-    const lines = text.split('\n');
+function univRefGradeKey(avgGrade) {
+    return Number(avgGrade).toFixed(2);
+}
+
+function getUnivAiWorkerUrl() {
+    const input = document.getElementById('univAiWorkerUrl');
+    const fromInput = input ? input.value.trim() : '';
+    if (fromInput) return fromInput.replace(/\/$/, '');
+    try {
+        return (localStorage.getItem(UNIV_AI_WORKER_URL_KEY) || '').trim().replace(/\/$/, '');
+    } catch (e) {
+        return '';
+    }
+}
+
+function saveUnivAiWorkerUrl(url) {
+    try {
+        localStorage.setItem(UNIV_AI_WORKER_URL_KEY, url || '');
+    } catch (e) { /* ignore */ }
+}
+
+function initUnivAiWorkerUrlInput() {
+    const input = document.getElementById('univAiWorkerUrl');
+    if (!input) return;
+    input.value = getUnivAiWorkerUrl();
+    input.addEventListener('change', function() {
+        saveUnivAiWorkerUrl(input.value.trim());
+    });
+}
+
+function forEachUnivRefReportByGrade(avgGrade, fn) {
+    const key = univRefGradeKey(avgGrade);
+    document.querySelectorAll('#printContainer .report-wrapper, #reportTemplate').forEach(function(report) {
+        const avgEl = report.querySelector('.info-avg-grade');
+        if (!avgEl || avgEl.textContent.trim() !== key) return;
+        const body = report.querySelector('.univ-ref-table-body');
+        if (body) fn(body, report);
+    });
+}
+
+function scheduleUnivRefProgressPaint() {
+    if (typeof requestAnimationFrame === 'function') {
+        requestAnimationFrame(paintUnivRefProgressDom);
+    } else {
+        paintUnivRefProgressDom();
+    }
+}
+
+function paintUnivRefProgressDom() {
+    const offset = String(UNIV_REF_PROGRESS_LEN * (1 - univRefProgressValue / 100));
+    const pctText = univRefProgressValue + '%';
+    document.querySelectorAll('.univ-ref-progress-bar').forEach(function(bar) {
+        bar.style.strokeDashoffset = offset;
+    });
+    document.querySelectorAll('.univ-ref-progress-pct').forEach(function(el) {
+        el.textContent = pctText;
+    });
+}
+
+function consumeDdgSseLines(text, full, onProgress) {
+    const lines = String(text || '').split('\n');
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
         if (!line.startsWith('data:')) continue;
         const data = line.slice(5).trim();
-        if (data === '[DONE]') break;
+        if (data === '[DONE]') continue;
         try {
             const chunk = JSON.parse(data);
             if (chunk && chunk.message) {
                 full += chunk.message;
                 if (onProgress) {
-                    const streamPct = Math.min(92, 22 + Math.floor(full.length / 75));
-                    onProgress(streamPct, '지원 대학 분석 중…');
+                    onProgress(Math.min(92, 22 + Math.floor(full.length / 70)), '지원 대학 분석 중…');
                 }
             }
-        } catch (e) { /* skip malformed chunk */ }
+        } catch (e) { /* skip */ }
     }
+    return full;
+}
+
+async function parseDdgSseResponse(res, onProgress) {
+    if (!res.body || !res.body.getReader) {
+        const text = await res.text();
+        let full = consumeDdgSseLines(text, '', onProgress);
+        const newVqd = res.headers.get('x-vqd-4');
+        if (newVqd) ddgVqdCache = newVqd;
+        return full;
+    }
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+    let buffer = '';
+    let full = '';
+    while (true) {
+        const chunk = await reader.read();
+        if (chunk.done) break;
+        buffer += decoder.decode(chunk.value, { stream: true });
+        const parts = buffer.split('\n');
+        buffer = parts.pop() || '';
+        full = consumeDdgSseLines(parts.join('\n') + '\n', full, onProgress);
+    }
+    if (buffer) full = consumeDdgSseLines(buffer, full, onProgress);
     const newVqd = res.headers.get('x-vqd-4');
     if (newVqd) ddgVqdCache = newVqd;
     return full;
@@ -3194,6 +3348,122 @@ async function ddgAiChat(userContent, onProgress) {
     return raw;
 }
 
+async function workerAiChat(userContent, onProgress) {
+    const url = getUnivAiWorkerUrl();
+    if (!url) throw new Error('Worker URL 미설정');
+    if (onProgress) onProgress(12, 'Worker AI 연결 중…');
+    const res = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: userContent })
+    });
+    if (!res.ok) throw new Error('Worker 응답 오류 (' + res.status + ')');
+    const data = await res.json();
+    const text = data.text || data.content || (data.choices && data.choices[0] && data.choices[0].message && data.choices[0].message.content) || '';
+    if (onProgress) onProgress(88, 'Worker 응답 수신…');
+    if (!text || !String(text).trim()) throw new Error('Worker 빈 응답');
+    return String(text);
+}
+
+function loadPuterScript() {
+    if (typeof puter !== 'undefined') return Promise.resolve();
+    if (!puterScriptPromise) {
+        puterScriptPromise = new Promise(function(resolve, reject) {
+            const s = document.createElement('script');
+            s.src = 'https://js.puter.com/v2/';
+            s.async = true;
+            s.onload = function() { resolve(); };
+            s.onerror = function() { reject(new Error('Puter 스크립트 로드 실패')); };
+            document.head.appendChild(s);
+        });
+    }
+    return puterScriptPromise;
+}
+
+async function ensurePuterGuestAuthForUnivAi() {
+    await loadPuterScript();
+    if (!puter.auth || !puter.ai) throw new Error('Perplexity AI 초기화 실패');
+    if (puter.auth.isSignedIn()) return;
+    if (!puterUnivAiGuestAuthPromise) {
+        puterUnivAiGuestAuthPromise = puter.auth.signIn({ attempt_temp_user_creation: true })
+            .finally(function() {
+                puterUnivAiGuestAuthPromise = null;
+            });
+    }
+    await puterUnivAiGuestAuthPromise;
+}
+
+function extractPuterChatText(result) {
+    if (!result) return '';
+    const msg = result.message || result;
+    const content = msg.content;
+    if (typeof content === 'string') return content;
+    if (Array.isArray(content)) {
+        return content.map(function(part) {
+            if (typeof part === 'string') return part;
+            return part && (part.text || part.content || '');
+        }).join('');
+    }
+    if (typeof result === 'string') return result;
+    return '';
+}
+
+async function puterPerplexityChat(userContent, onProgress) {
+    await ensurePuterGuestAuthForUnivAi();
+    if (onProgress) onProgress(18, 'Perplexity 연결됨');
+    const response = await puter.ai.chat([{ role: 'user', content: userContent }], {
+        model: PERPLEXITY_MODEL,
+        stream: true,
+        max_tokens: 2800,
+        temperature: 0.2
+    });
+    let full = '';
+    if (response && typeof response[Symbol.asyncIterator] === 'function') {
+        for await (const part of response) {
+            const piece = part && (part.text != null ? part.text : extractPuterChatText(part));
+            if (piece) full += piece;
+            if (onProgress) {
+                onProgress(Math.min(94, 24 + Math.floor(full.length / 65)), 'Perplexity 분석 중…');
+            }
+        }
+    } else {
+        full = extractPuterChatText(response);
+        if (onProgress) onProgress(85, 'Perplexity 응답 수신…');
+    }
+    if (!full || !full.trim()) throw new Error('Perplexity 빈 응답');
+    return full;
+}
+
+async function fetchUnivAiRawText(prompt, provider, onProgress) {
+    if (provider === 'puter') {
+        return puterPerplexityChat(prompt, onProgress);
+    }
+    if (provider === 'worker') {
+        return workerAiChat(prompt, onProgress);
+    }
+    if (provider === 'ddg') {
+        if (!ddgSwReady) {
+            const ok = await registerDdgServiceWorker();
+            if (!ok) throw new Error('HTTPS·Service Worker 필요 (GitHub Pages 권장)');
+        }
+        return ddgAiChat(prompt, onProgress);
+    }
+    const workerUrl = getUnivAiWorkerUrl();
+    if (workerUrl) {
+        try {
+            return await workerAiChat(prompt, onProgress);
+        } catch (workerErr) {
+            console.warn('[Worker AI] 실패, DuckDuckGo로 전환', workerErr);
+            if (onProgress) onProgress(8, 'Worker 실패 · DDG 재시도…');
+        }
+    }
+    if (!ddgSwReady) {
+        const ok = await registerDdgServiceWorker();
+        if (!ok) throw new Error('HTTPS·Service Worker 필요 (GitHub Pages 권장)');
+    }
+    return ddgAiChat(prompt, onProgress);
+}
+
 function withTimeout(promise, ms, message) {
     return new Promise(function(resolve, reject) {
         const timer = setTimeout(function() {
@@ -3209,27 +3479,34 @@ function withTimeout(promise, ms, message) {
     });
 }
 
-function loadUnivRefCache(avgGrade) {
-    const key = avgGrade.toFixed(2);
+function univRefCacheStorageKey(avgGrade, provider) {
+    return univRefGradeKey(avgGrade) + '|' + (provider || 'auto');
+}
+
+function loadUnivRefCache(avgGrade, provider) {
+    const key = univRefCacheStorageKey(avgGrade, provider);
     if (univRefAiMemoryCache[key]) return univRefAiMemoryCache[key];
     try {
         const raw = sessionStorage.getItem(UNIV_AI_CACHE_KEY);
         if (!raw) return null;
         const all = JSON.parse(raw);
         const entry = all[key];
-        if (entry && entry.rows && entry.rows.length) return entry.rows;
+        if (entry && entry.rows && entry.rows.length) {
+            univRefAiMemoryCache[key] = entry.rows;
+            return entry.rows;
+        }
     } catch (e) { /* ignore */ }
     return null;
 }
 
-function saveUnivRefCache(avgGrade, rows) {
-    const key = avgGrade.toFixed(2);
+function saveUnivRefCache(avgGrade, rows, provider) {
+    const key = univRefCacheStorageKey(avgGrade, provider);
     univRefAiMemoryCache[key] = rows;
     try {
         const all = {};
         const raw = sessionStorage.getItem(UNIV_AI_CACHE_KEY);
         if (raw) Object.assign(all, JSON.parse(raw));
-        all[key] = { rows: rows, savedAt: Date.now() };
+        all[key] = { rows: rows, provider: provider || 'auto', savedAt: Date.now() };
         sessionStorage.setItem(UNIV_AI_CACHE_KEY, JSON.stringify(all));
     } catch (e) { /* ignore */ }
 }
@@ -3290,8 +3567,6 @@ function buildLocalUnivRefFallback(avgGrade) {
 const UNIV_REF_STRATEGY_ORDER = { '상향': 0, '적정': 1, '하향': 2 };
 
 let lastCalculatedAvgGrade = null;
-let lastUnivRefFetchKey = null;
-let univRefFetchInFlight = false;
 
 function escapeRecHtml(value) {
     return String(value ?? '')
@@ -3316,16 +3591,15 @@ function strategySortKey(strategy) {
     return 9;
 }
 
-function renderUnivRefRecommendRows(rows) {
-    const body = document.getElementById('univRefTableBody');
-    if (!body || !rows || !rows.length) return;
+function buildUnivRefRowsHtml(rows) {
+    if (!rows || !rows.length) return '';
     const sorted = rows.slice().sort(function(a, b) {
         const oa = strategySortKey(a.strategy);
         const ob = strategySortKey(b.strategy);
         if (oa !== ob) return oa - ob;
         return String(a.region || '').localeCompare(String(b.region || ''), 'ko');
     });
-    body.innerHTML = sorted.map(function(r) {
+    return sorted.map(function(r) {
         const stratCls = strategyRowClass(r.strategy);
         const univ = r.university || ((r.name || '') + (r.department ? ' ' + r.department : '')).trim();
         return '<tr>' +
@@ -3338,28 +3612,42 @@ function renderUnivRefRecommendRows(rows) {
     }).join('');
 }
 
+function renderUnivRefRecommendRows(rows, avgGrade) {
+    if (!rows || !rows.length) return;
+    const html = buildUnivRefRowsHtml(rows);
+    if (avgGrade != null) {
+        forEachUnivRefReportByGrade(avgGrade, function(body) { body.innerHTML = html; });
+        return;
+    }
+    document.querySelectorAll('.univ-ref-table-body').forEach(function(body) {
+        body.innerHTML = html;
+    });
+}
+
 function renderStaticUnivRefPlaceholder() {
-    const body = document.getElementById('univRefTableBody');
-    if (!body) return;
-    body.innerHTML =
+    const html =
         '<tr><td colspan="5" class="univ-ref-placeholder-cell">' +
         '학생 성적 조회 후 AI가 지원 가능 대학 표를 생성합니다.' +
         '</td></tr>';
+    document.querySelectorAll('.univ-ref-table-body').forEach(function(body) {
+        body.innerHTML = html;
+    });
 }
 
 var univRefLoadingStartedAt = 0;
+var univRefProgressLabelText = '분석 준비 중…';
 
 function setUnivRefProgress(pct, label) {
     const next = Math.max(univRefProgressValue, Math.min(100, Math.round(pct)));
+    const pctChanged = next !== univRefProgressValue;
     univRefProgressValue = next;
-    const bar = document.getElementById('univRefProgressBar');
-    const pctEl = document.getElementById('univRefProgressPct');
-    const labelEl = document.getElementById('univRefProgressLabel');
-    if (bar) {
-        bar.style.strokeDashoffset = String(UNIV_REF_PROGRESS_LEN * (1 - next / 100));
+    if (label) univRefProgressLabelText = label;
+    if (pctChanged) scheduleUnivRefProgressPaint();
+    if (label) {
+        document.querySelectorAll('.univ-ref-progress-label').forEach(function(el) {
+            el.textContent = label;
+        });
     }
-    if (pctEl) pctEl.textContent = next + '%';
-    if (labelEl && label) labelEl.textContent = label;
 }
 
 function stopUnivRefProgressAnimator() {
@@ -3372,7 +3660,7 @@ function stopUnivRefProgressAnimator() {
 function startUnivRefProgressAnimator() {
     stopUnivRefProgressAnimator();
     univRefProgressTimer = setInterval(function() {
-        if (!document.getElementById('univRefProgressBar')) {
+        if (!document.querySelector('.univ-ref-progress-bar')) {
             stopUnivRefProgressAnimator();
             return;
         }
@@ -3381,49 +3669,59 @@ function startUnivRefProgressAnimator() {
         if (timePct > univRefProgressValue) {
             setUnivRefProgress(timePct, '지원 대학 분석 중…');
         }
-    }, 160);
+    }, 120);
 }
 
-function showUnivRefTableLoading() {
-    const body = document.getElementById('univRefTableBody');
-    if (!body) return;
+function showUnivRefTableLoading(avgGrade, label) {
     univRefLoadingStartedAt = Date.now();
     univRefProgressValue = 0;
-    body.innerHTML =
-        '<tr><td colspan="5" class="univ-ref-loading-cell">' +
-        '<div class="univ-ref-progress-wrap" role="status" aria-live="polite">' +
-        '<div class="univ-ref-progress-ring-host">' +
-        '<svg class="univ-ref-progress-ring" viewBox="0 0 120 120" aria-hidden="true">' +
-        '<circle class="univ-ref-progress-track" cx="60" cy="60" r="52"></circle>' +
-        '<circle class="univ-ref-progress-bar" id="univRefProgressBar" cx="60" cy="60" r="52"></circle>' +
-        '</svg>' +
-        '<span class="univ-ref-progress-pct" id="univRefProgressPct">0%</span>' +
-        '</div>' +
-        '<span class="univ-ref-progress-label" id="univRefProgressLabel">분석 준비 중…</span>' +
-        '</div>' +
-        '</td></tr>';
-    setUnivRefProgress(0, '분석 준비 중…');
+    univRefProgressLabelText = label || '분석 준비 중…';
+    activeUnivRefGradeKey = univRefGradeKey(avgGrade);
+    const paint = function(body) {
+        body.innerHTML = UNIV_REF_LOADING_HTML;
+        const labelEl = body.querySelector('.univ-ref-progress-label');
+        if (labelEl) labelEl.textContent = univRefProgressLabelText;
+    };
+    if (avgGrade != null) {
+        forEachUnivRefReportByGrade(avgGrade, paint);
+    } else {
+        document.querySelectorAll('.univ-ref-table-body').forEach(paint);
+    }
+    setUnivRefProgress(0, univRefProgressLabelText);
     startUnivRefProgressAnimator();
 }
 
 function stopUnivRefLoadingTimer() {
     stopUnivRefProgressAnimator();
     setUnivRefProgress(100, '완료');
+    activeUnivRefGradeKey = null;
 }
 
 function resetUniversityRecommendations() {
     lastCalculatedAvgGrade = null;
-    lastUnivRefFetchKey = null;
-    univRefFetchInFlight = false;
     renderStaticUnivRefPlaceholder();
 }
 
 function onGradeCalculated(avgGrade) {
     lastCalculatedAvgGrade = avgGrade;
-    const key = avgGrade.toFixed(2);
-    if (lastUnivRefFetchKey === key && univRefFetchInFlight) return;
-    lastUnivRefFetchKey = key;
-    fetchUnivRefTableFromAI(avgGrade);
+    enqueueUnivRefFetch(avgGrade, 'auto');
+}
+
+function enqueueUnivRefFetch(avgGrade, provider, options) {
+    const opts = options || {};
+    const key = univRefCacheStorageKey(avgGrade, provider);
+    const cached = loadUnivRefCache(avgGrade, provider);
+    if (cached && cached.length && !opts.force) {
+        renderUnivRefRecommendRows(cached, avgGrade);
+        return Promise.resolve(cached);
+    }
+    if (!univRefFetchPromises[key]) {
+        univRefFetchPromises[key] = fetchUnivRefTableFromAI(avgGrade, provider, { force: opts.force })
+            .finally(function() {
+                delete univRefFetchPromises[key];
+            });
+    }
+    return univRefFetchPromises[key];
 }
 
 function buildUnivRefTablePrompts(avgGrade) {
@@ -3505,9 +3803,34 @@ function renderUnivRefFromAiData(data) {
     return rows;
 }
 
-function applyUnivRefRows(rows, avgGrade) {
-    saveUnivRefCache(avgGrade, rows);
-    renderUnivRefRecommendRows(rows);
+function applyUnivRefRows(rows, avgGrade, provider) {
+    saveUnivRefCache(avgGrade, rows, provider);
+    renderUnivRefRecommendRows(rows, avgGrade);
+}
+
+function getActiveReportAvgGrade() {
+    if (lastCalculatedAvgGrade != null) return lastCalculatedAvgGrade;
+    const visible = document.querySelector('#printContainer .info-avg-grade, #reportTemplate .info-avg-grade');
+    if (!visible) return null;
+    const n = parseFloat(visible.textContent);
+    return isNaN(n) ? null : n;
+}
+
+async function runPerplexityUnivAnalysis() {
+    const avgGrade = getActiveReportAvgGrade();
+    if (avgGrade == null) {
+        alert('먼저 학생을 조회해주세요.');
+        return;
+    }
+    const btn = document.getElementById('univRefPerplexityBtn');
+    if (btn) btn.disabled = true;
+    try {
+        await enqueueUnivRefFetch(avgGrade, 'puter', { force: true });
+    } catch (err) {
+        alert('Perplexity 분석 실패: ' + (err && err.message ? err.message : '알 수 없음'));
+    } finally {
+        if (btn) btn.disabled = false;
+    }
 }
 
 function extractJsonFromModelText(text) {
@@ -3527,34 +3850,28 @@ function extractJsonFromModelText(text) {
     }
 }
 
-async function fetchUnivRefTableFromAI(avgGrade) {
-    if (univRefFetchInFlight) return;
-    univRefFetchInFlight = true;
+async function fetchUnivRefTableFromAI(avgGrade, provider, options) {
+    const opts = options || {};
+    const prov = provider || 'auto';
 
-    const cached = loadUnivRefCache(avgGrade);
-    if (cached && cached.length) {
-        renderUnivRefRecommendRows(cached);
-        univRefFetchInFlight = false;
-        return;
+    if (!opts.force) {
+        const cached = loadUnivRefCache(avgGrade, prov);
+        if (cached && cached.length) {
+            renderUnivRefRecommendRows(cached, avgGrade);
+            return cached;
+        }
     }
 
-    showUnivRefTableLoading();
+    const loadingLabel = prov === 'puter' ? 'Perplexity 분석 준비 중…' : '데이터 분석 중…';
+    showUnivRefTableLoading(avgGrade, loadingLabel);
     const deadline = Date.now() + UNIV_AI_TOTAL_MS;
 
     try {
-        if (!ddgSwReady) {
-            const ok = await withTimeout(
-                registerDdgServiceWorker(),
-                Math.max(2000, deadline - Date.now()),
-                'AI 준비 시간 초과'
-            );
-            if (!ok) throw new Error('HTTPS 접속이 필요합니다 (GitHub Pages 권장)');
-        }
-        setUnivRefProgress(5, 'AI 연결 중…');
+        setUnivRefProgress(4, prov === 'puter' ? 'Perplexity 연결 중…' : 'AI 연결 중…');
         const prompt = buildUnivRefTablePrompts(avgGrade);
         const remaining = Math.max(3000, deadline - Date.now());
         const raw = await withTimeout(
-            ddgAiChat(prompt, function(pct, label) {
+            fetchUnivAiRawText(prompt, prov, function(pct, label) {
                 setUnivRefProgress(pct, label);
             }),
             remaining,
@@ -3563,14 +3880,15 @@ async function fetchUnivRefTableFromAI(avgGrade) {
         setUnivRefProgress(96, '결과 정리 중…');
         const parsed = extractJsonFromModelText(raw);
         const rows = renderUnivRefFromAiData(parsed);
-        applyUnivRefRows(rows, avgGrade);
+        applyUnivRefRows(rows, avgGrade, prov);
+        return rows;
     } catch (err) {
-        console.warn('[대학 참고표 AI]', err);
+        console.warn('[대학 참고표 AI]', prov, err);
         const fallback = buildLocalUnivRefFallback(avgGrade);
-        applyUnivRefRows(fallback, avgGrade);
+        applyUnivRefRows(fallback, avgGrade, prov);
+        return fallback;
     } finally {
         stopUnivRefLoadingTimer();
-        univRefFetchInFlight = false;
     }
 }
 
@@ -4132,6 +4450,7 @@ document.getElementById('studentId').addEventListener('input', function() {
     }
     initUnivRefTable();
     initAppFooter();
+    initUnivAiWorkerUrlInput();
     await registerDdgServiceWorker();
     if (!restoreAppViewFromSession(savedUi)) {
         runDefaultSinglePreview({ scroll: false });
