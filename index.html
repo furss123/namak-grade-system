@@ -394,6 +394,61 @@
             font-size: calc(12px + 3pt); font-weight: 600; color: var(--school-navy);
             margin-bottom: 12px; letter-spacing: -0.01em;
         }
+        .query-card-desc {
+            font-size: calc(11px + 1pt); color: #64748b;
+            margin: -6px 0 12px; line-height: 1.45;
+        }
+        .query-layout {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+            margin-bottom: 14px;
+        }
+        @media (max-width: 720px) {
+            .query-layout { grid-template-columns: 1fr; }
+        }
+        .query-layout .query-card { margin-bottom: 0; }
+        .query-card-print { margin-bottom: 0; }
+        .print-options-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr);
+            gap: 10px 14px;
+        }
+        @media (max-width: 520px) {
+            .print-options-grid { grid-template-columns: 1fr; }
+        }
+        .print-opt-label {
+            display: flex; align-items: flex-start; gap: 10px;
+            font-size: calc(12px + 1pt); color: var(--school-text);
+            cursor: pointer; padding: 11px 14px;
+            border: 1px solid var(--school-border-light);
+            border-radius: var(--radius-sm); background: #fafbfc;
+            line-height: 1.4;
+            transition: border-color 0.2s var(--ease), background 0.2s var(--ease), box-shadow 0.2s var(--ease);
+        }
+        .print-opt-label:hover {
+            border-color: var(--school-border); background: #fff;
+            box-shadow: var(--shadow-xs);
+        }
+        .print-opt-label input[type="checkbox"] {
+            width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0;
+            accent-color: var(--school-navy);
+        }
+        .query-select {
+            flex: 1; min-width: 160px; padding: 12px 16px;
+            font-size: calc(14px + 1pt); font-family: inherit;
+            border: 1px solid var(--school-border); border-radius: var(--radius-sm);
+            background: #fafbfc; color: var(--school-text);
+            transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease);
+        }
+        .query-select:hover:not(:disabled) { background: #fff; border-color: #b8c5d6; }
+        .query-select:focus {
+            outline: none; border-color: var(--school-navy-light); background: #fff;
+            box-shadow: 0 0 0 3px rgba(61, 107, 158, 0.12);
+        }
+        .query-select:disabled { opacity: 0.65; cursor: not-allowed; }
+        #studentId.student-id-input {
+            flex: 0 1 140px; max-width: 160px;
+            text-align: center; letter-spacing: 0.06em;
+            font-variant-numeric: tabular-nums;
+        }
         .input-area { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .input-area input {
             flex: 1; min-width: 120px; padding: 12px 16px; font-size: calc(14px + 1pt);
@@ -1520,31 +1575,60 @@
 
         <section class="panel-section">
             <div class="section-label">학생 성적 조회</div>
-            <div class="query-card">
-                <div class="query-card-title">단일 학번 조회 및 분석 (1페이지 보고서 + 2페이지 성적분포)</div>
-                <div class="input-area">
-            <input type="text" id="studentId" value="1101" placeholder="학번 입력 (예: 1101)">
-            <button class="search-btn" onclick="searchSingleStudent()">
-                <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-                조회 및 분석
-            </button>
+            <div class="query-layout">
+                <div class="query-card">
+                    <div class="query-card-title">단일 학생 조회</div>
+                    <p class="query-card-desc">4자리 학번을 입력한 뒤 조회합니다.</p>
+                    <div class="input-area">
+                        <input type="text" id="studentId" class="student-id-input" value="1101"
+                            maxlength="4" inputmode="numeric" autocomplete="off"
+                            placeholder="학번 4자리" aria-label="학번 4자리">
+                        <button type="button" class="search-btn" onclick="searchSingleStudent()">
+                            <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            조회
+                        </button>
+                    </div>
+                </div>
+
+                <div class="query-card">
+                    <div class="query-card-title">반 조회</div>
+                    <p class="query-card-desc">업로드된 엑셀에서 학년·반을 자동 인식합니다. (배부용 · 반 전원)</p>
+                    <div class="input-area">
+                        <select id="classSelect" class="query-select" disabled aria-label="학년 반 선택">
+                            <option value="">엑셀 등록 후 선택</option>
+                        </select>
+                        <button type="button" class="search-btn search-btn-range" onclick="searchClassStudents()">
+                            <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                            </svg>
+                            반 조회
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="query-card">
-                <div class="query-card-title">학번 구간 조회 (배부용 · 1페이지만)</div>
-                <div class="input-area">
-            <input type="text" id="startStudentId" placeholder="시작 학번">
-            <span class="range-sep">~</span>
-            <input type="text" id="endStudentId" placeholder="끝 학번">
-            <button class="search-btn search-btn-range" onclick="searchStudentRange()">
-                <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-                구간 조회
-            </button>
+            <div class="query-card query-card-print">
+                <div class="query-card-title">인쇄 항목 선택</div>
+                <p class="query-card-desc">조회 시 선택한 항목만 보고서·인쇄에 포함됩니다.</p>
+                <div class="print-options-grid">
+                    <label class="print-opt-label" for="printOptScore">
+                        <input type="checkbox" id="printOptScore" checked>
+                        <span>과목별 성적</span>
+                    </label>
+                    <label class="print-opt-label" for="printOptRadar">
+                        <input type="checkbox" id="printOptRadar" checked>
+                        <span>한눈에 보기</span>
+                    </label>
+                    <label class="print-opt-label" for="printOptDist">
+                        <input type="checkbox" id="printOptDist" checked>
+                        <span>자신의 성적 상·하위 각 10명 성적 분포</span>
+                    </label>
+                    <label class="print-opt-label" for="printOptUniv">
+                        <input type="checkbox" id="printOptUniv" checked>
+                        <span>지원 대학</span>
+                    </label>
                 </div>
             </div>
         </section>
@@ -1584,7 +1668,7 @@
     <div id="reportActionSection" class="report-action-section">
         <div class="section-label">보고서 출력 · 초기화</div>
         <div class="report-action-buttons">
-            <button type="button" class="print-btn" onclick="window.print()">
+            <button type="button" class="print-btn" onclick="printSelectedReport()">
                 <svg style="width:20px; height:20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
                 </svg>
@@ -2067,6 +2151,81 @@ function processAllGrades() {
     const result = GradeEngine.processAllGrades(studentData);
     processedGradesCache = result.processedGradesCache;
     subjectStatsCache = result.subjectStatsCache;
+    refreshClassSelect();
+}
+
+function normalizeStudentId(raw) {
+    const digits = String(raw || '').replace(/\D/g, '');
+    if (!digits) return '';
+    if (digits.length > 4) return digits.slice(-4);
+    return digits.padStart(4, '0');
+}
+
+function getPrintOptions() {
+    return {
+        score: !!document.getElementById('printOptScore')?.checked,
+        radar: !!document.getElementById('printOptRadar')?.checked,
+        dist: !!document.getElementById('printOptDist')?.checked,
+        univ: !!document.getElementById('printOptUniv')?.checked
+    };
+}
+
+function validatePrintOptions(options) {
+    const opts = options || {};
+    const printOpts = getPrintOptions();
+    if (printOpts.score || printOpts.radar || printOpts.dist || printOpts.univ) return true;
+    if (!opts.silent) alert('인쇄할 항목을 하나 이상 선택해주세요.');
+    return false;
+}
+
+function resetPrintOptions() {
+    ['printOptScore', 'printOptRadar', 'printOptDist', 'printOptUniv'].forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) el.checked = true;
+    });
+}
+
+function refreshClassSelect() {
+    const sel = document.getElementById('classSelect');
+    if (!sel) return;
+    const prev = sel.value;
+    sel.innerHTML = '';
+    if (!studentData.length) {
+        sel.appendChild(new Option('엑셀 등록 후 선택', ''));
+        sel.disabled = true;
+        return;
+    }
+    const map = new Map();
+    studentData.forEach(function(s) {
+        const grade = Number(s['학년']) || 1;
+        const ban = s['반'];
+        if (ban == null || ban === '') return;
+        const key = grade + '-' + ban;
+        const label = grade + '학년 ' + ban + '반';
+        if (!map.has(key)) map.set(key, { key: key, label: label, grade: grade, ban: Number(ban), count: 0 });
+        map.get(key).count++;
+    });
+    const list = Array.from(map.values()).sort(function(a, b) {
+        return a.grade - b.grade || a.ban - b.ban;
+    });
+    sel.disabled = false;
+    sel.appendChild(new Option('반을 선택하세요', ''));
+    list.forEach(function(c) {
+        sel.appendChild(new Option(c.label + ' (' + c.count + '명)', c.key));
+    });
+    if (prev && Array.from(sel.options).some(function(o) { return o.value === prev; })) sel.value = prev;
+}
+
+function getStudentsInClass(classKey) {
+    const parts = String(classKey).split('-');
+    const grade = parseInt(parts[0], 10);
+    const ban = parseInt(parts[1], 10);
+    if (isNaN(grade) || isNaN(ban)) return [];
+    return studentData
+        .filter(function(s) {
+            return (Number(s['학년']) || 1) === grade && Number(s['반']) === ban;
+        })
+        .sort(function(a, b) { return Number(a['번호']) - Number(b['번호']); });
 }
 
 function displayGeneralStats() {
@@ -3073,8 +3232,9 @@ function resetResults() {
     hideReportActionSection();
     resetUniversityRecommendations();
     applyDefaultSingleStudentId();
-    document.getElementById('startStudentId').value = '';
-    document.getElementById('endStudentId').value = '';
+    resetPrintOptions();
+    const classSel = document.getElementById('classSelect');
+    if (classSel) classSel.value = '';
 }
 
 /** 연속 동점 점수를 "85.00 (3)" 형태로 묶어 표시 (최대 limit개) */
@@ -3392,19 +3552,59 @@ function renderStudentGradeRadar(subjectRows) {
     }
 }
 
-function cloneReport(includeDistributionPage) {
+function cloneReportForPrint(printOpts) {
+    const opts = printOpts || { score: true, radar: true, dist: true, univ: true };
     const template = document.getElementById('reportTemplate');
     const clone = template.cloneNode(true);
     clone.style.display = 'block';
     clone.removeAttribute('id');
-    if (!includeDistributionPage) {
+    if (!opts.score) {
+        clone.querySelectorAll('.report-zone-score, .report-zone-aux').forEach(function(el) { el.remove(); });
+    }
+    if (!opts.radar) {
+        const radarZone = clone.querySelector('.report-zone-radar');
+        if (radarZone) radarZone.remove();
+    }
+    if (!opts.dist) {
         const page2 = clone.querySelector('.page-2');
         if (page2) page2.remove();
     }
+    if (!opts.univ) {
+        const univZone = clone.querySelector('.report-zone-univ-ref');
+        if (univZone) univZone.remove();
+    }
     const elementsWithId = clone.querySelectorAll('[id]');
-    elementsWithId.forEach(el => el.removeAttribute('id'));
+    elementsWithId.forEach(function(el) { el.removeAttribute('id'); });
     initAppFooter();
     return clone;
+}
+
+function cloneReport(includeDistributionPage) {
+    return cloneReportForPrint({
+        score: true,
+        radar: true,
+        dist: !!includeDistributionPage,
+        univ: true
+    });
+}
+
+function appendReportsToPrintContainer(studentIds, printOpts) {
+    const printContainer = document.getElementById('printContainer');
+    printContainer.innerHTML = '';
+    studentIds.forEach(function(id) {
+        populateTemplate(id, { includeDistribution: printOpts.dist });
+        printContainer.appendChild(cloneReportForPrint(printOpts));
+    });
+}
+
+function printSelectedReport() {
+    const printContainer = document.getElementById('printContainer');
+    if (!printContainer || !printContainer.children.length) {
+        alert('먼저 학생을 조회해주세요.');
+        return;
+    }
+    if (!validatePrintOptions()) return;
+    window.print();
 }
 
 function searchSingleStudent(studentIdOverride, options) {
@@ -3413,61 +3613,48 @@ function searchSingleStudent(studentIdOverride, options) {
         if (!opts.silent) alert("엑셀 성적 파일을 먼저 등록해주세요.");
         return false;
     }
+    if (!validatePrintOptions(opts)) return false;
     const studentEl = document.getElementById('studentId');
-    const studentId = (studentIdOverride != null ? String(studentIdOverride) : (studentEl ? studentEl.value.trim() : ''));
-    if (!studentId) {
-        if (!opts.silent) alert("학번을 입력해주세요.");
+    const rawId = (studentIdOverride != null ? String(studentIdOverride) : (studentEl ? studentEl.value.trim() : ''));
+    const studentId = normalizeStudentId(rawId);
+    if (!studentId || studentId.length !== 4) {
+        if (!opts.silent) alert("4자리 학번을 입력해주세요.");
         return false;
     }
     if (studentEl) studentEl.value = studentId;
-    if (!populateTemplate(studentId, { includeDistribution: true })) {
+    const printOpts = getPrintOptions();
+    if (!populateTemplate(studentId, { includeDistribution: printOpts.dist })) {
         if (!opts.silent) alert("해당 학번의 학생을 찾을 수 없습니다.");
         return false;
     }
-    const printContainer = document.getElementById('printContainer');
-    printContainer.innerHTML = '';
-    printContainer.appendChild(cloneReport(true));
+    appendReportsToPrintContainer([studentId], printOpts);
     showReportActionSection();
     if (!opts.silent) scrollToReportStart();
     return true;
 }
 
-function searchStudentRange(startOverride, endOverride, options) {
+function searchClassStudents(options) {
     const opts = options || {};
     if (!isFileUploaded || studentData.length === 0) {
         if (!opts.silent) alert("엑셀 성적 파일을 먼저 등록해주세요.");
         return false;
     }
-    const startEl = document.getElementById('startStudentId');
-    const endEl = document.getElementById('endStudentId');
-    const startIdStr = (startOverride != null ? String(startOverride) : (startEl ? startEl.value.trim() : ''));
-    const endIdStr = (endOverride != null ? String(endOverride) : (endEl ? endEl.value.trim() : ''));
-    if (!startIdStr || !endIdStr) {
-        if (!opts.silent) alert("시작 학번과 끝 학번을 모두 입력해주세요.");
+    if (!validatePrintOptions(opts)) return false;
+    const classSel = document.getElementById('classSelect');
+    const classKey = classSel ? classSel.value : '';
+    if (!classKey) {
+        if (!opts.silent) alert("반을 선택해주세요.");
         return false;
     }
-    const startId = parseInt(startIdStr, 10);
-    const endId = parseInt(endIdStr, 10);
-    if (isNaN(startId) || isNaN(endId) || startId > endId) {
-        if (!opts.silent) alert("올바른 학번 구간을 입력해주세요.");
-        return false;
-    }
-
-    const targetStudents = [];
-    for (let id = startId; id <= endId; id++) {
-        const student = studentData.find(s => parseInt(s['학번'], 10) === id);
-        if (student) targetStudents.push(student);
-    }
+    const targetStudents = getStudentsInClass(classKey);
     if (targetStudents.length === 0) {
-        if (!opts.silent) alert("해당 구간 내에 학생 데이터가 없습니다.");
+        if (!opts.silent) alert("선택한 반에 학생 데이터가 없습니다.");
         return false;
     }
-    const printContainer = document.getElementById('printContainer');
-    printContainer.innerHTML = '';
-    targetStudents.forEach(student => {
-        populateTemplate(String(student['학번']), { includeDistribution: false });
-        printContainer.appendChild(cloneReport(false));
-    });
+    const printOpts = getPrintOptions();
+    const studentIds = targetStudents.map(function(s) { return String(s['학번']); });
+    populateTemplate(studentIds[0], { includeDistribution: printOpts.dist });
+    appendReportsToPrintContainer(studentIds, printOpts);
     showReportActionSection();
     if (!opts.silent) scrollToReportStart();
     return true;
@@ -3512,8 +3699,10 @@ function resetMainTables() {
 }
 
 document.getElementById('studentId').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchSingleStudent(); });
-document.getElementById('startStudentId').addEventListener('keydown', function(e) { if (e.key === 'Enter') document.getElementById('endStudentId').focus(); });
-document.getElementById('endStudentId').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchStudentRange(); });
+document.getElementById('classSelect').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchClassStudents(); });
+document.getElementById('studentId').addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g, '').slice(0, 4);
+});
 
 (function initUploadDragDrop() {
     const uploadBox = document.getElementById('uploadBox');
