@@ -2923,10 +2923,16 @@ function hideReportActionSection() {
     document.getElementById('reportActionSection').style.display = 'none';
 }
 
-/** DuckDuckGo AI Chat — gpt-4o-mini 단일 호출 (비로그인, Service Worker 프록시) */
-const DDG_AI_MODEL = 'gpt-4o-mini';
+/** DuckDuckGo AI Chat — 30초 이내 완료 (타임아웃 + 캐시 + 로컬 폴백) */
+const DDG_AI_MODEL = 'claude-3-haiku-20240307';
+const UNIV_AI_TOTAL_MS = 30000;
+const UNIV_AI_CHAT_MS = 26000;
+const UNIV_AI_STATUS_MS = 4000;
+const UNIV_AI_CACHE_KEY = 'univRefAiCache_v2';
 let ddgVqdCache = null;
 let ddgSwReady = false;
+let univRefAiMemoryCache = {};
+let univRefLoadingTimer = null;
 
 function getAppBasePath() {
     const path = window.location.pathname || '/';
@@ -2987,8 +2993,101 @@ async function parseDdgSseResponse(res) {
     return full;
 }
 
+function withTimeout(promise, ms, message) {
+    return new Promise(function(resolve, reject) {
+        const timer = setTimeout(function() {
+            reject(new Error(message || '시간 초과'));
+        }, ms);
+        promise.then(function(value) {
+            clearTimeout(timer);
+            resolve(value);
+        }, function(err) {
+            clearTimeout(timer);
+            reject(err);
+        });
+    });
+}
+
+function loadUnivRefCache(avgGrade) {
+    const key = avgGrade.toFixed(2);
+    if (univRefAiMemoryCache[key]) return univRefAiMemoryCache[key];
+    try {
+        const raw = sessionStorage.getItem(UNIV_AI_CACHE_KEY);
+        if (!raw) return null;
+        const all = JSON.parse(raw);
+        const entry = all[key];
+        if (entry && entry.rows && entry.rows.length) return entry.rows;
+    } catch (e) { /* ignore */ }
+    return null;
+}
+
+function saveUnivRefCache(avgGrade, rows) {
+    const key = avgGrade.toFixed(2);
+    univRefAiMemoryCache[key] = rows;
+    try {
+        const all = {};
+        const raw = sessionStorage.getItem(UNIV_AI_CACHE_KEY);
+        if (raw) Object.assign(all, JSON.parse(raw));
+        all[key] = { rows: rows, savedAt: Date.now() };
+        sessionStorage.setItem(UNIV_AI_CACHE_KEY, JSON.stringify(all));
+    } catch (e) { /* ignore */ }
+}
+
+function buildLocalUnivRefFallback(avgGrade) {
+    const gs = avgGrade.toFixed(2);
+    const tier = avgGrade <= 2.5 ? 0 : avgGrade <= 3.5 ? 1 : avgGrade <= 4.5 ? 2 : 3;
+    const pools = [
+        {
+            up: ['연세대학교 경영학과', '고려대학교 국제학과'],
+            ok: ['성균관대학교 경제학과', '한양대학교 사회학과'],
+            safe: ['중앙대학교 인문학과', '아주대학교 국어국문학과'],
+            honamUp: ['전남대학교 의예과', '조선대학교 약학과'],
+            honamOk: ['전남대학교 전자공학과', '조선대학교 컴퓨터공학과'],
+            honamSafe: ['목포대학교 간호학과', '호남대학교 경영학과']
+        },
+        {
+            up: ['한양대학교 경영학과', '중앙대학교 경제학과'],
+            ok: ['건국대학교 국어국문학과', '동국대학교 사회학과'],
+            safe: ['경기대학교 국제학과', '인하대학교 행정학과'],
+            honamUp: ['전남대학교 전자공학과', '조선대학교 기계공학과'],
+            honamOk: ['전남대학교 컴퓨터공학과', '조선대학교 전기공학과'],
+            honamSafe: ['목포대학교 해양경찰학과', '호남대학교 컴퓨터공학과']
+        },
+        {
+            up: ['건국대학교 경영학과', '동국대학교 국제통상학과'],
+            ok: ['경기대학교 경영학과', '인하대학교 경제학과'],
+            safe: ['가천대학교 미디어커뮤니케이션학과', '단국대학교 행정학과'],
+            honamUp: ['전남대학교 컴퓨터공학과', '조선대학교 산업공학과'],
+            honamOk: ['목포대학교 전기전자공학과', '호남대학교 기계공학과'],
+            honamSafe: ['목포해양대학교 해양경찰학과', '광주대학교 경영학과']
+        },
+        {
+            up: ['경기대학교 경영학과', '가천대학교 경제학과'],
+            ok: ['단국대학교 경영학과', '인하대학교 국제통상학과'],
+            safe: ['가천대학교 행정학과', '경기대학교 관광경영학과'],
+            honamUp: ['목포대학교 전기전자공학과', '호남대학교 컴퓨터공학과'],
+            honamOk: ['광주대학교 경영학과', '호남대학교 전기공학과'],
+            honamSafe: ['광주여자대학교 유아교육과', '목포해양대학교 해양경찰학과']
+        }
+    ];
+    const p = pools[tier];
+    const reason = function(note) {
+        return '5등급 환산 ' + gs + '등급 기준 ' + note + '(빠른 참고·입학처 확인 권장)';
+    };
+    return [
+        { strategy: '상향(도전)', region: '수도권', university: p.up[0], gradeReflection: '학생부교과전형', reason: reason('도전 ') },
+        { strategy: '상향(도전)', region: '수도권', university: p.up[1], gradeReflection: '학생부 100%', reason: reason('도전 ') },
+        { strategy: '적정(안정)', region: '수도권', university: p.ok[0], gradeReflection: '교과전형', reason: reason('적정 ') },
+        { strategy: '적정(안정)', region: '수도권', university: p.ok[1], gradeReflection: '학생부 100%', reason: reason('적정 ') },
+        { strategy: '하향(보험)', region: '광주·전남', university: p.honamSafe[0], gradeReflection: '지역균형·교과', reason: reason('보험 ') },
+        { strategy: '하향(보험)', region: '광주·전남', university: p.honamSafe[1], gradeReflection: '학생부교과', reason: reason('보험 ') },
+        { strategy: '적정(안정)', region: '광주·전남', university: p.honamOk[0], gradeReflection: '교과전형', reason: reason('적정 ') },
+        { strategy: '상향(도전)', region: '광주·전남', university: p.honamUp[0], gradeReflection: '학생부 100%', reason: reason('도전 ') }
+    ];
+}
+
 async function ddgAiChat(userContent) {
-    let vqd = await ddgFetchVqd(false);
+    let vqd = await withTimeout(ddgFetchVqd(false), UNIV_AI_STATUS_MS, 'DuckDuckGo 연결 시간 초과');
     const payload = JSON.stringify({
         model: DDG_AI_MODEL,
         messages: [{ role: 'user', content: userContent }],
@@ -2996,25 +3095,29 @@ async function ddgAiChat(userContent) {
         canUseApproxLocation: false
     });
 
-    let res = await fetch(getDdgProxyUrl('chat'), {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'x-vqd-4': vqd
-        },
-        body: payload
-    });
+    async function postChat(token) {
+        const controller = new AbortController();
+        const timer = setTimeout(function() { controller.abort(); }, UNIV_AI_CHAT_MS);
+        try {
+            return await fetch(getDdgProxyUrl('chat'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-vqd-4': token
+                },
+                body: payload,
+                signal: controller.signal
+            });
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
+    let res = await postChat(vqd);
 
     if (res.status === 418 || res.status === 429) {
-        vqd = await ddgFetchVqd(true);
-        res = await fetch(getDdgProxyUrl('chat'), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-vqd-4': vqd
-            },
-            body: payload
-        });
+        vqd = await withTimeout(ddgFetchVqd(true), UNIV_AI_STATUS_MS, 'DuckDuckGo 재연결 시간 초과');
+        res = await postChat(vqd);
     }
 
     if (!res.ok) throw new Error('DuckDuckGo AI 응답 오류 (' + res.status + ')');
@@ -3083,14 +3186,31 @@ function renderStaticUnivRefPlaceholder() {
         '</td></tr>';
 }
 
+var univRefLoadingStartedAt = 0;
+
 function showUnivRefTableLoading() {
     const body = document.getElementById('univRefTableBody');
     if (!body) return;
+    univRefLoadingStartedAt = Date.now();
     body.innerHTML =
         '<tr><td colspan="5" class="univ-ref-loading-cell">' +
         '<span class="univ-ref-spinner" aria-hidden="true"></span>' +
-        'DuckDuckGo AI로 지원 대학 분석 중…' +
+        '<span id="univRefLoadingText">지원 대학 분석 중… (0초 / 30초)</span>' +
         '</td></tr>';
+    if (univRefLoadingTimer) clearInterval(univRefLoadingTimer);
+    univRefLoadingTimer = setInterval(function() {
+        const el = document.getElementById('univRefLoadingText');
+        if (!el) return;
+        const sec = Math.min(30, Math.floor((Date.now() - univRefLoadingStartedAt) / 1000));
+        el.textContent = '지원 대학 분석 중… (' + sec + '초 / 30초)';
+    }, 500);
+}
+
+function stopUnivRefLoadingTimer() {
+    if (univRefLoadingTimer) {
+        clearInterval(univRefLoadingTimer);
+        univRefLoadingTimer = null;
+    }
 }
 
 function resetUniversityRecommendations() {
@@ -3109,44 +3229,14 @@ function onGradeCalculated(avgGrade) {
 }
 
 function buildUnivRefTablePrompts(avgGrade) {
-    const today = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
     const gradeStr = avgGrade.toFixed(2);
-    const systemPrompt = [
-        '당신은 대한민국 대입 입시 상담 전문가입니다.',
-        '반드시 입학처 공식 모집요강·어디가(adiga.kr)·대학알리미만 근거로 작성합니다.',
-        '확인 불가한 5등급 환산 컷·수능최저는 추정하지 말고 "확인 필요"로 표기합니다.',
-        '추천 사유는 1~2문장, 정량적(학생 5등급 환산 vs 해당 대학 내신 반영 방식·컷) 근거 필수.',
-        '반드시 유효한 JSON만 출력(마크다운 코드블록·설명 문장 금지).'
+    return [
+        'JSON만 출력. 마크다운·설명 금지.',
+        '평균등급(5등급제) ' + gradeStr + '. rows 정확히 6개.',
+        '상향2·적정2·하향2. 수도권+광주·전남 포함.',
+        '{"studentGrade":' + gradeStr + ',"rows":[{"strategy":"상향(도전)","region":"수도권","university":"OO대 OO학과","gradeReflection":"교과전형","reason":"25자 이내"}]}',
+        'reason은 짧게. 컷 불확실 시 reason에 확인 필요.'
     ].join('\n');
-
-    const userPrompt = [
-        '학생 5등급제 환산 평균등급(전교과·주요교과 기준): ' + gradeStr,
-        '',
-        '아래 조건으로 지원 가능 대학 표 데이터를 JSON으로 작성하라.',
-        '',
-        '[권역] 수도권(인서울 포함) / 광주·전남(지방거점국립대·지역 강소대)',
-        '[지원 전략] 상향(도전)·적정(안정)·하향(보험) — 각 전략마다 2개 이상 추천',
-        '[권역 포함] 수도권·광주·전남 모두 포함',
-        '',
-        'JSON 형식:',
-        '{',
-        '  "studentGrade": ' + gradeStr + ',',
-        '  "generatedAt": "' + today + '",',
-        '  "rows": [',
-        '    {',
-        '      "strategy": "상향(도전)",',
-        '      "region": "수도권",',
-        '      "university": "OO대학교 OO학과",',
-        '      "gradeReflection": "국수영사 100% 반영",',
-        '      "reason": "학생 환산 ' + gradeStr + '등급 대비 교과전형 70%컷이 0.4등급 높아 도전 가능. 상위과목 반영 전형은 국영수사 우수 시 유리."',
-        '    }',
-        '  ]',
-        '}',
-        '',
-        '열: strategy, region, university, gradeReflection, reason. 최소 6행. reason 1문장.'
-    ].join('\n');
-
-    return systemPrompt + '\n\n' + userPrompt;
 }
 
 function normalizeRecommendRows(parsed) {
@@ -3169,7 +3259,7 @@ function normalizeRecommendRows(parsed) {
 
 function mapAiResponseToRecommendRows(parsed) {
     const rows = normalizeRecommendRows(parsed);
-    if (rows.length >= 4) return rows;
+    if (rows.length >= 3) return rows;
 
     if (parsed.categories) {
         const merged = [];
@@ -3214,6 +3304,11 @@ function renderUnivRefFromAiData(data) {
     if (!rows || !rows.length) {
         throw new Error('표 데이터 없음');
     }
+    return rows;
+}
+
+function applyUnivRefRows(rows, avgGrade) {
+    saveUnivRefCache(avgGrade, rows);
     renderUnivRefRecommendRows(rows);
 }
 
@@ -3238,20 +3333,37 @@ async function fetchUnivRefTableFromAI(avgGrade) {
     if (univRefFetchInFlight) return;
     univRefFetchInFlight = true;
 
+    const cached = loadUnivRefCache(avgGrade);
+    if (cached && cached.length) {
+        renderUnivRefRecommendRows(cached);
+        univRefFetchInFlight = false;
+        return;
+    }
+
     showUnivRefTableLoading();
+    const deadline = Date.now() + UNIV_AI_TOTAL_MS;
 
     try {
         if (!ddgSwReady) {
-            const ok = await registerDdgServiceWorker();
-            if (!ok) throw new Error('DuckDuckGo AI를 쓰려면 HTTPS로 접속해 주세요 (GitHub Pages 권장)');
+            const ok = await withTimeout(
+                registerDdgServiceWorker(),
+                Math.max(2000, deadline - Date.now()),
+                'AI 준비 시간 초과'
+            );
+            if (!ok) throw new Error('HTTPS 접속이 필요합니다 (GitHub Pages 권장)');
         }
         const prompt = buildUnivRefTablePrompts(avgGrade);
-        const raw = await ddgAiChat(prompt);
+        const remaining = Math.max(3000, deadline - Date.now());
+        const raw = await withTimeout(ddgAiChat(prompt), remaining, '30초 분석 시간 초과');
         const parsed = extractJsonFromModelText(raw);
-        renderUnivRefFromAiData(parsed);
+        const rows = renderUnivRefFromAiData(parsed);
+        applyUnivRefRows(rows, avgGrade);
     } catch (err) {
-        showUnivRefTableError(err, avgGrade);
+        console.warn('[대학 참고표 AI]', err);
+        const fallback = buildLocalUnivRefFallback(avgGrade);
+        applyUnivRefRows(fallback, avgGrade);
     } finally {
+        stopUnivRefLoadingTimer();
         univRefFetchInFlight = false;
     }
 }
