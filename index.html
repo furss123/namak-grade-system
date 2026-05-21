@@ -1265,7 +1265,7 @@
         }
         .page-2.p2-opt-count-1 #distributionTable th,
         .page-2.p2-opt-count-1 #distributionTable td {
-            font-size: calc(10px + 4.5pt);
+            font-size: calc(10px + 5.5pt);
         }
         .page-2.p2-opt-count-1 .univ-ref-table th,
         .page-2.p2-opt-count-1 .univ-ref-table td {
@@ -1290,7 +1290,7 @@
         }
         .page-2.p2-opt-count-2 #distributionTable th,
         .page-2.p2-opt-count-2 #distributionTable td {
-            font-size: calc(8.5px + 4.5pt);
+            font-size: calc(8.5px + 5.5pt);
         }
         .page-2.p2-opt-count-2 .univ-ref-table th,
         .page-2.p2-opt-count-2 .univ-ref-table td {
@@ -1332,7 +1332,7 @@
         .page-2 #distributionTable th,
         .page-2 #distributionTable td {
             padding: 4px 3px;
-            font-size: calc(10px + 4.5pt);
+            font-size: calc(10px + 5.5pt);
             line-height: 1.3;
             border-color: #dce4ee;
         }
@@ -1344,7 +1344,7 @@
         }
         .page-2 #distributionTable .symbol-up,
         .page-2 #distributionTable .symbol-down {
-            font-size: calc(12px + 4.5pt);
+            font-size: calc(12px + 5.5pt);
             font-weight: 800;
             width: auto;
         }
@@ -1392,9 +1392,9 @@
             padding: var(--radar-chart-pad-y) 2.5mm;
             box-sizing: border-box;
             width: 100%;
-            height: var(--radar-panel-h);
+            height: auto;
             min-height: var(--radar-panel-h);
-            max-height: var(--radar-panel-h);
+            align-self: stretch;
         }
         .page-1 .report-radar-chart svg {
             width: 100%;
@@ -1419,9 +1419,9 @@
             flex-direction: column;
             min-width: 0;
             width: 100%;
-            height: var(--radar-panel-h);
+            height: auto;
             min-height: var(--radar-panel-h);
-            max-height: var(--radar-panel-h);
+            align-self: stretch;
         }
         .page-1 .report-grade-goal-panel {
             --goal-font-caption: calc(var(--rpt-font-caption) + 3pt);
@@ -1429,20 +1429,18 @@
             --goal-cell-pad-y: 3.7mm;
             display: flex;
             flex-direction: column;
-            height: 100%;
-            min-height: 0;
+            height: auto;
+            flex: 1 1 auto;
             border: 1px solid #d4dde8;
             border-radius: 5px;
-            overflow: hidden;
+            overflow: visible;
             background: #fff;
             box-sizing: border-box;
         }
         .page-1 #gradeRadarSummary {
-            flex: 1;
-            min-height: 0;
-            overflow: hidden;
-            display: flex;
-            align-items: stretch;
+            flex: 0 0 auto;
+            overflow: visible;
+            display: block;
         }
         .page-1 .report-grade-goal-panel .panel-caption {
             flex-shrink: 0;
@@ -1461,13 +1459,13 @@
         }
         .page-1 .report-grade-goal-table {
             width: 100%;
-            height: 100%;
+            height: auto;
             border-collapse: collapse;
             table-layout: fixed;
         }
         .page-1 .report-grade-goal-table thead tr,
         .page-1 .report-grade-goal-table tbody tr {
-            height: 1px;
+            height: auto;
         }
         .page-1 .report-grade-goal-table .col-subject { width: 26%; }
         .page-1 .report-grade-goal-table .col-grade { width: 18%; }
@@ -1676,13 +1674,20 @@
             border: 1px solid #e8edf4;
             border-radius: 4px;
         }
+        .page-1 .score-grade-manuals {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2mm;
+            margin: var(--report-block-gap) 0 0;
+            width: 100%;
+        }
         .page-1 .score-grade-manual {
             display: flex;
             flex-wrap: wrap;
             align-items: center;
             justify-content: flex-start;
             gap: 1.2mm 3mm;
-            margin: var(--report-block-gap) 0 0;
+            margin: 0;
             padding: 1.6mm 2.5mm;
             width: 100%;
             box-sizing: border-box;
@@ -2253,18 +2258,26 @@
                 <tbody>
                     <tr id="rowUnit"><th class="row-label">단위수</th></tr>
                     <tr id="rowScore"><th class="row-label">원점수</th></tr>
-                    <tr id="rowRank"><th class="row-label">석차(동석차수)</th></tr>
+                    <tr id="rowRank"><th class="row-label">석차</th></tr>
                     <tr id="rowGrade" style="font-weight: bold;"><th class="row-label">등급</th></tr>
                     <tr id="rowDiffUp"><th class="row-label">윗등급 차</th></tr>
                     <tr id="rowDiffDown"><th class="row-label">아랫등급 차</th></tr>
                 </tbody>
             </table>
             </div>
+            <div class="score-grade-manuals">
+            <div class="score-grade-manual" role="note" aria-label="석차 표기 안내">
+                <span class="score-grade-manual-label">석차 표기</span>
+                <span class="score-grade-manual-sample" aria-hidden="true"><span class="g5">6</span><span class="g9">(3)</span></span>
+                <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 석차</span>
+                <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 동석차수</span>
+            </div>
             <div class="score-grade-manual" role="note" aria-label="등급 표기 안내">
                 <span class="score-grade-manual-label">등급 표기</span>
                 <span class="score-grade-manual-sample" aria-hidden="true"><span class="g5">3</span><span class="g9">(4)</span></span>
                 <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 5등급제(고교학점제)</span>
                 <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 9등급제 상대평가(중간석차·누적 백분율)</span>
+            </div>
             </div>
             </div>
             </section>
@@ -5002,7 +5015,7 @@ function resetMainTables() {
     document.getElementById('distTableHead').innerHTML = '<th class="row-label" style="width: 12%;">구분</th>';
     document.getElementById('rowUnit').innerHTML = '<th class="row-label">단위수</th>'; 
     document.getElementById('rowScore').innerHTML = '<th class="row-label">원점수</th>';
-    document.getElementById('rowRank').innerHTML = '<th class="row-label">석차(동석차수)</th>'; 
+    document.getElementById('rowRank').innerHTML = '<th class="row-label">석차</th>'; 
     document.getElementById('rowGrade').innerHTML = '<th class="row-label">등급</th>';
     document.getElementById('rowDiffUp').innerHTML = '<th class="row-label">윗등급 차</th>'; 
     document.getElementById('rowDiffDown').innerHTML = '<th class="row-label">아랫등급 차</th>';
