@@ -1473,7 +1473,7 @@
             padding: var(--radar-chart-pad-y) 2.5mm;
             box-sizing: border-box;
             width: 100%;
-            height: auto;
+            height: var(--radar-panel-h);
             min-height: var(--radar-panel-h);
             align-self: stretch;
         }
@@ -1505,12 +1505,12 @@
             align-self: stretch;
         }
         .page-1 .report-grade-goal-panel {
-            --goal-font-caption: var(--rpt-font-sm);
-            --goal-font-cell: var(--rpt-font-base);
-            --goal-cell-pad-y: calc(var(--rpt-cell-pad-y) + 0.65mm);
+            --goal-font-caption: calc(var(--rpt-font-sm) + 0.5pt);
+            --goal-font-cell: calc(var(--rpt-font-base) + 1pt);
+            --goal-cell-pad-y: calc(var(--rpt-cell-pad-y) + 1.1mm);
             display: flex;
             flex-direction: column;
-            height: 100%;
+            height: var(--radar-panel-h);
             min-height: var(--radar-panel-h);
             flex: 1 1 auto;
             border: 1px solid #d4dde8;
@@ -1519,8 +1519,14 @@
             background: #fff;
             box-sizing: border-box;
         }
+        .page-1.p1-opt-count-1 .report-grade-goal-panel {
+            --goal-cell-pad-y: calc(var(--rpt-cell-pad-y) + 1.45mm);
+        }
+        .page-1.p1-opt-count-2 .report-grade-goal-panel {
+            --goal-cell-pad-y: calc(var(--rpt-cell-pad-y) + 0.85mm);
+        }
         .page-1 #gradeRadarSummary {
-            flex: 1 1 auto;
+            flex: 1 1 0;
             min-height: 0;
             overflow: hidden;
             display: flex;
@@ -1546,17 +1552,34 @@
             width: 100%;
             height: 100%;
             flex: 1 1 auto;
+            min-height: 0;
             border-collapse: collapse;
+            table-layout: fixed;
+            display: flex;
+            flex-direction: column;
+        }
+        .page-1 .report-grade-goal-table thead {
+            flex-shrink: 0;
+            display: table;
+            width: 100%;
             table-layout: fixed;
         }
         .page-1 .report-grade-goal-table tbody {
-            height: 100%;
+            flex: 1 1 auto;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            height: auto;
         }
         .page-1 .report-grade-goal-table thead tr {
             height: auto;
         }
         .page-1 .report-grade-goal-table tbody tr {
-            height: calc(100% / 6);
+            flex: 1 1 0;
+            display: table;
+            width: 100%;
+            table-layout: fixed;
+            min-height: 0;
         }
         .page-1 .report-grade-goal-table .col-subject { width: 26%; }
         .page-1 .report-grade-goal-table .col-grade { width: 18%; }
@@ -1575,6 +1598,7 @@
             background: var(--school-navy-dark);
             color: #fff;
             font-weight: 600;
+            font-size: var(--goal-font-cell);
             border-color: #1a3352;
             vertical-align: middle;
         }
@@ -2408,13 +2432,21 @@
             </table>
             </div>
             <div class="score-grade-manuals">
-            <div class="score-grade-manual-block" role="note" aria-label="석차·윗등급 차 안내">
+            <div class="score-grade-manual-block" role="note" aria-label="석차·등급·윗등급 차 안내">
                 <div class="score-grade-manual-row">
                     <span class="score-grade-manual-label">석차 표기</span>
                     <span class="score-grade-manual-sample" aria-hidden="true"><span class="g5">6</span><span class="g9">(3)</span></span>
                     <div class="score-grade-manual-desc">
                         <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 석차</span>
                         <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 동석차</span>
+                    </div>
+                </div>
+                <div class="score-grade-manual-row" role="note" aria-label="등급 표기 안내">
+                    <span class="score-grade-manual-label">등급 표기</span>
+                    <span class="score-grade-manual-sample" aria-hidden="true"><span class="g5">3</span><span class="g9">(4)</span></span>
+                    <div class="score-grade-manual-desc">
+                        <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 고교학점제 5등급제</span>
+                        <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 9등급제 상대평가(중간석차·누적백분율)</span>
                     </div>
                 </div>
                 <div class="score-grade-manual-row">
