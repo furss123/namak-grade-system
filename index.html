@@ -541,6 +541,25 @@
             padding-top: calc(11px - 0.5mm);
             padding-bottom: calc(11px - 0.5mm);
         }
+        .query-card-single .query-card-title,
+        .query-card-print .query-card-title {
+            font-size: calc(var(--text-base) + 1pt);
+        }
+        .query-card-single .query-card-desc {
+            font-size: calc(var(--text-sm) + 1pt);
+        }
+        .query-card-single .input-area input {
+            font-size: calc(var(--text-md) + 1pt);
+        }
+        .query-card-single .search-btn {
+            font-size: calc(var(--text-base) + 1pt);
+        }
+        .query-card-print .print-options-page-label {
+            font-size: calc(var(--text-sm) + 1pt);
+        }
+        .query-card-print .print-opt-label {
+            font-size: var(--text-sm);
+        }
         .query-card-print { margin-bottom: 0; }
         .print-options-pages {
             display: grid;
@@ -2070,7 +2089,7 @@
                     </div>
                     <div class="upload-guide-content">
                         <span class="upload-panel-head">사용 방법</span>
-                        <p class="upload-guide-desc">나이스에서 반별 전과목 결과를 「보고서 형태 유지」 해제 후 받은 엑셀을 한번에 업로드 가능</p>
+                        <p class="upload-guide-desc">나이스에서 반별 전과목 결과를 「보고서 형태 유지」 해제 후 받은 엑셀을 한 번에 업로드할 수 있습니다.</p>
                         <ul class="upload-guide-list">
                             <li>저장 시 <strong>보고서 형태 유지</strong> 체크 해제</li>
                             <li>반별 파일을 여러 개 선택해 한 번에 등록 가능</li>
@@ -2084,7 +2103,7 @@
         <section class="panel-section">
             <div class="section-label">학생 성적 조회</div>
             <div class="query-layout">
-                <div class="query-card">
+                <div class="query-card query-card-single">
                     <div class="query-card-title">단일 학생 조회</div>
                     <p class="query-card-desc">4자리 학번을 입력한 뒤 조회합니다.</p>
                     <div class="input-area">
@@ -2102,9 +2121,9 @@
 
                 <div class="query-card">
                     <div class="query-card-title">반 조회</div>
-                    <p class="query-card-desc">업로드된 엑셀에서 학년·반을 자동 인식합니다. (배부용 · 반 전원)</p>
+                    <p class="query-card-desc">업로드된 엑셀에서 학년·반을 자동 인식합니다. (배부용·반 전원)</p>
                     <div class="input-area">
-                        <select id="classSelect" class="query-select" disabled aria-label="학년 반 선택">
+                        <select id="classSelect" class="query-select" disabled aria-label="학년·반 선택">
                             <option value="">엑셀 등록 후 선택</option>
                         </select>
                         <button type="button" class="search-btn search-btn-range" onclick="searchClassStudents()">
@@ -2138,7 +2157,7 @@
                         <div class="print-options-grid">
                             <label class="print-opt-label" for="printOptDist">
                                 <input type="checkbox" id="printOptDist" checked>
-                                <span>상하위 10명 성적분포</span>
+                                <span>상하위 10명 성적 분포</span>
                             </label>
                             <label class="print-opt-label print-opt-hidden" for="printOptUniv" hidden>
                                 <input type="checkbox" id="printOptUniv">
@@ -2173,7 +2192,7 @@
             </div>
 
             <div class="stats-grade-dist" id="statsGradeDist">
-                <h3 class="stats-grade-dist-heading">1. 학년 전체 등급 분포 그래프</h3>
+                <h3 class="stats-grade-dist-heading">1학년 전체 등급 분포 그래프</h3>
                 <div class="stats-grade-dist-chart" id="statsGradeDistChart"></div>
                 <p class="stats-grade-dist-note" id="statsGradeDistNote"></p>
             </div>
@@ -2229,8 +2248,8 @@
             </div>
             <div class="report-panel report-panel-student">
             <div class="student-info">
-                <div id="infoStudentText">학생 정보 로딩중...</div>
-                <div class="avg-grade-pill">평균등급 <span id="infoAvgGrade" class="info-avg-grade">0.00</span></div>
+                <div id="infoStudentText">학생 정보 로딩 중…</div>
+                <div class="avg-grade-pill">평균 등급 <span id="infoAvgGrade" class="info-avg-grade">0.00</span></div>
             </div>
             </div>
             <div class="report-zone report-zone-maxcut report-block report-block-maxcut">
@@ -2313,7 +2332,7 @@
             <section class="report-zone report-zone-dist">
             <div class="page-doc-header">
                 <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
-                <h1 id="distPageTitle">상하위 10명 성적분포</h1>
+                <h1 id="distPageTitle">상하위 10명 성적 분포</h1>
             </div>
             <p id="distTableNote" class="dist-table-note">(※ 동일 점수는 괄호 안 인원으로 표시)</p>
             <div class="report-panel">
@@ -2776,7 +2795,7 @@ function validatePrintOptions(options) {
     const opts = options || {};
     const printOpts = getPrintOptions();
     if (printOpts.score || printOpts.radar || printOpts.dist || printOpts.univ) return true;
-    if (!opts.silent) alert('인쇄할 항목을 하나 이상 선택해주세요.');
+    if (!opts.silent) alert('인쇄할 항목을 하나 이상 선택해 주세요.');
     return false;
 }
 
@@ -4322,7 +4341,7 @@ function getActiveReportAvgGrade() {
 async function runPerplexityUnivAnalysis() {
     const avgGrade = getActiveReportAvgGrade();
     if (avgGrade == null) {
-        alert('먼저 학생을 조회해주세요.');
+        alert('먼저 학생을 조회해 주세요.');
         return;
     }
     const btn = document.getElementById('univRefPerplexityBtn');
@@ -4520,7 +4539,7 @@ function populateDistributionTable(studentIdStr, subjects, studentName) {
     const DIST_NEARBY = 10;
     const displayName = normalizeDistStudentName(studentName);
     const distTitle = document.getElementById('distPageTitle');
-    if (distTitle) distTitle.textContent = `${displayName} · 상하위 10명 성적분포`;
+    if (distTitle) distTitle.textContent = `${displayName} · 상하위 10명 성적 분포`;
 
     const distBody = document.getElementById('distTableBody');
     if (!distBody) return;
@@ -4600,7 +4619,7 @@ function populateTemplate(studentIdStr, options) {
     let sClass = student['반'] || Number(strId.substring(1, strId.length - 2));
     let sNum = student['번호'] || Number(strId.substring(strId.length - 2));
 
-    document.getElementById('infoStudentText').textContent = `${sGrade}학년 ${sClass}반 ${sNum}번 이름 ${student['이름']} 학생의 성적`;
+    document.getElementById('infoStudentText').textContent = `${sGrade}학년 ${sClass}반 ${sNum}번 ${student['이름']}`;
     resetMainTables();
 
     const studentName = student['이름'] || '학생';
@@ -4929,7 +4948,7 @@ function appendReportsToPrintContainer(studentIds, printOpts) {
 function printSelectedReport() {
     const printContainer = document.getElementById('printContainer');
     if (!printContainer || !printContainer.children.length) {
-        alert('먼저 학생을 조회해주세요.');
+        alert('먼저 학생을 조회해 주세요.');
         return;
     }
     if (!validatePrintOptions()) return;
@@ -4939,7 +4958,7 @@ function printSelectedReport() {
 function searchSingleStudent(studentIdOverride, options) {
     const opts = options || {};
     if (!isFileUploaded || studentData.length === 0) {
-        if (!opts.silent) alert("엑셀 성적 파일을 먼저 등록해주세요.");
+        if (!opts.silent) alert('엑셀 성적 파일을 먼저 등록해 주세요.');
         return false;
     }
     if (!validatePrintOptions(opts)) return false;
@@ -4947,13 +4966,13 @@ function searchSingleStudent(studentIdOverride, options) {
     const rawId = (studentIdOverride != null ? String(studentIdOverride) : (studentEl ? studentEl.value.trim() : ''));
     const studentId = normalizeStudentId(rawId);
     if (!studentId || studentId.length !== 4) {
-        if (!opts.silent) alert("4자리 학번을 입력해주세요.");
+        if (!opts.silent) alert('4자리 학번을 입력해 주세요.');
         return false;
     }
     if (studentEl) studentEl.value = studentId;
     const printOpts = getPrintOptions();
     if (!populateTemplate(studentId, { includeDistribution: printOpts.dist })) {
-        if (!opts.silent) alert("해당 학번의 학생을 찾을 수 없습니다.");
+        if (!opts.silent) alert('해당 학번의 학생을 찾을 수 없습니다.');
         return false;
     }
     appendReportsToPrintContainer([studentId], printOpts);
@@ -4966,14 +4985,14 @@ function searchSingleStudent(studentIdOverride, options) {
 function searchClassStudents(options) {
     const opts = options || {};
     if (!isFileUploaded || studentData.length === 0) {
-        if (!opts.silent) alert("엑셀 성적 파일을 먼저 등록해주세요.");
+        if (!opts.silent) alert('엑셀 성적 파일을 먼저 등록해 주세요.');
         return false;
     }
     if (!validatePrintOptions(opts)) return false;
     const classSel = document.getElementById('classSelect');
     const classKey = classSel ? classSel.value : '';
     if (!classKey) {
-        if (!opts.silent) alert("반을 선택해주세요.");
+        if (!opts.silent) alert('반을 선택해 주세요.');
         return false;
     }
     const targetStudents = getStudentsInClass(classKey);
@@ -5022,7 +5041,7 @@ function resetMainTables() {
     if (radarSvg) radarSvg.innerHTML = '';
     if (radarSummary) radarSummary.innerHTML = '';
     const distTitle = document.getElementById('distPageTitle');
-    if (distTitle) distTitle.textContent = '상하위 10명 성적분포';
+    if (distTitle) distTitle.textContent = '상하위 10명 성적 분포';
     const distBody = document.getElementById('distTableBody');
     if (distBody) distBody.innerHTML = '';
     const distNote = document.getElementById('distTableNote');
