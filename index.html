@@ -1314,7 +1314,7 @@
         .page-2 .dist-table-note {
             margin: 0;
             text-align: right;
-            font-size: calc(9px + 2.5pt);
+            font-size: calc(9px + 2pt);
             color: var(--school-muted);
             font-weight: 600;
             line-height: 1.35;
@@ -4517,7 +4517,6 @@ function fitDistStudentNameLabel(wrap) {
 
 function populateDistributionTable(studentIdStr, subjects, studentName) {
     const DIST_NEARBY = 10;
-    const displayName = normalizeDistStudentName(studentName);
     const distTitle = document.getElementById('distPageTitle');
     if (distTitle) distTitle.textContent = '상·하위 10명 성적 분포';
 
@@ -4549,9 +4548,7 @@ function populateDistributionTable(studentIdStr, subjects, studentName) {
 
     const distNote = document.getElementById('distTableNote');
     if (distNote) {
-        distNote.textContent =
-            '(※ 동일 점수는 괄호 안 인원으로 표시 · ' + displayName +
-            ' 기준 위로 오름차순, 아래로 내림차순 · 상·하위 ' + DIST_NEARBY + '구간)';
+        distNote.textContent = '(※ 동일 점수는 괄호 안 인원으로 표시)';
     }
 
     const myTr = document.createElement('tr');
