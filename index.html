@@ -1174,264 +1174,57 @@
             }
         }
 
-        #rec-trigger-wrap {
-            display: none;
-            margin-top: 20px;
-            text-align: center;
-        }
-        #rec-trigger-btn {
-            padding: 10px 24px;
-            font-size: calc(14px + 1pt);
-            font-weight: 700;
-            font-family: inherit;
-            background: linear-gradient(180deg, #4a7ab0 0%, var(--school-navy) 100%);
-            color: #fff;
-            border: none;
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            box-shadow: var(--shadow-sm);
-            transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease);
-        }
-        #rec-trigger-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(30, 58, 95, 0.28);
-        }
-        #univ-recommend-section {
-            display: none;
-            margin-top: 1.25rem;
-            padding: 1.5rem;
-            border-top: 2px solid var(--school-border);
-            background: var(--school-card);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--school-border-light);
-            box-shadow: var(--shadow-md);
-            font-family: inherit;
-        }
-        .rec-header h2 {
-            font-size: calc(1rem + 2pt);
-            font-weight: 700;
-            color: var(--school-navy-dark);
-            margin: 0 0 0.5rem;
-        }
-        .rec-meta {
+        .page-1 .univ-ref-ai-bar {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: 6px 10px;
             align-items: center;
-            margin-bottom: 0.75rem;
+            margin: 0 0 6px;
+            font-size: calc(10px + 1pt);
+            font-weight: 600;
+            color: var(--school-navy-dark);
         }
-        .rec-grade-badge {
+        .page-1 .univ-ref-ai-pill {
             background: var(--school-navy);
             color: #fff;
-            padding: 2px 10px;
+            padding: 2px 8px;
             border-radius: 999px;
-            font-weight: 700;
-            font-size: calc(12px + 1pt);
         }
-        .rec-source-badge {
+        .page-1 .univ-ref-ai-pill.muted {
             background: #f3f4f6;
             color: #374151;
-            padding: 2px 10px;
-            border-radius: 999px;
-            font-size: calc(11px + 1pt);
-            font-weight: 600;
         }
-        .rec-provider-badge {
+        .page-1 .univ-ref-ai-pill.ok {
             background: #ecfdf5;
             color: #047857;
-            padding: 2px 10px;
-            border-radius: 999px;
-            font-size: calc(11px + 1pt);
-            font-weight: 600;
         }
-        .rec-tabs {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+        .page-1 .univ-ref-ai-pill.warn {
+            background: #fef2f2;
+            color: #b91c1c;
         }
-        .rec-tab {
-            padding: 6px 18px;
-            border-radius: 8px;
-            border: 1px solid #d1d5db;
-            background: #fff;
-            cursor: pointer;
-            font-size: calc(12px + 1pt);
-            font-weight: 600;
-            font-family: inherit;
-            transition: all 0.2s var(--ease);
-        }
-        .rec-tab.active {
-            background: var(--school-navy);
-            color: #fff;
-            border-color: var(--school-navy);
-        }
-        .rec-card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1rem;
-        }
-        .rec-card {
-            border-radius: 10px;
-            padding: 1rem;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-        }
-        .rec-card-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 0.5rem;
-            margin-bottom: 0.25rem;
-        }
-        .rec-badge {
-            color: #fff;
-            padding: 2px 8px;
-            border-radius: 999px;
-            font-size: calc(10px + 1pt);
-            font-weight: 700;
-            flex-shrink: 0;
-        }
-        .rec-univ-name {
-            font-weight: 700;
-            font-size: calc(13px + 1pt);
-            color: var(--school-navy-dark);
-        }
-        .rec-dept {
-            font-size: calc(11px + 1pt);
-            color: #6b7280;
-            display: block;
-        }
-        .rec-card-sub {
-            font-size: calc(10px + 1pt);
-            color: #9ca3af;
-            margin-bottom: 0.75rem;
-        }
-        .rec-grade-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            background: #fff;
-            border-radius: 8px;
-            padding: 0.5rem;
-            margin-bottom: 0.75rem;
+        .page-1 .univ-ref-loading-cell {
             text-align: center;
-            gap: 0.25rem;
-        }
-        .rec-grade-label {
-            font-size: calc(10px + 1pt);
-            color: #9ca3af;
-            margin-bottom: 2px;
-        }
-        .rec-grade-value {
-            font-size: calc(12px + 1pt);
+            padding: 18px 8px !important;
+            color: #6b7280;
             font-weight: 600;
         }
-        .rec-grade-value.primary {
-            color: #d97706;
-            font-size: calc(13px + 1pt);
-        }
-        .rec-grade-value.muted {
-            color: #6b7280;
-            font-weight: 400;
-        }
-        .rec-grade-value.blue {
-            color: #2563eb;
-        }
-        .rec-info-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-            margin-bottom: 0.75rem;
-        }
-        .rec-info-chip {
-            font-size: calc(10px + 1pt);
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-weight: 600;
-        }
-        .rec-info-chip.suneung {
-            background: #eff6ff;
-            color: #1d4ed8;
-        }
-        .rec-info-chip.supplement {
-            background: #f0fdf4;
-            color: #16a34a;
-        }
-        .rec-info-chip.competition {
-            background: #fff7ed;
-            color: #c2410c;
-        }
-        .rec-source-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 4px;
-            font-size: calc(10px + 1pt);
-            color: #9ca3af;
-            margin-bottom: 0.5rem;
-        }
-        .rec-conf-text {
-            font-family: ui-monospace, monospace;
-            font-size: calc(9px + 1pt);
-        }
-        .rec-tip {
-            font-size: calc(11px + 1pt);
-            color: #374151;
-            background: #fff;
-            border-radius: 6px;
-            padding: 6px 10px;
-            line-height: 1.5;
-            margin: 0;
-        }
-        .rec-loading {
-            text-align: center;
-            padding: 3rem;
-            color: #6b7280;
-        }
-        .rec-spinner {
-            width: 40px;
-            height: 40px;
-            margin: 0 auto 1rem;
-            border: 4px solid #e5e7eb;
+        .page-1 .univ-ref-loading-cell .univ-ref-spinner {
+            display: inline-block;
+            width: 22px;
+            height: 22px;
+            margin-right: 8px;
+            vertical-align: middle;
+            border: 3px solid #e5e7eb;
             border-top-color: #2563eb;
             border-radius: 50%;
-            animation: rec-spin 0.8s linear infinite;
+            animation: univ-ref-spin 0.8s linear infinite;
         }
-        @keyframes rec-spin {
+        @keyframes univ-ref-spin {
             to { transform: rotate(360deg); }
         }
-        .rec-error {
-            text-align: center;
-            padding: 2rem;
-            color: #ef4444;
-        }
-        .rec-error button {
-            margin-top: 12px;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            background: var(--school-navy);
-            color: #fff;
-            font-weight: 600;
-            cursor: pointer;
-            font-family: inherit;
-        }
-        .rec-disclaimer {
-            margin-top: 1.5rem;
-            padding: 0.75rem 1rem;
-            background: #fffbeb;
-            border: 1px solid #fcd34d;
-            border-radius: 8px;
-            font-size: calc(11px + 1pt);
-            color: #92400e;
-            line-height: 1.6;
-        }
-        .rec-empty-tab {
-            grid-column: 1 / -1;
-            text-align: center;
-            padding: 2rem;
-            color: var(--school-muted);
-            font-weight: 600;
-        }
+        .page-1 .ref-cell-fit-up .univ-ref-grade { color: #b91c1c; }
+        .page-1 .ref-cell-fit-ok .univ-ref-grade { color: #c2410c; }
+        .page-1 .ref-cell-fit-safe .univ-ref-grade { color: #15803d; }
 
         @page {
             size: A4 portrait;
@@ -1520,10 +1313,6 @@
             #printContainer .page-1 .student-info {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
-            }
-            #univ-recommend-section,
-            #rec-trigger-wrap {
-                display: none !important;
             }
         }
     </style>
@@ -1663,33 +1452,6 @@
         </div>
     </div>
 
-    <div id="rec-trigger-wrap" class="no-print">
-        <button type="button" id="rec-trigger-btn">📌 내 등급 기반 추천 대학 보기</button>
-    </div>
-
-    <section id="univ-recommend-section" class="no-print" aria-label="AI 추천 대학">
-        <div class="rec-header">
-            <h2>📌 내 등급 기반 추천 대학</h2>
-            <div class="rec-meta">
-                <span class="rec-grade-badge">평균등급 <span id="rec-meta-grade">-</span></span>
-                <span class="rec-source-badge">🔵 2024학년도 공식 입시결과 기반</span>
-                <span class="rec-source-badge">📂 어디가·대학알리미·입학처 교차검증</span>
-                <span class="rec-provider-badge" id="rec-provider-badge">🤖 AI 자동 연결</span>
-            </div>
-        </div>
-        <div class="rec-tabs" id="rec-tabs" role="tablist">
-            <button type="button" class="rec-tab active" data-tab="insoul" role="tab" aria-selected="true">🏙 인서울</button>
-            <button type="button" class="rec-tab" data-tab="honam" role="tab" aria-selected="false">🌿 호남권</button>
-            <button type="button" class="rec-tab" data-tab="national" role="tab" aria-selected="false">🗺 전국지방</button>
-        </div>
-        <div class="rec-card-grid" id="rec-card-area" aria-live="polite"></div>
-        <p class="rec-disclaimer">
-            ⚠️ 본 추천은 2024학년도 실입시결과 기반이며 참고용입니다.<br>
-            반드시 해당 대학 입학처 공식 모집요강과 교차 확인하세요.<br>
-            모집인원·수능최저 변경 시 합격선이 달라질 수 있습니다.
-        </p>
-    </section>
-
     </div>
 
     <div id="printContainer"></div>
@@ -1785,6 +1547,10 @@
                 <span><span class="univ-ref-mark">⚫</span> 미공시·해당없음</span>
             </div>
             <p class="univ-ref-note">※ 등급란은 교과 5등급 기준 경쟁 참고치이며, 입학처가 과목별 5등급 컷을 별도 공시하지 않는 경우가 많습니다.</p>
+            <div class="univ-ref-ai-bar" id="univ-ref-ai-bar" aria-live="polite">
+                <span class="univ-ref-ai-pill">내 평균등급 <span id="univ-ref-student-grade">-</span></span>
+                <span class="univ-ref-ai-pill muted" id="univ-ref-ai-status">학생 조회 시 AI가 표를 자동 갱신합니다</span>
+            </div>
             <div class="report-panel">
             <table class="univ-ref-table" id="univRefTable">
                 <thead>
@@ -1799,69 +1565,9 @@
                 <tbody id="univRefTableBody"></tbody>
             </table>
             </div>
-            <p class="univ-ref-disclaimer">본 자료는 참고용이며, 실제 합격선은 경쟁률·지원자 수준에 따라 다를 수 있습니다. 반드시 각 대학 입학처 공식 자료를 확인하세요.</p>
+            <p class="univ-ref-disclaimer">본 자료는 참고용이며, 실제 합격선은 경쟁률·지원자 수준에 따라 다를 수 있습니다. AI 갱신 후에도 반드시 각 대학 입학처 공식 자료를 확인하세요.</p>
             </div>
             </section>
-            <script>
-            (function renderUnivRefTableOnly() {
-                var NONE = 'none';
-                var EST = 'estimate';
-                var OFF = 'official';
-                function cell(mark, grade, sub) {
-                    var cls = mark === OFF ? 'ref-cell-official' : (mark === EST ? 'ref-cell-estimate' : 'ref-cell-none');
-                    var markChar = mark === OFF ? '🔴' : (mark === EST ? '🟡' : '⚫');
-                    var gradeText = grade || '미공시';
-                    var subHtml = sub ? '<span class="univ-ref-sub">' + sub + '</span>' : '';
-                    return '<td class="' + cls + '"><span class="univ-ref-cell-inner"><span class="univ-ref-mark">' + markChar + '</span><span class="univ-ref-grade">' + gradeText + '</span>' + subHtml + '</span></td>';
-                }
-                var rows = [
-                    { name: '서울대', h: NONE, n: NONE, m: NONE, hG: '해당없음', nG: '해당없음', mG: '해당없음',
-                      note: '전형: 종합(지역/일반/기회균형)·교과전형 없음 · 수능최저: 전형별 적용 · 출처: 입학처 2026🔴' },
-                    { name: '연세대', h: EST, n: EST, m: EST, hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
-                      hG: '1~2등급', nG: '1~2등급', mG: '1등급',
-                      note: '전형: 교과우수자(추천/일반)·교과100% · 수능최저: 일반형 O · 출처: 2026모집요강🔴/경쟁참고 생글생글·교육비추다🟡' },
-                    { name: '고려대', h: EST, n: EST, m: EST, hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
-                      hG: '1~2등급', nG: '1~2등급', mG: '1~2등급',
-                      note: '전형: 학교추천(교과90%+서류10%) · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
-                    { name: '성균관대', h: EST, n: EST, m: EST, hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
-                      hG: '1~2등급', nG: '1~2등급', mG: '1~2등급',
-                      note: '전형: 교과(학교장추천) · 수능최저: O(등급합) · 출처: 입학처 2026🔴/교과등급 경쟁🟡' },
-                    { name: '한양대', h: EST, n: EST, m: EST, hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
-                      hG: '2등급 이내', nG: '2등급 이내', mG: '1~2등급',
-                      note: '전형: 교과(추천)·학종(추천) · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
-                    { name: '서강대', h: EST, n: EST, m: NONE, hSub: '참고용 추정', nSub: '참고용 추정',
-                      hG: '2등급 이내', nG: '2등급 이내', mG: '미공시',
-                      note: '전형: 교과·학종·지역균형 · 수능최저: 전형별 · 출처: 입학처 2026🔴/경쟁참고🟡' },
-                    { name: '중앙대', h: EST, n: EST, m: EST, hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
-                      hG: '2~3등급', nG: '2등급 이내', mG: '2등급 이내',
-                      note: '전형: 교과·학종 · 수능최저: 전형별 · 출처: 입학처 2026🔴/경쟁참고🟡' },
-                    { name: '경희대', h: EST, n: EST, m: EST, hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
-                      hG: '2~3등급', nG: '2~3등급', mG: '2~3등급',
-                      note: '전형: 교과·학종 · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
-                    { name: '이화여대', h: EST, n: NONE, m: EST, hSub: '참고용 추정', mSub: '참고용 추정',
-                      hG: '2등급 이내', nG: '미공시', mG: '2등급 이내',
-                      note: '전형: 교과(추천) · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
-                    { name: '한국외대', h: EST, n: NONE, m: NONE, hSub: '참고용 추정', hG: '2~3등급', nG: '미공시', mG: '미공시',
-                      note: '전형: 교과·학종 · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
-                    { name: '건국대(서울)', h: EST, n: EST, m: NONE, hSub: '참고용 추정', nSub: '참고용 추정',
-                      hG: '3등급 이내', nG: '3등급 이내', mG: '미공시',
-                      note: '전형: 교과·학종 · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
-                    { name: '동국대', h: EST, n: EST, m: NONE, hSub: '참고용 추정', nSub: '참고용 추정',
-                      hG: '3등급 이내', nG: '3등급 이내', mG: '미공시',
-                      note: '전형: 교과·학종 · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' }
-                ];
-                var body = document.getElementById('univRefTableBody');
-                if (!body) return;
-                body.innerHTML = rows.map(function(r) {
-                    return '<tr><th class="univ-name">' + r.name + '</th>' +
-                        cell(r.h, r.hG || '미공시', r.hSub) +
-                        cell(r.n, r.nG || '미공시', r.nSub) +
-                        cell(r.m, r.mG || '미공시', r.mSub) +
-                        '<td class="ref-note-cell">' + r.note + '</td></tr>';
-                }).join('');
-            })();
-            </script>
-            </div>
             <footer class="page-footer">
                 <p class="page-footer-num" aria-label="페이지 번호"></p>
             </footer>
@@ -2876,18 +2582,58 @@ function hideReportActionSection() {
     document.getElementById('reportActionSection').style.display = 'none';
 }
 
-/** 무료·저비용 상위 모델 우선 (Puter.js — API 키 불필요, 순차 자동 시도) */
+/** Puter.js — API 키 없이 순차 자동 시도 (사용자 지정 순서) */
 const REC_AI_PROVIDERS = [
     { id: 'perplexity', label: 'Perplexity', model: 'perplexity/sonar' },
+    { id: 'claude', label: 'Claude', model: 'anthropic/claude-sonnet-4-6' },
     { id: 'gemini', label: 'Gemini', model: 'google/gemini-2.5-flash' },
     { id: 'openai', label: 'ChatGPT', model: 'openai/gpt-4.1-mini' },
-    { id: 'claude', label: 'Claude', model: 'anthropic/claude-sonnet-4-6' },
     { id: 'deepseek', label: 'DeepSeek', model: 'deepseek/deepseek-v4-flash' }
 ];
 
+const UNIV_REF_MARK = { NONE: 'none', EST: 'estimate', OFF: 'official' };
+
+const UNIV_REF_STATIC_ROWS = [
+    { name: '서울대', h: 'none', n: 'none', m: 'none', hG: '해당없음', nG: '해당없음', mG: '해당없음',
+      note: '전형: 종합(지역/일반/기회균형)·교과전형 없음 · 수능최저: 전형별 적용 · 출처: 입학처 2026🔴' },
+    { name: '연세대', h: 'estimate', n: 'estimate', m: 'estimate', hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
+      hG: '1~2등급', nG: '1~2등급', mG: '1등급',
+      note: '전형: 교과우수자(추천/일반)·교과100% · 수능최저: 일반형 O · 출처: 2026모집요강🔴/경쟁참고🟡' },
+    { name: '고려대', h: 'estimate', n: 'estimate', m: 'estimate', hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
+      hG: '1~2등급', nG: '1~2등급', mG: '1~2등급',
+      note: '전형: 학교추천(교과90%+서류10%) · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
+    { name: '성균관대', h: 'estimate', n: 'estimate', m: 'estimate', hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
+      hG: '1~2등급', nG: '1~2등급', mG: '1~2등급',
+      note: '전형: 교과(학교장추천) · 수능최저: O(등급합) · 출처: 입학처 2026🔴/교과등급 경쟁🟡' },
+    { name: '한양대', h: 'estimate', n: 'estimate', m: 'estimate', hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
+      hG: '2등급 이내', nG: '2등급 이내', mG: '1~2등급',
+      note: '전형: 교과(추천)·학종(추천) · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
+    { name: '서강대', h: 'estimate', n: 'estimate', m: 'none', hSub: '참고용 추정', nSub: '참고용 추정',
+      hG: '2등급 이내', nG: '2등급 이내', mG: '미공시',
+      note: '전형: 교과·학종·지역균형 · 수능최저: 전형별 · 출처: 입학처 2026🔴/경쟁참고🟡' },
+    { name: '중앙대', h: 'estimate', n: 'estimate', m: 'estimate', hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
+      hG: '2~3등급', nG: '2등급 이내', mG: '2등급 이내',
+      note: '전형: 교과·학종 · 수능최저: 전형별 · 출처: 입학처 2026🔴/경쟁참고🟡' },
+    { name: '경희대', h: 'estimate', n: 'estimate', m: 'estimate', hSub: '참고용 추정', nSub: '참고용 추정', mSub: '참고용 추정',
+      hG: '2~3등급', nG: '2~3등급', mG: '2~3등급',
+      note: '전형: 교과·학종 · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
+    { name: '이화여대', h: 'estimate', n: 'none', m: 'estimate', hSub: '참고용 추정', mSub: '참고용 추정',
+      hG: '2등급 이내', nG: '미공시', mG: '2등급 이내',
+      note: '전형: 교과(추천) · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
+    { name: '한국외대', h: 'estimate', n: 'none', m: 'none', hSub: '참고용 추정',
+      hG: '2~3등급', nG: '미공시', mG: '미공시',
+      note: '전형: 교과·학종 · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
+    { name: '건국대(서울)', h: 'estimate', n: 'estimate', m: 'none', hSub: '참고용 추정', nSub: '참고용 추정',
+      hG: '3등급 이내', nG: '3등급 이내', mG: '미공시',
+      note: '전형: 교과·학종 · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' },
+    { name: '동국대', h: 'estimate', n: 'estimate', m: 'none', hSub: '참고용 추정', nSub: '참고용 추정',
+      hG: '3등급 이내', nG: '3등급 이내', mG: '미공시',
+      note: '전형: 교과·학종 · 수능최저: O · 출처: 입학처 2026🔴/경쟁참고🟡' }
+];
+
 let lastCalculatedAvgGrade = null;
-let lastRecommendationData = null;
-let activeRecTab = 'insoul';
+let lastUnivRefFetchKey = null;
+let univRefFetchInFlight = false;
 
 function escapeRecHtml(value) {
     return String(value ?? '')
@@ -2897,55 +2643,93 @@ function escapeRecHtml(value) {
         .replace(/"/g, '&quot;');
 }
 
+function normalizeUnivRefMark(mark) {
+    const m = String(mark || '').toLowerCase();
+    if (m === 'official' || m === 'off') return UNIV_REF_MARK.OFF;
+    if (m === 'estimate' || m === 'est') return UNIV_REF_MARK.EST;
+    return UNIV_REF_MARK.NONE;
+}
+
+function univRefMarkCell(mark, grade, sub, fitClass) {
+    const mk = normalizeUnivRefMark(mark);
+    const cls = mk === UNIV_REF_MARK.OFF ? 'ref-cell-official' : (mk === UNIV_REF_MARK.EST ? 'ref-cell-estimate' : 'ref-cell-none');
+    const markChar = mk === UNIV_REF_MARK.OFF ? '🔴' : (mk === UNIV_REF_MARK.EST ? '🟡' : '⚫');
+    const gradeText = grade || '미공시';
+    const subHtml = sub ? '<span class="univ-ref-sub">' + escapeRecHtml(sub) + '</span>' : '';
+    const fit = fitClass ? ' ' + fitClass : '';
+    return '<td class="' + cls + fit + '"><span class="univ-ref-cell-inner"><span class="univ-ref-mark">' + markChar +
+        '</span><span class="univ-ref-grade">' + escapeRecHtml(gradeText) + '</span>' + subHtml + '</span></td>';
+}
+
+function fitClassFromClassification(classification) {
+    if (classification === '상향') return 'ref-cell-fit-up';
+    if (classification === '하향') return 'ref-cell-fit-safe';
+    if (classification === '적정') return 'ref-cell-fit-ok';
+    return '';
+}
+
+function renderUnivRefTableRows(rows) {
+    const body = document.getElementById('univRefTableBody');
+    if (!body || !rows || !rows.length) return;
+    body.innerHTML = rows.map(function(r) {
+        const hFit = r.hFit || '';
+        const nFit = r.nFit || '';
+        const mFit = r.mFit || '';
+        return '<tr><th class="univ-name">' + escapeRecHtml(r.name) + '</th>' +
+            univRefMarkCell(r.h, r.hG || '미공시', r.hSub, hFit) +
+            univRefMarkCell(r.n, r.nG || '미공시', r.nSub, nFit) +
+            univRefMarkCell(r.m, r.mG || '미공시', r.mSub, mFit) +
+            '<td class="ref-note-cell">' + escapeRecHtml(r.note || '') + '</td></tr>';
+    }).join('');
+}
+
+function renderStaticUnivRefTable() {
+    renderUnivRefTableRows(UNIV_REF_STATIC_ROWS);
+}
+
+function setUnivRefAiStatus(text, tone) {
+    const el = document.getElementById('univ-ref-ai-status');
+    if (!el) return;
+    el.textContent = text;
+    el.className = 'univ-ref-ai-pill' + (tone ? ' ' + tone : ' muted');
+}
+
+function setUnivRefStudentGrade(avgGrade) {
+    const el = document.getElementById('univ-ref-student-grade');
+    if (el) el.textContent = avgGrade != null ? avgGrade.toFixed(2) : '-';
+}
+
+function showUnivRefTableLoading(providerLabel, attemptIndex) {
+    const body = document.getElementById('univRefTableBody');
+    if (!body) return;
+    const attemptText = attemptIndex != null
+        ? ' (' + (attemptIndex + 1) + '/' + REC_AI_PROVIDERS.length + ')'
+        : '';
+    const label = providerLabel ? escapeRecHtml(providerLabel) : 'AI';
+    body.innerHTML =
+        '<tr><td colspan="5" class="univ-ref-loading-cell">' +
+        '<span class="univ-ref-spinner" aria-hidden="true"></span>' +
+        label + '로 입시 데이터 분석 중' + attemptText + '…' +
+        '</td></tr>';
+    setUnivRefAiStatus(label + ' 연결 중…', 'muted');
+}
+
 function resetUniversityRecommendations() {
     lastCalculatedAvgGrade = null;
-    lastRecommendationData = null;
-    activeRecTab = 'insoul';
-    const section = document.getElementById('univ-recommend-section');
-    const triggerWrap = document.getElementById('rec-trigger-wrap');
-    const cardArea = document.getElementById('rec-card-area');
-    const metaGrade = document.getElementById('rec-meta-grade');
-    if (section) section.style.display = 'none';
-    if (triggerWrap) triggerWrap.style.display = 'none';
-    if (cardArea) cardArea.innerHTML = '';
-    if (metaGrade) metaGrade.textContent = '-';
-    const providerBadge = document.getElementById('rec-provider-badge');
-    if (providerBadge) providerBadge.textContent = '🤖 AI 자동 연결';
-    document.querySelectorAll('.rec-tab').forEach(function(tab) {
-        const isInsoul = tab.getAttribute('data-tab') === 'insoul';
-        tab.classList.toggle('active', isInsoul);
-        tab.setAttribute('aria-selected', isInsoul ? 'true' : 'false');
-    });
+    lastUnivRefFetchKey = null;
+    univRefFetchInFlight = false;
+    setUnivRefStudentGrade(null);
+    setUnivRefAiStatus('학생 조회 시 AI가 표를 자동 갱신합니다', 'muted');
+    renderStaticUnivRefTable();
 }
 
 function onGradeCalculated(avgGrade) {
     lastCalculatedAvgGrade = avgGrade;
-    const triggerWrap = document.getElementById('rec-trigger-wrap');
-    const section = document.getElementById('univ-recommend-section');
-    if (!triggerWrap) return;
-    triggerWrap.style.display = 'block';
-    if (section) section.style.display = 'none';
-    const metaGrade = document.getElementById('rec-meta-grade');
-    if (metaGrade) metaGrade.textContent = avgGrade.toFixed(2);
-}
-
-function showLoadingState(providerLabel, attemptIndex) {
-    const area = document.getElementById('rec-card-area');
-    if (!area) return;
-    const attemptText = attemptIndex != null
-        ? ' (' + (attemptIndex + 1) + '/' + REC_AI_PROVIDERS.length + ')'
-        : '';
-    const providerText = providerLabel
-        ? '<strong>' + escapeRecHtml(providerLabel) + '</strong> 연결 중' + attemptText + '…'
-        : 'AI 서비스 자동 연결 중…';
-    area.innerHTML =
-        '<div class="rec-loading">' +
-        '<div class="rec-spinner" aria-hidden="true"></div>' +
-        '<p>📡 공식 입시 데이터 분석 중</p>' +
-        '<p style="font-size:0.85rem;margin-top:0.5rem;">' + providerText + '</p>' +
-        '<p style="font-size:0.78rem;margin-top:0.35rem;color:#9ca3af;">' +
-        'Perplexity → Gemini → ChatGPT → Claude → DeepSeek 순 자동 시도</p>' +
-        '</div>';
+    setUnivRefStudentGrade(avgGrade);
+    const key = avgGrade.toFixed(2);
+    if (lastUnivRefFetchKey === key && univRefFetchInFlight) return;
+    lastUnivRefFetchKey = key;
+    fetchUnivRefTableFromAI(avgGrade);
 }
 
 function extractPuterChatText(result) {
@@ -2963,162 +2747,114 @@ function extractPuterChatText(result) {
     return '';
 }
 
-function buildRecommendationPrompts(avgGrade) {
+function buildUnivRefTablePrompts(avgGrade) {
     const today = new Date().toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric' });
     const gradeStr = avgGrade.toFixed(2);
+    const univList = UNIV_REF_STATIC_ROWS.map(function(r) { return r.name; }).join(', ');
     const systemPrompt = [
         '당신은 대한민국 대입 입시 전문가입니다.',
-        '다음 공식 출처만을 근거로 대학을 추천합니다:',
-        '',
-        '[필수 참고 출처 - 우선순위 순]',
-        '1. 각 대학 입학처 공식 홈페이지 모집요강 (2024~2025학년도)',
-        '2. 대학알리미(academyinfo.go.kr) 교육부 공식 통계',
-        '3. 어디가(adiga.kr) 교육부 공식 대입정보',
-        '4. 한국대학교육협의회(kcue.or.kr) 공식 자료',
-        '',
-        '[절대 규칙]',
-        '- 위 출처에서 확인 불가한 수치는 절대 생성하지 말 것',
-        '- 모든 70%컷은 학생부교과전형 기준',
-        '- 5등급제 소수점 2자리 기준으로만 표기',
-        '- 반드시 유효한 JSON 객체 하나만 응답 (설명·마크다운 없이)',
-        '- 각 카테고리(insoul, honam, national)별 상향 2개, 적정 3개, 하향 2개 (총 7개)',
-        '- 판단: 하향=학생등급이 70%컷보다 0.31 이상 좋음, 적정=±0.30, 상향=0.31~0.70 나쁨',
-        '- diff = 학생등급 - cut70 (양수=불리)'
+        '공식 출처(입학처·어디가·대학알리미)만 근거로 학생부교과 70%컷을 제시합니다.',
+        '확인 불가 수치는 생성하지 말고 mark를 none, gradeText를 미공시로 표기합니다.',
+        'mark: official(입학처 공식)=🔴, estimate(교차추정)=🟡, none=⚫',
+        '5등급 소수점 2자리. 반드시 유효한 JSON만 출력(마크다운 금지).',
+        '적합도: 상향=학생등급이 70%컷보다 0.31~0.70 나쁨, 적정=±0.30, 하향=0.31 이상 좋음'
     ].join('\n');
 
     const userPrompt = [
-        '학생 5등급 환산 평균등급: ' + gradeStr,
+        '학생 평균등급(5등급): ' + gradeStr,
+        '서울 주요 4년제 대학 표를 학생 등급에 맞게 갱신하라.',
+        '대학 목록(순서 유지): ' + univList,
         '',
-        '3개 카테고리별 추천 대학·학과 JSON을 출력하라.',
-        'insoul: 서울 4년제, honam: 광주·전남·전북 4년제, national: 그 외 전국 4년제',
-        '',
-        'JSON 스키마:',
         '{',
         '  "studentGrade": ' + gradeStr + ',',
-        '  "basedOn": "2024학년도 학생부교과전형 실입시결과",',
-        '  "sources": ["대학입학처공식","어디가","대학알리미"],',
         '  "generatedAt": "' + today + '",',
-        '  "categories": {',
-        '    "insoul": { "label": "🏙 인서울", "description": "...", "universities": [',
-        '      { "name","department","admissionType","cut70","avgCut","supplementRate","competitionRate",',
-        '        "suneungMin","classification","diff","region","source","sourceUrl","dataYear","confidence","tip" }',
-        '    ]},',
-        '    "honam": { ... }, "national": { ... }',
-        '  }',
-        '}'
+        '  "rows": [',
+        '    {',
+        '      "name": "연세대",',
+        '      "humanities": { "mark":"estimate", "gradeText":"1.62", "sub":"70%컷", "classification":"적정" },',
+        '      "natural": { "mark":"estimate", "gradeText":"1.58", "sub":"", "classification":"적정" },',
+        '      "medical": { "mark":"none", "gradeText":"미공시", "sub":"", "classification":"" },',
+        '      "note": "교과우수 · 수능최저 · 🟡적정 · 출처 어디가2024"',
+        '    }',
+        '  ]',
+        '}',
+        '각 계열별 gradeText는 70%컷(소수 2자리) 또는 미공시. note에 전형·수능최저·적합도·출처 포함.'
     ].join('\n');
 
     return { system: systemPrompt, user: userPrompt };
 }
 
-function updateRecProviderBadge(provider, modelId) {
-    const el = document.getElementById('rec-provider-badge');
-    if (!el) return;
-    const shortModel = modelId ? String(modelId).split('/').pop() : '';
-    el.textContent = '🤖 ' + provider + (shortModel ? ' · ' + shortModel : '');
+function mapAiCellToRowField(cell) {
+    if (!cell) return { mark: 'none', grade: '미공시', sub: '', fit: '' };
+    const classification = cell.classification || '';
+    return {
+        mark: cell.mark || 'estimate',
+        grade: cell.gradeText || cell.grade || (cell.cut70 != null ? Number(cell.cut70).toFixed(2) : '미공시'),
+        sub: cell.sub || (classification ? classification : ''),
+        fit: fitClassFromClassification(classification)
+    };
 }
 
-function showErrorState(err, retryGrade) {
-    const area = document.getElementById('rec-card-area');
-    if (!area) return;
-    const grade = retryGrade != null ? retryGrade : lastCalculatedAvgGrade;
-    area.innerHTML =
-        '<div class="rec-error">' +
-        '<p>⚠️ 데이터를 불러오지 못했습니다.</p>' +
-        '<p style="font-size:0.85rem;color:#6b7280;">잠시 후 다시 시도하거나 직접 어디가(adiga.kr)를 확인해주세요.</p>' +
-        (err && err.message ? '<p style="font-size:0.8rem;margin-top:8px;">' + escapeRecHtml(err.message) + '</p>' : '') +
-        '<button type="button" id="rec-retry-btn">🔄 다시 시도</button>' +
-        '</div>';
-    const retryBtn = document.getElementById('rec-retry-btn');
-    if (retryBtn && grade != null) {
-        retryBtn.addEventListener('click', function() {
-            fetchUniversityRecommendations(grade);
+function mapAiResponseToTableRows(parsed, studentGrade) {
+    if (parsed.rows && parsed.rows.length) {
+        return parsed.rows.map(function(row) {
+            const h = mapAiCellToRowField(row.humanities || row.h);
+            const n = mapAiCellToRowField(row.natural || row.n);
+            const m = mapAiCellToRowField(row.medical || row.m);
+            return {
+                name: row.name,
+                h: h.mark, hG: h.grade, hSub: h.sub, hFit: h.fit,
+                n: n.mark, nG: n.grade, nSub: n.sub, nFit: n.fit,
+                m: m.mark, mG: m.grade, mSub: m.sub, mFit: m.fit,
+                note: row.note || ''
+            };
         });
     }
-    console.error('[추천 대학 오류]', err);
-}
 
-function renderUnivCard(univ, studentGrade) {
-    const colorMap = {
-        '상향': { bg: '#FEF2F2', border: '#EF4444', badge: '#EF4444', icon: '🔴' },
-        '적정': { bg: '#FFFBEB', border: '#F59E0B', badge: '#F59E0B', icon: '🟡' },
-        '하향': { bg: '#F0FDF4', border: '#10B981', badge: '#10B981', icon: '🟢' }
-    };
-    const classification = univ.classification || '적정';
-    const c = colorMap[classification] || colorMap['적정'];
-    const cut70 = Number(univ.cut70);
-    const avgCut = Number(univ.avgCut);
-    const diff = Number(univ.diff);
-    const confidence = Math.max(0, Math.min(100, Number(univ.confidence) || 0));
-    const diffSign = diff > 0 ? '▲' : '▼';
-    const diffColor = diff > 0 ? '#EF4444' : '#10B981';
-    const confFilled = Math.floor(confidence / 10);
-    const confBar = '█'.repeat(confFilled) + '░'.repeat(10 - confFilled);
-    const supplementRate = univ.supplementRate != null ? univ.supplementRate : '-';
-    const competitionRate = univ.competitionRate != null ? univ.competitionRate : '-';
+    const insoul = parsed.categories && parsed.categories.insoul && parsed.categories.insoul.universities;
+    if (!insoul || !insoul.length) return null;
 
-    return (
-        '<article class="rec-card" style="background:' + c.bg + ';border:1px solid ' + c.border + '">' +
-        '<div class="rec-card-header">' +
-        '<span class="rec-badge" style="background:' + c.badge + '">' + c.icon + ' ' + escapeRecHtml(classification) + '</span>' +
-        '<div><div class="rec-univ-name">' + escapeRecHtml(univ.name) + '</div>' +
-        '<span class="rec-dept">' + escapeRecHtml(univ.department) + '</span></div></div>' +
-        '<div class="rec-card-sub">' + escapeRecHtml(univ.admissionType) + ' · ' + escapeRecHtml(univ.region) + '</div>' +
-        '<div class="rec-grade-row">' +
-        '<div><div class="rec-grade-label">70%컷</div><div class="rec-grade-value primary">' + (isFinite(cut70) ? cut70.toFixed(2) : '-') + '</div></div>' +
-        '<div><div class="rec-grade-label">평균컷</div><div class="rec-grade-value muted">' + (isFinite(avgCut) ? avgCut.toFixed(2) : '-') + '</div></div>' +
-        '<div><div class="rec-grade-label">내 등급</div><div class="rec-grade-value blue">' + studentGrade.toFixed(2) + '</div></div>' +
-        '<div><div class="rec-grade-label">차이</div><div class="rec-grade-value" style="color:' + diffColor + '">' +
-        diffSign + (isFinite(diff) ? Math.abs(diff).toFixed(2) : '-') + '</div></div></div>' +
-        '<div class="rec-info-row">' +
-        '<span class="rec-info-chip suneung">📋 수능최저: ' + escapeRecHtml(univ.suneungMin) + '</span>' +
-        '<span class="rec-info-chip supplement">🔄 충원율: ' + escapeRecHtml(supplementRate) + '%</span>' +
-        '<span class="rec-info-chip competition">📊 경쟁률: ' + escapeRecHtml(competitionRate) + ':1</span></div>' +
-        '<div class="rec-source-row"><span>📂 ' + escapeRecHtml(univ.source) + ' · ' + escapeRecHtml(univ.dataYear) + '</span>' +
-        '<span class="rec-conf-text">신뢰도: ' + confBar + ' ' + confidence + '점</span></div>' +
-        '<p class="rec-tip">💡 ' + escapeRecHtml(univ.tip) + '</p></article>'
-    );
-}
-
-function sortUniversitiesByClassification(list) {
-    const order = { '상향': 0, '적정': 1, '하향': 2 };
-    return (list || []).slice().sort(function(a, b) {
-        return (order[a.classification] ?? 1) - (order[b.classification] ?? 1);
+    return insoul.map(function(u) {
+        const cut = u.cut70 != null ? Number(u.cut70).toFixed(2) : '미공시';
+        const cls = u.classification || '적정';
+        const diff = u.diff != null ? (u.diff > 0 ? '+' : '') + Number(u.diff).toFixed(2) : '';
+        const fit = fitClassFromClassification(cls);
+        const note = [
+            u.admissionType || '',
+            u.suneungMin ? '수능' + u.suneungMin : '',
+            cls + (diff ? ' ' + diff : ''),
+            u.source || ''
+        ].filter(Boolean).join(' · ');
+        return {
+            name: u.name,
+            h: 'estimate', hG: cut, hSub: cls, hFit: fit,
+            n: 'estimate', nG: cut, nSub: cls, nFit: fit,
+            m: 'none', mG: '미공시', mSub: '',
+            note: note || ('내등급 ' + studentGrade.toFixed(2))
+        };
     });
 }
 
-function renderRecommendationCards(categoryKey) {
-    const area = document.getElementById('rec-card-area');
-    if (!area || !lastRecommendationData) return;
-    const studentGrade = Number(lastRecommendationData.studentGrade) || lastCalculatedAvgGrade || 0;
-    const cat = lastRecommendationData.categories && lastRecommendationData.categories[categoryKey];
-    if (!cat || !cat.universities || !cat.universities.length) {
-        area.innerHTML = '<p class="rec-empty-tab">해당 카테고리 추천 결과가 없습니다.</p>';
-        return;
+function showUnivRefTableError(err, avgGrade) {
+    renderStaticUnivRefTable();
+    const msg = err && err.message ? err.message : '연결 실패';
+    setUnivRefAiStatus('⚠️ AI 갱신 실패 — 참고 표 유지 (' + msg + ')', 'warn');
+    console.error('[대학 참고표 AI]', err);
+    if (avgGrade != null) {
+        setUnivRefStudentGrade(avgGrade);
     }
-    const sorted = sortUniversitiesByClassification(cat.universities);
-    area.innerHTML = sorted.map(function(u) { return renderUnivCard(u, studentGrade); }).join('');
 }
 
-function renderRecommendationSection(data) {
-    lastRecommendationData = data;
+function renderUnivRefFromAiData(data, provider) {
     const studentGrade = Number(data.studentGrade) || lastCalculatedAvgGrade || 0;
-    const metaGrade = document.getElementById('rec-meta-grade');
-    if (metaGrade) metaGrade.textContent = studentGrade.toFixed(2);
-    if (data.aiProvider) updateRecProviderBadge(data.aiProvider, data.aiModel);
-    renderRecommendationCards(activeRecTab);
-}
-
-function switchRecTab(tabKey) {
-    activeRecTab = tabKey;
-    document.querySelectorAll('.rec-tab').forEach(function(tab) {
-        const active = tab.getAttribute('data-tab') === tabKey;
-        tab.classList.toggle('active', active);
-        tab.setAttribute('aria-selected', active ? 'true' : 'false');
-    });
-    if (lastRecommendationData) {
-        renderRecommendationCards(tabKey);
+    const rows = mapAiResponseToTableRows(data, studentGrade);
+    if (!rows || !rows.length) {
+        throw new Error('표 데이터 없음');
     }
+    renderUnivRefTableRows(rows);
+    const shortModel = provider.model ? String(provider.model).split('/').pop() : '';
+    setUnivRefAiStatus('✓ ' + provider.label + (shortModel ? ' · ' + shortModel : '') + ' 분석 완료', 'ok');
+    setUnivRefStudentGrade(studentGrade);
 }
 
 function extractJsonFromModelText(text) {
@@ -3138,83 +2874,65 @@ function extractJsonFromModelText(text) {
     }
 }
 
-async function fetchUniversityRecommendations(avgGrade) {
+async function fetchUnivRefTableFromAI(avgGrade) {
     if (typeof puter === 'undefined' || !puter.ai || typeof puter.ai.chat !== 'function') {
-        showErrorState(new Error('AI 라이브러리를 불러오지 못했습니다. 페이지를 새로고침해 주세요.'), avgGrade);
+        showUnivRefTableError(new Error('AI 라이브러리 로드 실패'), avgGrade);
         return;
     }
 
-    const prompts = buildRecommendationPrompts(avgGrade);
+    if (univRefFetchInFlight) return;
+    univRefFetchInFlight = true;
+
+    const prompts = buildUnivRefTablePrompts(avgGrade);
     const messages = [
         { role: 'system', content: prompts.system },
         { role: 'user', content: prompts.user }
     ];
     let lastError = null;
 
-    showLoadingState(null, 0);
+    showUnivRefTableLoading(null, 0);
 
-    for (let i = 0; i < REC_AI_PROVIDERS.length; i++) {
-        const provider = REC_AI_PROVIDERS[i];
-        showLoadingState(provider.label, i);
+    try {
+        for (let i = 0; i < REC_AI_PROVIDERS.length; i++) {
+            const provider = REC_AI_PROVIDERS[i];
+            showUnivRefTableLoading(provider.label, i);
 
-        try {
-            const chatOptions = {
-                model: provider.model,
-                max_tokens: 4000,
-                temperature: 0.2
-            };
-            if (provider.id === 'openai') {
-                chatOptions.tools = [{ type: 'web_search' }];
+            try {
+                const chatOptions = {
+                    model: provider.model,
+                    max_tokens: 4000,
+                    temperature: 0.2
+                };
+                if (provider.id === 'openai') {
+                    chatOptions.tools = [{ type: 'web_search' }];
+                }
+
+                const result = await puter.ai.chat(messages, chatOptions);
+                const raw = extractPuterChatText(result);
+                if (!raw || !raw.trim()) {
+                    throw new Error(provider.label + ': 빈 응답');
+                }
+
+                const parsed = extractJsonFromModelText(raw);
+                renderUnivRefFromAiData(parsed, provider);
+                return;
+            } catch (err) {
+                lastError = err;
+                console.warn('[대학 참고표 AI]', provider.label, err);
             }
-
-            const result = await puter.ai.chat(messages, chatOptions);
-            const raw = extractPuterChatText(result);
-            if (!raw || !raw.trim()) {
-                throw new Error(provider.label + ': 빈 응답');
-            }
-
-            const parsed = extractJsonFromModelText(raw);
-            if (!parsed.categories) {
-                throw new Error(provider.label + ': JSON 형식 오류');
-            }
-
-            parsed.aiProvider = provider.label;
-            parsed.aiModel = provider.model;
-            renderRecommendationSection(parsed);
-            return;
-        } catch (err) {
-            lastError = err;
-            console.warn('[추천 대학]', provider.label, err);
         }
-    }
 
-    showErrorState(
-        lastError || new Error('Gemini·ChatGPT·Claude·Perplexity·DeepSeek 모두 연결에 실패했습니다.'),
-        avgGrade
-    );
+        showUnivRefTableError(
+            lastError || new Error('Perplexity·Claude·Gemini·ChatGPT·DeepSeek 연결 실패'),
+            avgGrade
+        );
+    } finally {
+        univRefFetchInFlight = false;
+    }
 }
 
-function initUniversityRecommendations() {
-    const triggerBtn = document.getElementById('rec-trigger-btn');
-    const section = document.getElementById('univ-recommend-section');
-
-    if (triggerBtn) {
-        triggerBtn.addEventListener('click', function() {
-            if (lastCalculatedAvgGrade == null) return;
-            if (section) section.style.display = 'block';
-            document.getElementById('rec-trigger-wrap').style.display = 'none';
-            fetchUniversityRecommendations(lastCalculatedAvgGrade);
-            if (section) {
-                section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        });
-    }
-
-    document.querySelectorAll('.rec-tab').forEach(function(tab) {
-        tab.addEventListener('click', function() {
-            switchRecTab(tab.getAttribute('data-tab'));
-        });
-    });
+function initUnivRefTable() {
+    renderStaticUnivRefTable();
 }
 
 function clearPrintContainer() {
@@ -3727,7 +3445,7 @@ document.getElementById('endStudentId').addEventListener('keydown', function(e) 
         if (!loaded) loadDemoData();
     }
     runDefaultSinglePreview({ scroll: false });
-    initUniversityRecommendations();
+    initUnivRefTable();
     initAppFooter();
     initPageScrollNav();
     requestAnimationFrame(function() {
