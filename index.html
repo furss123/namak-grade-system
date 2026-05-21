@@ -118,6 +118,12 @@
             border-top: 1px solid var(--school-border);
             box-shadow: 0 -2px 10px rgba(15, 36, 64, 0.05);
         }
+        #siteFooterRoot.is-hidden-for-batch { display: none !important; }
+        #printContainer .batch-end-footer {
+            margin-top: 12px;
+            border-radius: var(--radius-md);
+            max-width: 100%;
+        }
         .site-footer-inner {
             flex: 1; width: 100%;
             max-width: var(--content-max); margin: 0 auto;
@@ -1441,7 +1447,8 @@
             body * { visibility: hidden; }
             #printContainer, #printContainer * { visibility: visible; }
             .site-header, .app-layout, .site-footer, .app-footer, .no-print,
-            #reportTemplate { display: none !important; }
+            #siteFooterRoot, .batch-end-footer,
+            #reportTemplate { display: none !important; visibility: hidden !important; }
             #printContainer {
                 display: block !important;
                 position: absolute; left: 0; top: 0; width: 100%;
@@ -1856,7 +1863,7 @@
         </button>
     </nav>
 
-    <footer class="site-footer app-footer no-print" role="contentinfo">
+    <footer id="siteFooterRoot" class="site-footer app-footer no-print" role="contentinfo">
         <div class="site-footer-inner">
             <div class="site-footer-bar">
                 <p class="app-footer-copy" id="appCopyrightDisplay">—</p>
@@ -1869,12 +1876,53 @@
 <script>
 const APP_VERSION = '1.1.0';
 const APP_RELEASE_DATE = '2026-05-20';
+function getAppFooterCopyrightHtml() {
+    return '© 2026 남악고등학교 <span class="footer-credit-hyot">HyoT</span>. All rights reserved.';
+}
+
+function getAppFooterVersionText() {
+    return 'v' + APP_VERSION + ' (' + APP_RELEASE_DATE + ')';
+}
+
+function fillAppFooterElement(footerEl) {
+    if (!footerEl) return;
+    const v = footerEl.querySelector('.app-footer-version span');
+    const c = footerEl.querySelector('.app-footer-copy');
+    if (v) v.textContent = getAppFooterVersionText();
+    if (c) c.innerHTML = getAppFooterCopyrightHtml();
+}
+
 function initAppFooter() {
-    const v = document.getElementById('appVersionDisplay');
-    const c = document.getElementById('appCopyrightDisplay');
-    if (v) v.textContent = 'v' + APP_VERSION + ' (' + APP_RELEASE_DATE + ')';
-    if (c) {
-        c.innerHTML = '© 2026 남악고등학교 <span class="footer-credit-hyot">HyoT</span>. All rights reserved.';
+    fillAppFooterElement(document.getElementById('siteFooterRoot'));
+}
+
+function buildAppFooterElement() {
+    const footer = document.createElement('footer');
+    footer.className = 'site-footer app-footer no-print batch-end-footer';
+    footer.setAttribute('role', 'contentinfo');
+    footer.innerHTML =
+        '<div class="site-footer-inner">' +
+            '<div class="site-footer-bar">' +
+                '<p class="app-footer-copy"></p>' +
+                '<p class="app-footer-version"><span></span></p>' +
+            '</div>' +
+        '</div>';
+    fillAppFooterElement(footer);
+    return footer;
+}
+
+/** 반 전체 조회 시 푸터는 보고서 목록 맨 아래 1회만, 인쇄 제외 */
+function syncScreenFooterAfterReports(studentCount) {
+    const siteRoot = document.getElementById('siteFooterRoot');
+    const printContainer = document.getElementById('printContainer');
+    if (printContainer) {
+        printContainer.querySelectorAll('.batch-end-footer').forEach(function(el) { el.remove(); });
+    }
+    if (studentCount > 1) {
+        if (siteRoot) siteRoot.classList.add('is-hidden-for-batch');
+        if (printContainer) printContainer.appendChild(buildAppFooterElement());
+    } else if (siteRoot) {
+        siteRoot.classList.remove('is-hidden-for-batch');
     }
 }
 
@@ -3225,6 +3273,7 @@ function initUnivRefTable() {
 
 function clearPrintContainer() {
     document.getElementById('printContainer').innerHTML = '';
+    syncScreenFooterAfterReports(0);
 }
 
 function resetResults() {
@@ -3575,7 +3624,6 @@ function cloneReportForPrint(printOpts) {
     }
     const elementsWithId = clone.querySelectorAll('[id]');
     elementsWithId.forEach(function(el) { el.removeAttribute('id'); });
-    initAppFooter();
     return clone;
 }
 
@@ -3595,6 +3643,7 @@ function appendReportsToPrintContainer(studentIds, printOpts) {
         populateTemplate(id, { includeDistribution: printOpts.dist });
         printContainer.appendChild(cloneReportForPrint(printOpts));
     });
+    syncScreenFooterAfterReports(studentIds.length);
 }
 
 function printSelectedReport() {
