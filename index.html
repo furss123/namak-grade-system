@@ -2791,7 +2791,7 @@
                         <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 9등급제</span>
                     </div>
                 </div>
-                <div class="score-grade-manual-row">
+                <div class="score-grade-manual-row score-grade-manual-row-diffup">
                     <span class="score-grade-manual-label">윗등급 차</span>
                     <div class="score-grade-manual-desc">
                         <span class="score-grade-manual-item">상위 등급 컷과의 차이</span>
@@ -2988,10 +2988,28 @@ function ensureGlobalChromeOutsideTemplate() {
     }
 }
 
+/** 윗등급 차 안내: ※ 제거·문구 고정 (캐시·구버전 DOM 대비) */
+function syncScoreGradeManuals(root) {
+    const scope = root && root.querySelectorAll ? root : document;
+    scope.querySelectorAll('.score-grade-manual-row').forEach(function(row) {
+        const label = row.querySelector('.score-grade-manual-label');
+        if (!label || (label.textContent || '').replace(/\s+/g, ' ').trim() !== '윗등급 차') return;
+        const desc = row.querySelector('.score-grade-manual-desc');
+        if (desc) {
+            desc.innerHTML = '<span class="score-grade-manual-item">상위 등급 컷과의 차이</span>';
+        }
+    });
+    scope.querySelectorAll('.score-grade-manual-item').forEach(function(el) {
+        const cleaned = (el.textContent || '').replace(/※\s*/g, '').replace(/\s+/g, ' ').trim();
+        if (cleaned !== el.textContent) el.textContent = cleaned;
+    });
+}
+
 function initAppFooter() {
     ensureGlobalChromeOutsideTemplate();
     fillAppFooterElement(document.getElementById('siteFooterRoot'));
     stripCopyrightFromPageFooters(document.getElementById('reportTemplate'));
+    syncScoreGradeManuals(document.getElementById('reportTemplate'));
 }
 
 /** 저작권·버전: 화면 최하단 고정 1줄만 (#siteFooterRoot). 보고서·인쇄 영역 중복 제거 */
@@ -5310,6 +5328,8 @@ function populateTemplate(studentIdStr, options) {
         const distBody = document.getElementById('distTableBody');
         if (distBody) distBody.innerHTML = '';
     }
+    syncScoreGradeManuals(document.getElementById('reportTemplate'));
+    syncScoreGradeManuals(document.getElementById('printContainer'));
     return true;
 }
 
@@ -5569,6 +5589,7 @@ function appendReportsToPrintContainer(studentIds, printOpts) {
     return new Promise(function(resolve) {
         requestAnimationFrame(function() {
             fitReportPagesInRoot(printContainer);
+            syncScoreGradeManuals(printContainer);
             requestAnimationFrame(function() {
                 requestAnimationFrame(resolve);
             });
