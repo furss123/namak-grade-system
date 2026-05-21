@@ -1942,7 +1942,7 @@ function syncScreenFooterAfterReports(studentCount) {
 let studentData = [];
 let isFileUploaded = false;
 let isDemoData = false;
-const SESSION_STORAGE_KEY = 'gradeReport_session_v1';
+const SESSION_STORAGE_KEY = 'gradeReport_session_v2';
 const BUNDLED_SCORES_URL = 'assets/virtual-school-scores.xlsx';
 const BUNDLED_SCORES_LABEL = '가상 학교 점수.xlsx';
 const DEFAULT_RANGE_START = '1110';
@@ -1995,6 +1995,7 @@ function loadDemoData() {
     displayGeneralStats();
     clearPrintContainer();
     hideReportActionSection();
+    saveSessionData('가상 예시', true);
 }
 
 function applyParsedStudentData(parsedData, fileName, options = {}) {
@@ -2010,7 +2011,7 @@ function applyParsedStudentData(parsedData, fileName, options = {}) {
     processAllGrades();
     setUploadState('데이터 분석 완료!', true, fileName);
     displayGeneralStats();
-    if (options.saveSession) saveSessionData(fileName);
+    if (options.saveSession) saveSessionData(fileName, !!options.resetUi);
     return true;
 }
 
@@ -2035,7 +2036,7 @@ async function loadBundledSchoolData() {
         const res = await fetch(BUNDLED_SCORES_URL);
         if (!res.ok) throw new Error('bundled fetch ' + res.status);
         const buffer = await res.arrayBuffer();
-        return loadGradesFromArrayBuffer(buffer, BUNDLED_SCORES_LABEL, { isDemo: true, saveSession: false });
+        return loadGradesFromArrayBuffer(buffer, BUNDLED_SCORES_LABEL, { isDemo: true, saveSession: true });
     } catch (err) {
         console.warn('가상 학교 점수 파일 로드 실패:', err);
         return false;
@@ -2246,6 +2247,119 @@ function resetPrintOptions() {
     });
 }
 
+function applyPrintOptions(opts) {
+    if (!opts) return;
+    const map = {
+        printOptScore: opts.score,
+        printOptRadar: opts.radar,
+        printOptDist: opts.dist,
+        printOptUniv: opts.univ
+    };
+    Object.keys(map).forEach(function(id) {
+        const el = document.getElementById(id);
+        if (el) el.checked = !!map[id];
+    });
+}
+
+function readSessionPayload() {
+    try {
+        const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+    } catch (err) {
+        return null;
+    }
+}
+
+function writeSessionPayload(payload) {
+    try {
+        sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(payload));
+    } catch (err) {
+        console.warn('세션 저장 실패(용량 초과 등):', err);
+    }
+}
+
+function collectUiState() {
+    return {
+        studentId: (document.getElementById('studentId')?.value || '').trim(),
+        classKey: document.getElementById('classSelect')?.value || '',
+        printOptions: getPrintOptions(),
+        scrollY: window.scrollY || 0
+    };
+}
+
+function persistUiSnapshot(patch) {
+    const payload = readSessionPayload();
+    if (!payload || !payload.studentData || !payload.studentData.length) return;
+    const base = collectUiState();
+    payload.ui = Object.assign({}, payload.ui || {}, base, patch || {});
+    payload.savedAt = Date.now();
+    writeSessionPayload(payload);
+}
+
+function recordQuerySession(mode, studentIds) {
+    const ids = (studentIds || []).map(function(id) { return String(id); });
+    persistUiSnapshot({
+        queryMode: mode,
+        studentIds: ids,
+        studentId: (document.getElementById('studentId')?.value || '').trim(),
+        classKey: document.getElementById('classSelect')?.value || '',
+        printOptions: getPrintOptions(),
+        scrollY: window.scrollY || 0
+    });
+}
+
+function restoreAppViewFromSession(ui) {
+    if (!ui || !ui.queryMode || !isFileUploaded) return false;
+    applyPrintOptions(ui.printOptions);
+    const studentEl = document.getElementById('studentId');
+    const classSel = document.getElementById('classSelect');
+    if (studentEl && ui.studentId) studentEl.value = ui.studentId;
+    if (classSel && ui.classKey) classSel.value = ui.classKey;
+
+    let ok = false;
+    if (ui.queryMode === 'class' && ui.classKey) {
+        ok = searchClassStudents({ silent: true });
+    } else if (ui.queryMode === 'single') {
+        const targetId = (ui.studentIds && ui.studentIds[0]) || ui.studentId;
+        if (targetId) ok = searchSingleStudent(targetId, { silent: true });
+    }
+    if (ok && ui.scrollY > 0) {
+        requestAnimationFrame(function() {
+            window.scrollTo({ top: ui.scrollY, left: 0, behavior: 'auto' });
+        });
+    }
+    return ok;
+}
+
+function initSessionPersistenceListeners() {
+    window.addEventListener('beforeunload', function() {
+        if (!isFileUploaded) return;
+        persistUiSnapshot(collectUiState());
+    });
+    ['printOptScore', 'printOptRadar', 'printOptDist', 'printOptUniv'].forEach(function(id) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('change', function() {
+            if (!isFileUploaded) return;
+            persistUiSnapshot({ printOptions: getPrintOptions() });
+        });
+    });
+    const studentEl = document.getElementById('studentId');
+    if (studentEl) {
+        studentEl.addEventListener('change', function() {
+            if (!isFileUploaded) return;
+            persistUiSnapshot({ studentId: studentEl.value.trim() });
+        });
+    }
+    const classSel = document.getElementById('classSelect');
+    if (classSel) {
+        classSel.addEventListener('change', function() {
+            if (!isFileUploaded) return;
+            persistUiSnapshot({ classKey: classSel.value });
+        });
+    }
+}
+
 function refreshClassSelect() {
     const sel = document.getElementById('classSelect');
     if (!sel) return;
@@ -2415,17 +2529,16 @@ function appendStatsTd(rowId, text, className = 'stats-val') {
     document.getElementById(rowId).appendChild(td);
 }
 
-function saveSessionData(fileName) {
-    try {
-        sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({
-            studentData,
-            subjectUnitMap,
-            fileName: fileName || '',
-            savedAt: Date.now()
-        }));
-    } catch (err) {
-        console.warn('성적 데이터 저장 실패(용량 초과 등):', err);
-    }
+function saveSessionData(fileName, resetUi) {
+    const existing = readSessionPayload();
+    writeSessionPayload({
+        studentData: studentData,
+        subjectUnitMap: subjectUnitMap,
+        fileName: fileName || (existing && existing.fileName) || '',
+        isDemoData: isDemoData,
+        savedAt: Date.now(),
+        ui: resetUi ? null : (existing && existing.ui) || null
+    });
 }
 
 function clearSessionData() {
@@ -2434,24 +2547,26 @@ function clearSessionData() {
 
 function restoreSessionData() {
     try {
-        const raw = sessionStorage.getItem(SESSION_STORAGE_KEY);
-        if (!raw) return;
-        const saved = JSON.parse(raw);
+        const saved = readSessionPayload();
+        if (!saved) return null;
         if (!saved.studentData || !saved.studentData.length || !saved.studentData[0]['학번']) {
             clearSessionData();
-            return;
+            return null;
         }
         studentData = saved.studentData;
         subjectUnitMap = saved.subjectUnitMap && typeof saved.subjectUnitMap === 'object'
             ? saved.subjectUnitMap
             : buildDefaultSubjectUnits(getSubjects(studentData[0]));
         isFileUploaded = true;
+        isDemoData = !!saved.isDemoData;
         processAllGrades();
         setUploadState('데이터 분석 완료!', true, saved.fileName || '저장된 성적 파일');
         displayGeneralStats();
+        return saved.ui || null;
     } catch (err) {
         console.warn('성적 데이터 복원 실패:', err);
         clearSessionData();
+        return null;
     }
 }
 
@@ -2905,6 +3020,7 @@ async function processExcelFiles(fileList) {
         if (applyParsedStudentData(mergedStudents, label + statusNote, {
             isDemo: false,
             saveSession: true,
+            resetUi: true,
             subjectUnitMap
         })) {
             runDefaultSinglePreview({ scroll: false });
@@ -3438,6 +3554,14 @@ function resetResults() {
     resetPrintOptions();
     const classSel = document.getElementById('classSelect');
     if (classSel) classSel.value = '';
+    persistUiSnapshot({
+        queryMode: null,
+        studentIds: [],
+        studentId: DEFAULT_SINGLE_STUDENT_ID,
+        classKey: '',
+        printOptions: getPrintOptions(),
+        scrollY: 0
+    });
 }
 
 /** 연속 동점 점수를 "85.00 (3)" 형태로 묶어 표시 (최대 limit개) */
@@ -3832,6 +3956,7 @@ function searchSingleStudent(studentIdOverride, options) {
     }
     appendReportsToPrintContainer([studentId], printOpts);
     showReportActionSection();
+    recordQuerySession('single', [studentId]);
     if (!opts.silent) scrollToReportStart();
     return true;
 }
@@ -3859,6 +3984,7 @@ function searchClassStudents(options) {
     populateTemplate(studentIds[0], { includeDistribution: printOpts.dist });
     appendReportsToPrintContainer(studentIds, printOpts);
     showReportActionSection();
+    recordQuerySession('class', studentIds);
     if (!opts.silent) scrollToReportStart();
     return true;
 }
@@ -3960,8 +4086,9 @@ document.getElementById('studentId').addEventListener('input', function() {
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
-    scrollToPageTop(true);
-    restoreSessionData();
+    initSessionPersistenceListeners();
+    const savedUi = restoreSessionData();
+    if (!savedUi || !savedUi.scrollY) scrollToPageTop(true);
     if (!isFileUploaded) {
         const loaded = await loadBundledSchoolData();
         if (!loaded) loadDemoData();
@@ -3969,11 +4096,15 @@ document.getElementById('studentId').addEventListener('input', function() {
     initUnivRefTable();
     initAppFooter();
     initPuterUnivAiGuestMode();
-    runDefaultSinglePreview({ scroll: false });
+    if (!restoreAppViewFromSession(savedUi)) {
+        runDefaultSinglePreview({ scroll: false });
+    }
     initPageScrollNav();
-    requestAnimationFrame(function() {
-        scrollToPageTop(true);
-    });
+    if (!savedUi || !savedUi.scrollY) {
+        requestAnimationFrame(function() {
+            scrollToPageTop(true);
+        });
+    }
 })();
 </script>
 
