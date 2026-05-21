@@ -1111,6 +1111,56 @@
             border: 1px solid #e8edf4;
             border-radius: 4px;
         }
+        .page-1 .score-grade-manual {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1.2mm 3mm;
+            margin: 1.4mm 0 0;
+            padding: 1.6mm 2.5mm;
+            font-size: var(--rpt-font-caption);
+            font-weight: 600;
+            line-height: 1.4;
+            color: var(--school-navy-dark);
+            background: #f8fafc;
+            border: 1px solid #e8edf4;
+            border-radius: 4px;
+        }
+        .page-1 .score-grade-manual-label {
+            flex-shrink: 0;
+            padding: 0.5mm 2mm;
+            border-radius: 3px;
+            background: var(--school-navy-dark);
+            color: #fff;
+            font-size: var(--rpt-font-caption);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+        .page-1 .score-grade-manual-sample {
+            flex-shrink: 0;
+            padding: 0.4mm 2.2mm;
+            border-radius: 3px;
+            background: #eef4fc;
+            border: 1px solid #c5d4e4;
+            font-weight: 800;
+            color: var(--school-navy-dark);
+            letter-spacing: 0.02em;
+        }
+        .page-1 .score-grade-manual-sample .g5 {
+            color: var(--school-navy-dark);
+        }
+        .page-1 .score-grade-manual-sample .g9 {
+            color: #64748b;
+            font-weight: 700;
+        }
+        .page-1 .score-grade-manual-item {
+            color: var(--school-muted);
+            white-space: nowrap;
+        }
+        .page-1 .score-grade-manual-item strong {
+            color: var(--school-navy);
+            font-weight: 700;
+        }
         .page-1 #rowGrade td,
         .page-1 #rowGrade th.row-label {
             font-weight: 800;
@@ -1524,6 +1574,12 @@
                     <tr id="rowDiffDown"><th class="row-label">아랫등급 차</th></tr>
                 </tbody>
             </table>
+            </div>
+            <div class="score-grade-manual" role="note" aria-label="등급 표기 안내">
+                <span class="score-grade-manual-label">등급 표기</span>
+                <span class="score-grade-manual-sample" aria-hidden="true"><span class="g5">3</span><span class="g9">(4)</span></span>
+                <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 5등급제(고교학점제)</span>
+                <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 9등급제 상대평가(중간석차·누적 백분율)</span>
             </div>
             </div>
 
