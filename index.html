@@ -6066,7 +6066,49 @@ async function runHtml2PdfSave(printContainer, filename, captureWin) {
         capturePageToPdf(pdfDoc, captured.canvas, i);
     }
 
+    await savePdfDocument(pdfDoc, filename);
+}
+
+/** 브라우저 저장 대화상자(지원 시) 또는 즉시 다운로드 */
+async function savePdfDocument(pdfDoc, filename) {
+    if (typeof window.showSaveFilePicker === 'function') {
+        try {
+            const blob = pdfDoc.output('blob');
+            const handle = await window.showSaveFilePicker({
+                suggestedName: filename,
+                types: [{
+                    description: 'PDF 문서',
+                    accept: { 'application/pdf': ['.pdf'] }
+                }]
+            });
+            const writable = await handle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+            return;
+        } catch (err) {
+            if (err && err.name === 'AbortError') return;
+            console.warn('저장 대화상자 실패, 다운로드로 대체:', err);
+        }
+    }
     pdfDoc.save(filename);
+}
+
+/** 메인 화면에서 캡처·저장 (팝업 창 없음) */
+async function runPdfExportInMainDocument(printContainer, filename) {
+    if (!printContainer) throw new Error('PDF capture container missing');
+    const hadCaptureClass = printContainer.classList.contains('pdf-export-capture');
+    printContainer.classList.add('pdf-export-capture');
+    document.body.classList.add('pdf-exporting');
+    setPdfExportOverlayVisible(true);
+    try {
+        await ensurePdfLibsLoaded();
+        await preparePdfCaptureLayout(printContainer);
+        await runHtml2PdfSave(printContainer, filename, null);
+    } finally {
+        document.body.classList.remove('pdf-exporting');
+        if (!hadCaptureClass) printContainer.classList.remove('pdf-export-capture');
+        setPdfExportOverlayVisible(false);
+    }
 }
 
 /** 메인 화면은 그대로 두고 팝업 창에서만 PDF 캡처·저장 */
@@ -6092,38 +6134,23 @@ async function runPdfExportInWorkerWindow(workerWin, sourceContainer, filename) 
 async function saveReportAsPdf() {
     if (pdfExportInProgress) return;
     setPdfBtnLoading(true);
-    let workerWin = null;
     try {
         if (!prepareSelectedReportForOutput()) return;
-        const sourceContainer = document.getElementById('printContainer');
-        if (!sourceContainer || !sourceContainer.children.length) {
+        const printContainer = document.getElementById('printContainer');
+        if (!printContainer || !printContainer.children.length) {
             alert('저장할 보고서가 없습니다.');
             return;
         }
         pdfExportInProgress = true;
         await waitForPrintContainerLayout();
-        workerWin = openPdfExportWorkerWindow();
-        if (!workerWin) return;
         const filename = getReportPdfFilename();
-        await runPdfExportInWorkerWindow(workerWin, sourceContainer, filename);
-        setPdfWorkerStatus(workerWin.document, 'PDF 저장 완료. 창을 닫습니다…', false);
-        await new Promise(function(resolve) { setTimeout(resolve, 400); });
+        await runPdfExportInMainDocument(printContainer, filename);
     } catch (err) {
         console.warn('PDF 저장 실패:', err);
-        if (workerWin && !workerWin.closed) {
-            setPdfWorkerStatus(
-                workerWin.document,
-                'PDF를 저장할 수 없습니다.\n네트워크·팝업 설정을 확인한 뒤 다시 시도해 주세요.',
-                true
-            );
-            await new Promise(function(resolve) { setTimeout(resolve, 2800); });
-        } else {
-            alert('PDF를 저장할 수 없습니다. PDF 라이브러리 로드 실패이거나 생성 중 오류가 발생했습니다.\n팝업 허용·네트워크 연결을 확인한 뒤 다시 시도해 주세요.');
+        if (!(err && err.name === 'AbortError')) {
+            alert('PDF를 저장할 수 없습니다. PDF 라이브러리 로드 실패이거나 생성 중 오류가 발생했습니다.\n네트워크 연결을 확인한 뒤 다시 시도해 주세요.');
         }
     } finally {
-        if (workerWin && !workerWin.closed) {
-            try { workerWin.close(); } catch (e) { /* ignore */ }
-        }
         pdfExportInProgress = false;
         setPdfBtnLoading(false);
     }
