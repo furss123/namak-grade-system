@@ -1819,8 +1819,9 @@
         .page-2 .dist-student-name.dist-name-size-sm { font-size: calc(8.5px + 1.5pt); }
         .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 1.5pt); }
         .page-1 .report-radar-layout {
-            --radar-chart-pad-top: 6mm;
-            --radar-chart-pad-bottom: 10mm;
+            --radar-chart-pad-top: 4.5mm;
+            --radar-chart-pad-bottom: 8.5mm;
+            --radar-box-trim: 3mm;
             --radar-graph-h: calc(69mm * 1.44);
             --radar-svg-h: calc(var(--radar-graph-h) + 9.6mm);
             --radar-panel-h: calc(var(--radar-svg-h) + var(--radar-chart-pad-top) + var(--radar-chart-pad-bottom));
@@ -1837,9 +1838,11 @@
             background: #fafbfd;
             border: 1px solid #d4dde8;
             border-radius: 5px;
-            padding: var(--radar-chart-pad-top) 3mm var(--radar-chart-pad-bottom);
+            padding: var(--radar-chart-pad-top) 0 var(--radar-chart-pad-bottom);
             box-sizing: border-box;
-            width: 100%;
+            width: calc(100% - var(--radar-box-trim));
+            max-width: calc(100% - var(--radar-box-trim));
+            margin-inline: auto;
             height: auto;
             min-height: var(--radar-panel-h);
             align-self: stretch;
@@ -1847,8 +1850,9 @@
             flex-shrink: 0;
         }
         .page-1 .report-radar-chart svg {
-            width: 100%;
-            max-width: 100%;
+            width: calc(100% + var(--radar-box-trim));
+            max-width: calc(100% + var(--radar-box-trim));
+            margin-left: calc(var(--radar-box-trim) / -2);
             height: var(--radar-svg-h);
             max-height: var(--radar-svg-h);
             overflow: visible;
