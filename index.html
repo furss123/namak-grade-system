@@ -1096,7 +1096,7 @@
             background: linear-gradient(180deg, #f7fafd 0%, #eef3f9 100%);
             border: none;
             border-radius: 0;
-            font-size: calc(var(--rpt-font-base) + 3pt);
+            font-size: calc(var(--rpt-font-base) + 4pt);
             font-weight: 600;
             color: var(--school-navy-dark);
             display: flex;
@@ -1307,6 +1307,12 @@
         .page-2.p2-opt-count-2 .univ-ref-legend {
             margin-bottom: 1.5mm;
             padding: 1.5mm 2mm;
+        }
+        .page-2 .page-doc-header h1,
+        .page-2 #distPageTitle {
+            min-width: 0;
+            max-width: 100%;
+            white-space: nowrap;
         }
         .page-2 .page-doc-header h1 {
             font-size: calc(15px + 5pt);
@@ -4528,11 +4534,49 @@ function fitDistStudentNameLabel(wrap) {
     }
 }
 
+function buildDistPageTitleText(studentName) {
+    const displayName = normalizeDistStudentName(studentName);
+    if (!displayName) return '학생의 상·하위 10명 성적 분포';
+    return displayName + ' 학생의 상·하위 10명 성적 분포';
+}
+
+function distTitleMaxWidthPx(titleEl) {
+    const w = titleEl.clientWidth;
+    if (w >= 8) return w;
+    const header = titleEl.closest('.page-doc-header');
+    if (header && header.clientWidth >= 8) {
+        const gap = parseFloat(getComputedStyle(header).columnGap) || 0;
+        const logo = header.querySelector('.page-logo');
+        const logoW = logo ? logo.offsetWidth : 0;
+        return Math.max(8, header.clientWidth - logoW * 2 - gap * 2 - 2);
+    }
+    const page = titleEl.closest('.page');
+    const mmPx = 96 / 25.4;
+    const pageW = (page && page.clientWidth >= 8) ? page.clientWidth : 210 * mmPx;
+    return Math.max(8, pageW - (28 + 2 + 2) * mmPx);
+}
+
+function fitDistPageTitle(titleEl) {
+    if (!titleEl) return;
+    titleEl.style.fontSize = '';
+    const maxW = distTitleMaxWidthPx(titleEl);
+    let sizePx = parseFloat(getComputedStyle(titleEl).fontSize);
+    const minPx = 9;
+    while (sizePx > minPx && titleEl.scrollWidth > maxW + 1) {
+        sizePx -= 0.5;
+        titleEl.style.fontSize = sizePx + 'px';
+    }
+}
+
 function populateDistributionTable(studentIdStr, subjects, studentName) {
     const DIST_NEARBY = 10;
-    const displayName = normalizeDistStudentName(studentName) || '학생';
     const distTitle = document.getElementById('distPageTitle');
-    if (distTitle) distTitle.textContent = displayName + '의 상·하위 10명 성적 분포';
+    if (distTitle) {
+        distTitle.textContent = buildDistPageTitleText(studentName);
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() { fitDistPageTitle(distTitle); });
+        });
+    }
 
     const distBody = document.getElementById('distTableBody');
     if (!distBody) return;
@@ -4842,6 +4886,7 @@ function applyReportPageFitScale(pageEl) {
 
 function fitReportPagesInRoot(root) {
     if (!root) return;
+    root.querySelectorAll('.report-zone-dist .page-doc-header h1').forEach(fitDistPageTitle);
     root.querySelectorAll('.page-1, .page-2').forEach(function(pageEl) {
         applyReportPageFitScale(pageEl);
     });
@@ -5029,7 +5074,10 @@ function resetMainTables() {
     if (radarSvg) radarSvg.innerHTML = '';
     if (radarSummary) radarSummary.innerHTML = '';
     const distTitle = document.getElementById('distPageTitle');
-    if (distTitle) distTitle.textContent = '상·하위 10명 성적 분포';
+    if (distTitle) {
+        distTitle.textContent = '상·하위 10명 성적 분포';
+        distTitle.style.fontSize = '';
+    }
     const distBody = document.getElementById('distTableBody');
     if (distBody) distBody.innerHTML = '';
     const distNote = document.getElementById('distTableNote');
