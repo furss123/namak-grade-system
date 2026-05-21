@@ -1875,20 +1875,23 @@
         .my-score-row td { border: 2px solid var(--school-navy) !important; }
         .page-chrome-actions {
             --page-chrome-btn-w: 54px;
-            --page-chrome-btn-h: 72px;
+            --page-chrome-btn-h: calc(72px - 2mm);
             position: fixed;
-            right: max(12px, calc((100vw - var(--content-max)) / 2 - 212px));
+            right: max(12px, calc((100vw - var(--content-max)) / 2 - var(--page-chrome-btn-w) - 34px));
             top: 50%;
             transform: translateY(-50%);
             z-index: 900;
             display: flex;
-            flex-direction: row;
-            align-items: stretch;
+            flex-direction: column;
+            align-items: center;
             gap: 8px;
         }
         .page-scroll-nav,
         .page-action-nav {
-            display: contents;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
         }
         .page-scroll-btn,
         .page-action-btn {
@@ -1994,7 +1997,7 @@
             .page-chrome-actions {
                 right: 10px;
                 --page-chrome-btn-w: 52px;
-                --page-chrome-btn-h: 68px;
+                --page-chrome-btn-h: calc(68px - 2mm);
             }
             .page-scroll-btn,
             .page-action-btn {
@@ -2621,6 +2624,7 @@ const BUNDLED_SCORES_LABEL = '가상 학교 점수.xlsx';
 const DEFAULT_RANGE_START = '1110';
 const DEFAULT_RANGE_END = '1130';
 const DEFAULT_SINGLE_STUDENT_ID = '1101';
+const STUDENT_ID_PRESET_VALUES = ['1101', '1401'];
 
 const DEMO_SUBJECTS = ['국어', '수학', '영어', '한국사', '통합사회', '통합과학'];
 const DEMO_LAST_NAMES = ['김', '이', '박', '최', '정', '강', '조', '윤', '장', '임'];
@@ -2722,12 +2726,25 @@ async function loadBundledSchoolData() {
 
 let studentIdInputEdited = false;
 
+function isStudentIdPresetValue(value) {
+    return STUDENT_ID_PRESET_VALUES.includes(normalizeStudentId(value));
+}
+
 function syncStudentIdPresetClass() {
     const studentEl = document.getElementById('studentId');
     if (!studentEl) return;
-    const isPreset = !studentIdInputEdited
-        && normalizeStudentId(studentEl.value) === DEFAULT_SINGLE_STUDENT_ID;
+    const isPreset = !studentIdInputEdited && isStudentIdPresetValue(studentEl.value);
     studentEl.classList.toggle('student-id-preset', isPreset);
+}
+
+function clearStudentIdPresetOnInteract() {
+    const studentEl = document.getElementById('studentId');
+    if (!studentEl) return;
+    const hasPresetClass = studentEl.classList.contains('student-id-preset');
+    const hasPresetValue = !studentIdInputEdited && isStudentIdPresetValue(studentEl.value);
+    if (!hasPresetClass && !hasPresetValue) return;
+    studentEl.value = '';
+    studentEl.classList.remove('student-id-preset');
 }
 
 function markStudentIdEdited() {
@@ -2749,6 +2766,8 @@ function applyDefaultSingleStudentId() {
 function initStudentIdInput() {
     const studentEl = document.getElementById('studentId');
     if (!studentEl) return;
+    studentEl.addEventListener('focus', clearStudentIdPresetOnInteract);
+    studentEl.addEventListener('click', clearStudentIdPresetOnInteract);
     studentEl.addEventListener('input', markStudentIdEdited);
     studentEl.addEventListener('keydown', function(e) {
         if (e.key === 'Backspace' || e.key === 'Delete' || e.key.length === 1) markStudentIdEdited();
