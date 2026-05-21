@@ -1200,6 +1200,12 @@
             vertical-align: middle;
             border-color: #dce4ee;
         }
+        .page-1 .report-block-maxcut .report-panel th,
+        .page-1 .report-block-maxcut .report-panel td,
+        .page-1 .report-block-main .report-panel th,
+        .page-1 .report-block-main .report-panel td {
+            font-size: calc(var(--rpt-font-base) + 1pt);
+        }
         .page-1 .report-block thead th {
             background: var(--school-navy-dark);
             color: #fff;
@@ -1409,8 +1415,8 @@
             max-height: var(--radar-panel-h);
         }
         .page-1 .report-grade-goal-panel {
-            --goal-font-caption: calc(var(--rpt-font-caption) + 1pt);
-            --goal-font-cell: calc(var(--rpt-font-sm) + 1pt);
+            --goal-font-caption: calc(var(--rpt-font-caption) + 2pt);
+            --goal-font-cell: calc(var(--rpt-font-sm) + 2pt);
             --goal-cell-pad-y: 3.7mm;
             display: flex;
             flex-direction: column;
@@ -4745,14 +4751,14 @@ function renderStudentGradeRadar(subjectRows) {
         const nameSpan = document.createElementNS(NS, 'tspan');
         nameSpan.setAttribute('x', String(labPt.x));
         nameSpan.setAttribute('dy', '-0.55em');
-        nameSpan.setAttribute('font-size', '13');
+        nameSpan.setAttribute('font-size', '14');
         nameSpan.setAttribute('font-weight', '700');
         nameSpan.textContent = row.subject;
 
         const gradeSpan = document.createElementNS(NS, 'tspan');
         gradeSpan.setAttribute('x', String(labPt.x));
         gradeSpan.setAttribute('dy', '1.15em');
-        gradeSpan.setAttribute('font-size', '14.5');
+        gradeSpan.setAttribute('font-size', '15.5');
         gradeSpan.setAttribute('font-weight', '800');
         gradeSpan.textContent = row.grade + '등급';
 
