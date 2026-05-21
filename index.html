@@ -2090,7 +2090,7 @@
                 <p class="header-meta">
                     <strong>2026학년도 정기고사</strong>
                     <span class="header-meta-sep" aria-hidden="true">·</span>
-                    <span>고교학점제 5등급 반영</span>
+                    <span>고교학점제 5등급제 반영</span>
                 </p>
             </div>
         </div>
@@ -2110,9 +2110,9 @@
                         </svg>
                     </div>
                     <div class="upload-text-container">
-                        <span class="upload-panel-head">성적 데이터 업로드</span>
-                        <div class="upload-title" id="uploadTitle">엑셀 성적 파일을 여기에 등록<span class="upload-format">.xlsx</span></div>
-                        <span class="upload-desc" id="fileStatus">이 칸을 클릭하거나 .xlsx 파일을 드래그하여 등록해 주세요.</span>
+                        <span class="upload-panel-head">성적 데이터 등록</span>
+                        <div class="upload-title" id="uploadTitle">엑셀 성적 파일을 여기에 등록<span class="upload-format">(.xlsx·.xls)</span></div>
+                        <span class="upload-desc" id="fileStatus">이 칸을 클릭하거나 엑셀(.xlsx, .xls) 파일을 드래그하여 등록해 주세요.</span>
                     </div>
                 </div>
                 <div class="upload-guide-box" aria-label="사용 방법 안내">
@@ -2123,7 +2123,7 @@
                     </div>
                     <div class="upload-guide-content">
                         <span class="upload-panel-head">사용 방법</span>
-                        <p class="upload-guide-desc">나이스에서 반별 전과목 결과를 「보고서 형태 유지」 해제 후 받은 엑셀을 한 번에 업로드할 수 있습니다.</p>
+                        <p class="upload-guide-desc">나이스에서 반별 전과목 결과를 「보고서 형태 유지」를 해제한 뒤 받은 엑셀을 한 번에 등록할 수 있습니다.</p>
                         <ul class="upload-guide-list">
                             <li>저장 시 <strong>보고서 형태 유지</strong> 체크 해제</li>
                             <li>반별 파일을 여러 개 선택해 한 번에 등록 가능</li>
@@ -2143,7 +2143,7 @@
                     <div class="input-area">
                         <input type="text" id="studentId" class="student-id-input" value="1101"
                             maxlength="4" inputmode="numeric" autocomplete="off"
-                            placeholder="학번 4자리" aria-label="학번 4자리">
+                            placeholder="4자리 학번" aria-label="4자리 학번">
                         <button type="button" class="search-btn" onclick="searchSingleStudent()">
                             <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -2195,7 +2195,7 @@
                             </label>
                             <label class="print-opt-label print-opt-hidden" for="printOptUniv" hidden>
                                 <input type="checkbox" id="printOptUniv">
-                                <span>지원 대학</span>
+                                <span>지원 가능 대학</span>
                             </label>
                         </div>
                     </div>
@@ -2215,8 +2215,8 @@
                 <tbody id="statsTableBody">
                     <tr id="statsRowUnit"><td class="stats-row-label">단위수</td></tr>
                     <tr id="statsRowAvg" class="stats-row-divider"><td class="stats-row-label">평균 점수</td></tr>
-                    <tr id="statsRowMax"><td class="stats-row-label">최상위 점수</td></tr>
-                    <tr id="statsRowMin"><td class="stats-row-label">최하위 점수</td></tr>
+                    <tr id="statsRowMax"><td class="stats-row-label">최고 점수</td></tr>
+                    <tr id="statsRowMin"><td class="stats-row-label">최저 점수</td></tr>
                     <tr id="statsRowCut1" class="stats-row-divider"><td class="stats-row-label">1등급 최저</td></tr>
                     <tr id="statsRowCut2"><td class="stats-row-label">2등급 최저</td></tr>
                     <tr id="statsRowCut3"><td class="stats-row-label">3등급 최저</td></tr>
@@ -2226,7 +2226,7 @@
             </div>
 
             <div class="stats-grade-dist" id="statsGradeDist">
-                <h3 class="stats-grade-dist-heading">1학년 전체 등급 분포 그래프</h3>
+                <h3 class="stats-grade-dist-heading">1학년 전체 등급 분포</h3>
                 <div class="stats-grade-dist-chart" id="statsGradeDistChart"></div>
                 <p class="stats-grade-dist-note" id="statsGradeDistNote"></p>
             </div>
@@ -2268,7 +2268,7 @@
                     <tr id="maxCutTableHead"><th class="row-label">구분</th></tr>
                 </thead>
                 <tbody>
-                    <tr id="rowMax"><th class="row-label">최고점수</th></tr>
+                    <tr id="rowMax"><th class="row-label">최고 점수</th></tr>
                     <tr id="rowCut1"><th class="row-label">1등급</th></tr>
                     <tr id="rowCut2"><th class="row-label">2등급</th></tr>
                     <tr id="rowCut3"><th class="row-label">3등급</th></tr>
@@ -2286,7 +2286,7 @@
             <div class="report-panel">
             <table id="mainScoreTable">
                 <thead>
-                    <tr id="mainTableHead"><th class="row-label">교과명</th></tr>
+                    <tr id="mainTableHead"><th class="row-label">과목</th></tr>
                 </thead>
                 <tbody>
                     <tr id="rowUnit"><th class="row-label">단위수</th></tr>
@@ -2303,13 +2303,13 @@
                 <span class="score-grade-manual-label">석차 표기</span>
                 <span class="score-grade-manual-sample" aria-hidden="true"><span class="g5">6</span><span class="g9">(3)</span></span>
                 <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 석차</span>
-                <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 동석차수</span>
+                <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 동석차</span>
             </div>
             <div class="score-grade-manual" role="note" aria-label="등급 표기 안내">
                 <span class="score-grade-manual-label">등급 표기</span>
                 <span class="score-grade-manual-sample" aria-hidden="true"><span class="g5">3</span><span class="g9">(4)</span></span>
-                <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 5등급제(고교학점제)</span>
-                <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 9등급제 상대평가(중간석차·누적 백분율)</span>
+                <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 고교학점제 5등급제</span>
+                <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 9등급제 상대평가(중간석차·누적백분율)</span>
             </div>
             </div>
             </div>
@@ -2324,7 +2324,7 @@
                 </div>
                 <div class="report-radar-side">
                     <div class="report-grade-goal-panel">
-                        <p class="panel-caption">한 등급 올리기 목표점수 (원점수 + 윗등급 차×2)</p>
+                        <p class="panel-caption">한 등급 올리기 목표 점수 (원점수 + 윗등급 차×2)</p>
                         <div id="gradeRadarSummary"></div>
                     </div>
                 </div>
@@ -2365,9 +2365,9 @@
             <div class="report-block report-block-univ-ref">
             <h3>내신 기반 지원 가능 대학 안내</h3>
             <div class="univ-ref-legend">
-                <span><span class="univ-ref-strategy-tag up">상향</span> 도전 지원</span>
-                <span><span class="univ-ref-strategy-tag ok">적정</span> 안정 지원</span>
-                <span><span class="univ-ref-strategy-tag safe">하향</span> 보험 지원</span>
+                <span><span class="univ-ref-strategy-tag up">상향(도전)</span></span>
+                <span><span class="univ-ref-strategy-tag ok">적정(안정)</span></span>
+                <span><span class="univ-ref-strategy-tag safe">하향(보험)</span></span>
             </div>
             <div class="report-panel">
             <table class="univ-ref-table" id="univRefTable">
@@ -2565,7 +2565,7 @@ function applyParsedStudentData(parsedData, fileName, options = {}) {
     }
     isFileUploaded = true;
     processAllGrades();
-    setUploadState('데이터 분석 완료!', true, fileName);
+    setUploadState('성적 데이터 분석 완료!', true, fileName);
     displayGeneralStats();
     if (options.resetUi) {
         clearPrintContainer();
@@ -2778,7 +2778,7 @@ function downloadGradeTemplate(event) {
         ['① 「' + GRADE_DATA_SHEET_NAME + '」 1행: 열 제목, 2행: 과목별 단위수, 3행부터 학생 성적을 입력합니다.'],
         ['② 단위수는 「' + GRADE_DATA_SHEET_NAME + '」 2행(첫 열에 「단위수」)에만 적으면 됩니다.'],
         ['③ 열 이름을 국어(4)처럼 괄호에 단위수를 넣어도 인식합니다.'],
-        ['④ 필수: 반·번호·이름 또는 학번·이름. .xlsx 저장 후 「성적 데이터 등록」에서 업로드합니다.']
+        ['④ 필수: 반·번호·이름 또는 학번·이름. xlsx·xls 파일로 저장한 뒤 「성적 데이터 등록」에서 등록합니다.']
     ]);
     guide['!cols'] = [{ wch: 65 }];
     const wb = XLSX.utils.book_new();
@@ -3012,8 +3012,8 @@ function displayGeneralStats() {
     document.getElementById('statsTableHead').innerHTML = '<th class="stats-head-corner">구분</th>';
     document.getElementById('statsRowUnit').innerHTML = '<td class="stats-row-label">단위수</td>';
     document.getElementById('statsRowAvg').innerHTML = '<td class="stats-row-label">평균 점수</td>';
-    document.getElementById('statsRowMax').innerHTML = '<td class="stats-row-label">최상위 점수</td>';
-    document.getElementById('statsRowMin').innerHTML = '<td class="stats-row-label">최하위 점수</td>';
+    document.getElementById('statsRowMax').innerHTML = '<td class="stats-row-label">최고 점수</td>';
+    document.getElementById('statsRowMin').innerHTML = '<td class="stats-row-label">최저 점수</td>';
     document.getElementById('statsRowCut1').innerHTML = '<td class="stats-row-label">1등급 최저</td>';
     document.getElementById('statsRowCut2').innerHTML = '<td class="stats-row-label">2등급 최저</td>';
     document.getElementById('statsRowCut3').innerHTML = '<td class="stats-row-label">3등급 최저</td>';
@@ -3161,7 +3161,7 @@ function restoreSessionData() {
         isFileUploaded = true;
         isDemoData = !!saved.isDemoData;
         processAllGrades();
-        setUploadState('데이터 분석 완료!', true, saved.fileName || '저장된 성적 파일');
+        setUploadState('성적 데이터 분석 완료!', true, saved.fileName || '저장된 성적 파일');
         displayGeneralStats();
         return saved.ui || null;
     } catch (err) {
@@ -3604,7 +3604,7 @@ async function processExcelFiles(fileList) {
             studentData = [];
             clearSessionData();
             const hint = failedNames.length
-                ? `인식된 파일 없음 (${failedNames.length}개 실패)`
+                ? `인식된 파일이 없습니다 (${failedNames.length}개 실패)`
                 : '유효한 성적 데이터가 없거나 올바른 양식이 아닙니다.';
             setUploadState(hint, false);
             document.getElementById('statsDashboard').style.display = 'none';
@@ -3616,7 +3616,7 @@ async function processExcelFiles(fileList) {
         subjectUnitMap = finalizeSubjectUnitMap(mergedStudents, mergedUnits, unitsExplicit);
         const label = formatUploadedFileLabel(loadedNames);
         const statusNote = failedNames.length
-            ? ` (${failedNames.length}개 파일은 건너뜀)`
+            ? ` (${failedNames.length}개 파일은 건너뛰었습니다)`
             : '';
         if (applyParsedStudentData(mergedStudents, label + statusNote, {
             isDemo: false,
@@ -3644,7 +3644,7 @@ function processExcelFile(file) {
 }
 
 function getDefaultUploadTitleHtml() {
-    return '엑셀 성적 파일을 여기에 등록<span class="upload-format">.xlsx</span>';
+    return '엑셀 성적 파일을 여기에 등록<span class="upload-format">(.xlsx·.xls)</span>';
 }
 
 function setUploadState(statusText, isSuccess, fileName = "") {
@@ -4375,7 +4375,7 @@ async function runPerplexityUnivAnalysis() {
     try {
         await enqueueUnivRefFetch(avgGrade, 'puter', { force: true });
     } catch (err) {
-        alert('Perplexity 분석 실패: ' + (err && err.message ? err.message : '알 수 없음'));
+        alert('AI(Perplexity) 분석에 실패했습니다: ' + (err && err.message ? err.message : '알 수 없음'));
     } finally {
         if (btn) btn.disabled = false;
     }
@@ -4866,7 +4866,7 @@ function renderStudentGradeRadar(subjectRows) {
         table.className = 'report-grade-goal-table';
         table.innerHTML =
             '<colgroup><col class="col-subject"><col class="col-grade"><col class="col-score"><col class="col-goal"></colgroup>' +
-            '<thead><tr><th>과목</th><th>등급</th><th>원점수</th><th>목표점수</th></tr></thead>';
+            '<thead><tr><th>과목</th><th>등급</th><th>원점수</th><th>목표 점수</th></tr></thead>';
         const tbody = document.createElement('tbody');
         subjectRows.forEach((row) => {
             const tr = document.createElement('tr');
@@ -5082,9 +5082,9 @@ function appendTd(targetId, text) {
 }
 
 function resetMainTables() {
-    document.getElementById('mainTableHead').innerHTML = '<th class="row-label">교과명</th>'; 
+    document.getElementById('mainTableHead').innerHTML = '<th class="row-label">과목</th>';
     document.getElementById('maxCutTableHead').innerHTML = '<th class="row-label">구분</th>';
-    document.getElementById('rowMax').innerHTML = '<th class="row-label">최고점수</th>';
+    document.getElementById('rowMax').innerHTML = '<th class="row-label">최고 점수</th>';
     document.getElementById('distTableHead').innerHTML = '<th class="row-label" style="width: 12%;">구분</th>';
     document.getElementById('rowUnit').innerHTML = '<th class="row-label">단위수</th>'; 
     document.getElementById('rowScore').innerHTML = '<th class="row-label">원점수</th>';
