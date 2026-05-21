@@ -897,9 +897,10 @@
         }
         .page-1 .report-radar-layout {
             display: grid;
-            grid-template-columns: 4fr 6fr;
+            grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
             align-items: stretch;
+            min-height: 54mm;
         }
         .page-1 .report-radar-chart {
             display: flex;
@@ -909,28 +910,43 @@
             border: 1px solid #d4dde8;
             border-radius: 5px;
             padding: 2.5mm;
-            min-height: 50mm;
+            min-height: 54mm;
+            height: 100%;
+            box-sizing: border-box;
         }
         .page-1 .report-radar-chart svg {
             width: 100%;
             max-width: 100%;
-            max-height: 54mm;
-            height: auto;
+            height: 100%;
+            max-height: 100%;
             overflow: visible;
         }
         .page-1 .report-radar-side {
             display: flex;
             flex-direction: column;
-            gap: 2mm;
             min-width: 0;
+            min-height: 54mm;
+            height: 100%;
         }
         .page-1 .report-grade-goal-panel {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            min-height: 0;
+            height: 100%;
             border: 1px solid #d4dde8;
             border-radius: 5px;
             overflow: hidden;
             background: #fff;
+            box-sizing: border-box;
+        }
+        .page-1 #gradeRadarSummary {
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
         }
         .page-1 .report-grade-goal-panel .panel-caption {
+            flex-shrink: 0;
             margin: 0;
             padding: 1.8mm 3mm;
             font-size: var(--rpt-font-caption);
@@ -947,10 +963,11 @@
         }
         .page-1 .report-grade-goal-table th,
         .page-1 .report-grade-goal-table td {
-            padding: var(--rpt-cell-pad);
+            padding: 2mm 3px;
             font-size: var(--rpt-font-sm);
             line-height: 1.28;
             text-align: center;
+            vertical-align: middle;
             border: 1px solid #e8edf4;
         }
         .page-1 .report-grade-goal-table thead th {
