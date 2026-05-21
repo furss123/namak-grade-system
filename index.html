@@ -1768,7 +1768,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
-            align-items: stretch;
+            align-items: start;
             width: 100%;
         }
         .page-1 .report-radar-chart {
@@ -1808,37 +1808,27 @@
             flex-direction: column;
             min-width: 0;
             width: 100%;
-            height: 100%;
-            min-height: var(--radar-panel-h);
-            align-self: stretch;
+            height: auto;
+            align-self: start;
         }
         .page-1 .report-grade-goal-panel {
             --goal-font-caption: calc(var(--rpt-font-sm) + 0.5pt);
             --goal-font-cell: calc(var(--rpt-font-base) + 1pt);
-            --goal-cell-pad-y: calc(var(--rpt-cell-pad-y) + 1.1mm);
+            --goal-cell-pad-y: var(--rpt-cell-pad-y);
             display: flex;
             flex-direction: column;
-            height: var(--radar-panel-h);
-            min-height: var(--radar-panel-h);
-            flex: 1 1 auto;
+            height: auto;
+            flex: 0 0 auto;
             border: 1px solid #d4dde8;
             border-radius: 5px;
             overflow: hidden;
             background: #fff;
             box-sizing: border-box;
         }
-        .page-1.p1-opt-count-1 .report-grade-goal-panel {
-            --goal-cell-pad-y: calc(var(--rpt-cell-pad-y) + 1.45mm);
-        }
-        .page-1.p1-opt-count-2 .report-grade-goal-panel {
-            --goal-cell-pad-y: calc(var(--rpt-cell-pad-y) + 0.85mm);
-        }
         .page-1 #gradeRadarSummary {
-            flex: 1 1 0;
-            min-height: 0;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            flex: 0 0 auto;
+            overflow: visible;
+            display: block;
         }
         .page-1 .report-grade-goal-panel .panel-caption-bottom {
             flex-shrink: 0;
@@ -1858,20 +1848,15 @@
         }
         .page-1 .report-grade-goal-table {
             width: 100%;
-            height: 100%;
-            flex: 1 1 auto;
-            min-height: 0;
+            height: auto;
             border-collapse: collapse;
             table-layout: fixed;
-        }
-        .page-1 .report-grade-goal-table tbody {
-            height: 100%;
         }
         .page-1 .report-grade-goal-table thead tr {
             height: auto;
         }
         .page-1 .report-grade-goal-table tbody tr {
-            height: 16.666667%;
+            height: auto;
         }
         .page-1 .report-grade-goal-table .col-subject { width: 26%; }
         .page-1 .report-grade-goal-table .col-grade { width: 18%; }
