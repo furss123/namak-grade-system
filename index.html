@@ -7,7 +7,7 @@
     <link rel="icon" href="assets/namak-logo.png" type="image/png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" integrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSrI1beYzmZvVBypnVnhG+Pm0uZaDnW8In/2YKS3RnO4g5vNvQcJQ9hQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script defer id="html2pdfBundle" src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
     <script src="verification/grade-engine.js"></script>
     <style>
         :root {
@@ -139,7 +139,7 @@
             flex-direction: column;
             justify-content: center;
             align-items: flex-start;
-            gap: 6px;
+            gap: clamp(3px, 0.5vw, 5px);
             min-width: 0;
             flex: 1 1 auto;
             min-height: 135px;
@@ -147,19 +147,19 @@
         }
         .header-school {
             margin: 0;
-            font-size: var(--text-sm);
+            font-size: clamp(0.7rem, 1.1vw, 0.75rem);
             font-weight: 700;
             letter-spacing: -0.02em;
             color: var(--school-navy);
-            line-height: 1.3;
+            line-height: 1.25;
             text-align: left;
         }
         .site-header-text h1 {
             margin: 0;
-            font-size: var(--text-2xl);
+            font-size: clamp(1.28rem, 2.6vw, 1.48rem);
             font-weight: 800;
             letter-spacing: -0.035em;
-            line-height: 1.2;
+            line-height: 1.18;
             color: var(--school-navy-dark);
             text-align: left;
         }
@@ -174,10 +174,10 @@
             display: inline-flex;
             align-items: center;
             text-align: left;
-            padding: 4px 10px;
-            font-size: var(--text-xs);
+            padding: 3px 9px;
+            font-size: clamp(0.68rem, 1vw, 0.72rem);
             font-weight: 600;
-            line-height: 1.4;
+            line-height: 1.35;
             letter-spacing: -0.01em;
             color: var(--school-navy-dark);
             background: var(--school-accent-soft);
@@ -201,10 +201,10 @@
             .site-header-text {
                 align-items: flex-start;
                 text-align: left;
-                min-height: 0;
+                min-height: 100px;
             }
             .site-header-text h1 {
-                font-size: var(--text-xl);
+                font-size: clamp(1.12rem, 4.2vw, 1.28rem);
             }
         }
 
@@ -690,6 +690,7 @@
         #studentId.student-id-input.student-id-preset {
             color: #94a3b8;
             font-weight: 500;
+            font-size: calc(var(--text-md) + 1pt - 1pt);
         }
         .print-opt-label.print-opt-hidden {
             display: none !important;
@@ -919,6 +920,15 @@
             display: flex;
             flex-direction: column;
             gap: var(--space-5);
+        }
+        #printContainer.pdf-export-capture {
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: -1;
+            visibility: visible;
+            opacity: 1;
+            pointer-events: none;
         }
         #printContainer .page {
             border-radius: var(--radius-sm);
@@ -1461,30 +1471,33 @@
             flex-direction: column;
             min-width: 0;
             width: 100%;
-            height: auto;
+            height: 100%;
             min-height: var(--radar-panel-h);
             align-self: stretch;
         }
         .page-1 .report-grade-goal-panel {
             --goal-font-caption: var(--rpt-font-sm);
             --goal-font-cell: var(--rpt-font-base);
-            --goal-cell-pad-y: var(--rpt-cell-pad-y);
+            --goal-cell-pad-y: calc(var(--rpt-cell-pad-y) + 0.65mm);
             display: flex;
             flex-direction: column;
-            height: auto;
+            height: 100%;
+            min-height: var(--radar-panel-h);
             flex: 1 1 auto;
             border: 1px solid #d4dde8;
             border-radius: 5px;
-            overflow: visible;
+            overflow: hidden;
             background: #fff;
             box-sizing: border-box;
         }
         .page-1 #gradeRadarSummary {
-            flex: 0 0 auto;
-            overflow: visible;
-            display: block;
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
-        .page-1 .report-grade-goal-panel .panel-caption {
+        .page-1 .report-grade-goal-panel .panel-caption-bottom {
             flex-shrink: 0;
             margin: 0;
             padding: 1.4mm 2mm;
@@ -1492,7 +1505,8 @@
             font-weight: 700;
             color: var(--school-navy);
             background: #f4f7fa;
-            border-bottom: 1px solid #e2e8f0;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: none;
             letter-spacing: -0.01em;
             text-align: center;
             display: flex;
@@ -1501,13 +1515,19 @@
         }
         .page-1 .report-grade-goal-table {
             width: 100%;
-            height: auto;
+            height: 100%;
+            flex: 1 1 auto;
             border-collapse: collapse;
             table-layout: fixed;
         }
-        .page-1 .report-grade-goal-table thead tr,
-        .page-1 .report-grade-goal-table tbody tr {
+        .page-1 .report-grade-goal-table tbody {
+            height: 100%;
+        }
+        .page-1 .report-grade-goal-table thead tr {
             height: auto;
+        }
+        .page-1 .report-grade-goal-table tbody tr {
+            height: calc(100% / 6);
         }
         .page-1 .report-grade-goal-table .col-subject { width: 26%; }
         .page-1 .report-grade-goal-table .col-grade { width: 18%; }
@@ -1895,33 +1915,25 @@
             outline: 2px solid var(--school-navy-light);
             outline-offset: 2px;
         }
-        .page-action-split {
+        .page-action-nav {
             display: flex;
             flex-direction: column;
-            align-items: stretch;
-            align-self: stretch;
-            width: var(--page-chrome-btn-w);
-            min-width: var(--page-chrome-btn-w);
-            gap: 0;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            box-shadow: 0 4px 14px rgba(30, 58, 95, 0.18);
+            gap: var(--space-2);
         }
-        .page-action-split[hidden] {
+        .page-action-nav[hidden] {
             display: none !important;
         }
         .page-action-btn {
-            flex: 1 1 50%;
-            min-height: 0;
-            height: 50%;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            gap: 3px;
-            padding: 6px 4px;
+            gap: 4px;
+            width: var(--page-chrome-btn-w);
+            min-width: var(--page-chrome-btn-w);
+            padding: 10px 6px;
             border: none;
-            border-radius: 0;
+            border-radius: var(--radius-md);
             font-family: inherit;
             font-size: var(--text-xs);
             font-weight: 700;
@@ -1929,9 +1941,9 @@
             letter-spacing: -0.02em;
             white-space: nowrap;
             cursor: pointer;
-            box-shadow: none;
-            backdrop-filter: none;
-            transition: filter 0.2s var(--ease), background 0.2s var(--ease);
+            box-shadow: 0 4px 14px rgba(30, 58, 95, 0.18);
+            transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease),
+                filter 0.2s var(--ease), background 0.2s var(--ease);
         }
         .page-action-btn svg {
             width: 18px;
@@ -1943,14 +1955,17 @@
         }
         .page-action-btn:hover {
             filter: brightness(1.06);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(30, 58, 95, 0.2);
         }
         .page-action-btn:active {
             filter: brightness(0.96);
+            transform: translateY(0);
+            box-shadow: 0 3px 10px rgba(30, 58, 95, 0.16);
         }
         .page-action-btn:focus-visible {
             outline: 2px solid var(--school-navy-light);
-            outline-offset: -2px;
-            z-index: 1;
+            outline-offset: 2px;
         }
         .page-action-btn:disabled {
             opacity: 0.65;
@@ -1960,7 +1975,6 @@
         .page-action-print {
             color: #fff;
             background: linear-gradient(180deg, #4a7ab0 0%, var(--school-navy) 100%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.22);
         }
         .page-action-print:hover {
             filter: brightness(1.08);
@@ -1980,10 +1994,6 @@
             .page-chrome-actions {
                 right: 10px;
                 --page-chrome-btn-w: 52px;
-            }
-            .page-action-split {
-                width: var(--page-chrome-btn-w);
-                min-width: var(--page-chrome-btn-w);
             }
             .page-scroll-btn,
             .page-action-btn {
@@ -2177,7 +2187,7 @@
                 <p class="header-school">남악고등학교</p>
                 <h1>1학년 <span class="header-em">성적 조회</span> 시스템</h1>
                 <p class="header-subline">
-                    <span class="header-subtitle">고교학점제 5등급제</span>
+                    <span class="header-subtitle">고교학점제 5등급제 반영</span>
                 </p>
             </div>
         </div>
@@ -2421,8 +2431,8 @@
                 </div>
                 <div class="report-radar-side">
                     <div class="report-grade-goal-panel">
-                        <p class="panel-caption">한 등급 올리기 목표 점수 (원점수 + 윗등급 차×2)</p>
                         <div id="gradeRadarSummary"></div>
+                        <p class="panel-caption panel-caption-bottom">한 등급 올리기 목표 점수 (원점수 + 윗등급 차×2)</p>
                     </div>
                 </div>
             </div>
@@ -2509,7 +2519,7 @@
                 <span>맨 아래</span>
             </button>
         </nav>
-        <div class="page-action-split" id="reportActionSplit" hidden aria-label="결과 출력">
+        <div class="page-action-nav" id="reportActionNav" hidden aria-label="결과 출력">
             <button type="button" class="page-action-btn page-action-print" id="printActionBtn" onclick="printSelectedReport()" aria-label="결과 인쇄하기">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M6 9V4h12v5M6 18H4v2h16v-2h-2M6 14h12v-4H6v4z" />
@@ -3775,13 +3785,13 @@ function setUploadState(statusText, isSuccess, fileName = "") {
 }
 
 function showPrintFloatActions() {
-    const split = document.getElementById('reportActionSplit');
-    if (split) split.hidden = false;
+    const nav = document.getElementById('reportActionNav');
+    if (nav) nav.hidden = false;
 }
 
 function hidePrintFloatActions() {
-    const split = document.getElementById('reportActionSplit');
-    if (split) split.hidden = true;
+    const nav = document.getElementById('reportActionNav');
+    if (nav) nav.hidden = true;
 }
 
 /** 대학 AI — ① Worker(선택) ② DDG(팝업 없음) ③ Puter/Perplexity(버튼 1회 로그인) */
@@ -4946,14 +4956,14 @@ function renderStudentGradeRadar(subjectRows) {
         const nameSpan = document.createElementNS(NS, 'tspan');
         nameSpan.setAttribute('x', String(labPt.x));
         nameSpan.setAttribute('dy', '-0.55em');
-        nameSpan.setAttribute('font-size', '16');
+        nameSpan.setAttribute('font-size', '15');
         nameSpan.setAttribute('font-weight', '700');
         nameSpan.textContent = row.subject;
 
         const gradeSpan = document.createElementNS(NS, 'tspan');
         gradeSpan.setAttribute('x', String(labPt.x));
         gradeSpan.setAttribute('dy', '1.15em');
-        gradeSpan.setAttribute('font-size', '17.5');
+        gradeSpan.setAttribute('font-size', '16.5');
         gradeSpan.setAttribute('font-weight', '800');
         gradeSpan.textContent = row.grade + '등급';
 
@@ -5162,8 +5172,68 @@ function printSelectedReport() {
     window.print();
 }
 
+function isHtml2PdfAvailable() {
+    return typeof html2pdf === 'function';
+}
+
+var html2pdfLoadPromise = null;
+
+/** html2pdf.js CDN 로드 대기·재시도 (0.10.2, jsDelivr) */
+function ensureHtml2PdfLoaded() {
+    if (isHtml2PdfAvailable()) return Promise.resolve();
+    if (html2pdfLoadPromise) return html2pdfLoadPromise;
+    html2pdfLoadPromise = new Promise(function(resolve, reject) {
+        var bundle = document.getElementById('html2pdfBundle');
+        function finishOk() {
+            if (isHtml2PdfAvailable()) resolve();
+            else reject(new Error('html2pdf not defined'));
+        }
+        function finishErr() {
+            reject(new Error('html2pdf script load failed'));
+        }
+        function injectRetry() {
+            if (document.getElementById('html2pdfBundleRetry')) return;
+            var retry = document.createElement('script');
+            retry.id = 'html2pdfBundleRetry';
+            retry.crossOrigin = 'anonymous';
+            retry.src = 'https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.2/dist/html2pdf.bundle.min.js';
+            retry.onload = finishOk;
+            retry.onerror = finishErr;
+            document.head.appendChild(retry);
+        }
+        if (bundle) {
+            bundle.addEventListener('load', finishOk, { once: true });
+            bundle.addEventListener('error', injectRetry, { once: true });
+            if (isHtml2PdfAvailable()) {
+                finishOk();
+                return;
+            }
+            if (document.readyState === 'complete') {
+                injectRetry();
+            }
+            return;
+        }
+        injectRetry();
+    }).catch(function(err) {
+        html2pdfLoadPromise = null;
+        throw err;
+    });
+    return html2pdfLoadPromise;
+}
+
+/** appendReportsToPrintContainer의 rAF 레이아웃(fit) 완료 후 캡처 */
+function waitForPrintContainerLayout() {
+    return new Promise(function(resolve) {
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                setTimeout(resolve, 100);
+            });
+        });
+    });
+}
+
 /**
- * PDF 저장: html2pdf(CDN)로 자동 다운로드. 라이브러리 미로드 시 window.print() 폴백(대화상자에서 PDF 저장).
+ * PDF 저장: html2pdf로 브라우저 다운로드(Save As). 인쇄 대화상자(window.print)는 사용하지 않음.
  */
 function saveReportAsPdf() {
     if (!prepareSelectedReportForOutput()) return;
@@ -5172,29 +5242,31 @@ function saveReportAsPdf() {
         alert('저장할 보고서가 없습니다.');
         return;
     }
-    if (typeof html2pdf !== 'function') {
-        window.print();
-        return;
-    }
     const pdfBtn = document.getElementById('pdfActionBtn');
     if (pdfBtn) pdfBtn.disabled = true;
+    printContainer.classList.add('pdf-export-capture');
     const filename = getReportPdfFilename();
-    html2pdf()
-        .set({
-            margin: 0,
-            filename: filename,
-            image: { type: 'jpeg', quality: 0.98 },
-            html2canvas: { scale: 2, useCORS: true, logging: false },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: ['css', 'legacy'], before: '.page + .page' }
+    waitForPrintContainerLayout()
+        .then(function() { return ensureHtml2PdfLoaded(); })
+        .then(function() {
+            return html2pdf()
+                .set({
+                    margin: 0,
+                    filename: filename,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2, useCORS: true, logging: false },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                    pagebreak: { mode: ['css', 'legacy'], before: '.page + .page' }
+                })
+                .from(printContainer)
+                .save();
         })
-        .from(printContainer)
-        .save()
         .catch(function(err) {
-            console.warn('PDF 저장 실패, 인쇄 대화상자로 대체:', err);
-            window.print();
+            console.warn('PDF 저장 실패:', err);
+            alert('PDF를 저장할 수 없습니다. PDF 라이브러리 로드 실패이거나 생성 중 오류가 발생했습니다.\n네트워크 연결을 확인한 뒤 다시 시도해 주세요.');
         })
         .finally(function() {
+            printContainer.classList.remove('pdf-export-capture');
             if (pdfBtn) pdfBtn.disabled = false;
         });
 }
