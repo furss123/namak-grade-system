@@ -1265,7 +1265,7 @@
         }
         .page-2.p2-opt-count-1 #distributionTable th,
         .page-2.p2-opt-count-1 #distributionTable td {
-            font-size: calc(10px + 5.5pt);
+            font-size: calc(10px + 7pt);
         }
         .page-2.p2-opt-count-1 .univ-ref-table th,
         .page-2.p2-opt-count-1 .univ-ref-table td {
@@ -1290,7 +1290,7 @@
         }
         .page-2.p2-opt-count-2 #distributionTable th,
         .page-2.p2-opt-count-2 #distributionTable td {
-            font-size: calc(8.5px + 5.5pt);
+            font-size: calc(8.5px + 7pt);
         }
         .page-2.p2-opt-count-2 .univ-ref-table th,
         .page-2.p2-opt-count-2 .univ-ref-table td {
@@ -1312,7 +1312,7 @@
             font-size: calc(15px + 5pt);
         }
         .page-2 .dist-table-note {
-            margin: 0;
+            margin: 1mm 0 1.2mm;
             text-align: right;
             font-size: calc(9px + 2pt);
             color: var(--school-muted);
@@ -1332,7 +1332,7 @@
         .page-2 #distributionTable th,
         .page-2 #distributionTable td {
             padding: 4px 3px;
-            font-size: calc(10px + 5.5pt);
+            font-size: calc(10px + 7pt);
             line-height: 1.3;
             border-color: #dce4ee;
         }
@@ -1344,7 +1344,7 @@
         }
         .page-2 #distributionTable .symbol-up,
         .page-2 #distributionTable .symbol-down {
-            font-size: calc(12px + 5.5pt);
+            font-size: calc(12px + 7pt);
             font-weight: 800;
             width: auto;
         }
@@ -4530,8 +4530,9 @@ function fitDistStudentNameLabel(wrap) {
 
 function populateDistributionTable(studentIdStr, subjects, studentName) {
     const DIST_NEARBY = 10;
+    const displayName = normalizeDistStudentName(studentName) || '학생';
     const distTitle = document.getElementById('distPageTitle');
-    if (distTitle) distTitle.textContent = '상·하위 10명 성적 분포';
+    if (distTitle) distTitle.textContent = displayName + '의 상·하위 10명 성적 분포';
 
     const distBody = document.getElementById('distTableBody');
     if (!distBody) return;
