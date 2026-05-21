@@ -431,12 +431,25 @@
         }
         .query-layout .query-card { margin-bottom: 0; }
         .query-card-print { margin-bottom: 0; }
-        .print-options-grid {
-            display: grid; grid-template-columns: repeat(2, 1fr);
-            gap: 10px 14px;
+        .print-options-pages {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px 18px;
         }
-        @media (max-width: 520px) {
-            .print-options-grid { grid-template-columns: 1fr; }
+        @media (max-width: 640px) {
+            .print-options-pages { grid-template-columns: 1fr; }
+        }
+        .print-options-page-label {
+            margin: 0 0 8px;
+            font-size: calc(12px + 1pt);
+            font-weight: 800;
+            color: var(--school-navy-dark);
+            letter-spacing: -0.02em;
+        }
+        .print-options-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
         }
         .print-opt-label {
             display: flex; align-items: flex-start; gap: 10px;
@@ -868,6 +881,25 @@
             flex-direction: column;
             gap: var(--report-zone-gap);
             overflow: hidden;
+            min-height: 0;
+        }
+        .page-1 .report-zone-head .report-zone-maxcut {
+            margin-top: 2mm;
+        }
+        .page-1 .report-page-one-split {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.6mm;
+            align-items: start;
+            flex: 1;
+            min-height: 0;
+        }
+        .page-1 .report-page-one-split.is-single-col {
+            grid-template-columns: 1fr;
+        }
+        .page-1 .report-page-one-split .report-zone-score,
+        .page-1 .report-page-one-split .report-zone-radar {
+            min-width: 0;
         }
         .page-1 .report-zone {
             flex-shrink: 0;
@@ -980,6 +1012,12 @@
             display: flex;
             flex-direction: column;
             gap: 3mm;
+            min-height: 0;
+        }
+        .page-2 .report-zone-dist,
+        .page-2 .report-zone-univ-ref {
+            flex-shrink: 0;
+            min-width: 0;
         }
         .page-2 .page-doc-header h1 {
             font-size: calc(15px + 4pt);
@@ -1027,6 +1065,10 @@
             grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
             align-items: start;
+        }
+        .page-1 .report-page-one-split .report-radar-layout {
+            grid-template-columns: 1fr;
+            --radar-panel-h: 42mm;
         }
         .page-1 .report-radar-chart {
             display: flex;
@@ -1144,10 +1186,10 @@
             color: #94a3b8;
             font-weight: 600;
         }
-        .page-1 .report-block-univ-ref h3 {
+        .page-2 .report-block-univ-ref h3 {
             font-size: var(--rpt-font-h);
         }
-        .page-1 .univ-ref-legend {
+        .page-2 .univ-ref-legend {
             display: flex;
             flex-wrap: wrap;
             gap: 2mm 4mm;
@@ -1156,10 +1198,10 @@
             font-weight: 600;
             color: var(--school-navy-dark);
         }
-        .page-1 .univ-ref-legend span {
+        .page-2 .univ-ref-legend span {
             white-space: nowrap;
         }
-        .page-1 .univ-ref-strategy-tag {
+        .page-2 .univ-ref-strategy-tag {
             display: inline-block;
             padding: 0.3mm 2mm;
             border-radius: 3px;
@@ -1167,28 +1209,28 @@
             font-weight: 800;
             margin-right: 1mm;
         }
-        .page-1 .univ-ref-strategy-tag.up {
+        .page-2 .univ-ref-strategy-tag.up {
             background: #fef2f2;
             color: #b91c1c;
             border: 1px solid #fecaca;
         }
-        .page-1 .univ-ref-strategy-tag.ok {
+        .page-2 .univ-ref-strategy-tag.ok {
             background: #fffbeb;
             color: #c2410c;
             border: 1px solid #fde68a;
         }
-        .page-1 .univ-ref-strategy-tag.safe {
+        .page-2 .univ-ref-strategy-tag.safe {
             background: #ecfdf5;
             color: #15803d;
             border: 1px solid #bbf7d0;
         }
-        .page-1 .univ-ref-table {
+        .page-2 .univ-ref-table {
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
         }
-        .page-1 .univ-ref-table th,
-        .page-1 .univ-ref-table td {
+        .page-2 .univ-ref-table th,
+        .page-2 .univ-ref-table td {
             padding: var(--rpt-cell-pad);
             font-size: var(--rpt-font-caption);
             line-height: 1.3;
@@ -1196,13 +1238,13 @@
             vertical-align: middle;
             border: 1px solid #e2e8f0;
         }
-        .page-1 .univ-ref-table thead th {
+        .page-2 .univ-ref-table thead th {
             background: var(--school-navy-dark);
             color: #fff;
             font-weight: 600;
             border-color: #1a3352;
         }
-        .page-1 .univ-ref-table tbody th.univ-name {
+        .page-2 .univ-ref-table tbody th.univ-name {
             background: #f4f7fa;
             color: var(--school-navy-dark);
             font-weight: 700;
@@ -1210,8 +1252,8 @@
             padding-left: 4px;
             width: 14%;
         }
-        .page-1 .univ-ref-table tbody td.ref-note-cell,
-        .page-1 .univ-ref-table tbody td.ref-reason-cell {
+        .page-2 .univ-ref-table tbody td.ref-note-cell,
+        .page-2 .univ-ref-table tbody td.ref-reason-cell {
             text-align: left;
             font-size: var(--rpt-font-caption);
             line-height: 1.45;
@@ -1219,76 +1261,76 @@
             color: #334155;
             font-weight: 600;
         }
-        .page-1 .univ-ref-table tbody td.ref-univ-cell {
+        .page-2 .univ-ref-table tbody td.ref-univ-cell {
             text-align: center;
             font-weight: 700;
             color: var(--school-navy-dark);
         }
-        .page-1 .univ-ref-table tbody td.ref-strategy-cell {
+        .page-2 .univ-ref-table tbody td.ref-strategy-cell {
             font-weight: 800;
             white-space: nowrap;
             text-align: center;
         }
-        .page-1 .univ-ref-table tbody td.ref-strategy-cell.ref-strategy-up {
+        .page-2 .univ-ref-table tbody td.ref-strategy-cell.ref-strategy-up {
             background: #fef2f2 !important;
             color: #b91c1c;
         }
-        .page-1 .univ-ref-table tbody td.ref-strategy-cell.ref-strategy-ok {
+        .page-2 .univ-ref-table tbody td.ref-strategy-cell.ref-strategy-ok {
             background: #fffbeb !important;
             color: #c2410c;
         }
-        .page-1 .univ-ref-table tbody td.ref-strategy-cell.ref-strategy-safe {
+        .page-2 .univ-ref-table tbody td.ref-strategy-cell.ref-strategy-safe {
             background: #ecfdf5 !important;
             color: #15803d;
         }
-        .page-1 .univ-ref-table tbody td.ref-region-cell {
+        .page-2 .univ-ref-table tbody td.ref-region-cell {
             font-weight: 700;
             color: var(--school-navy);
             text-align: center;
         }
-        .page-1 .univ-ref-table tbody td.ref-reflect-cell {
+        .page-2 .univ-ref-table tbody td.ref-reflect-cell {
             font-size: var(--rpt-font-caption);
             color: #475569;
             font-weight: 600;
             text-align: center;
         }
-        .page-1 .univ-ref-table .col-strategy { width: 14%; }
-        .page-1 .univ-ref-table .col-region { width: 12%; }
-        .page-1 .univ-ref-table .col-univ { width: 22%; }
-        .page-1 .univ-ref-table .col-reflect { width: 18%; }
-        .page-1 .univ-ref-table .col-reason { width: 34%; }
-        .page-1 .univ-ref-placeholder-cell {
+        .page-2 .univ-ref-table .col-strategy { width: 14%; }
+        .page-2 .univ-ref-table .col-region { width: 12%; }
+        .page-2 .univ-ref-table .col-univ { width: 22%; }
+        .page-2 .univ-ref-table .col-reflect { width: 18%; }
+        .page-2 .univ-ref-table .col-reason { width: 34%; }
+        .page-2 .univ-ref-placeholder-cell {
             text-align: center;
             padding: 14px 8px !important;
             color: var(--school-muted);
             font-weight: 600;
         }
-        .page-1 .univ-ref-table tbody tr:nth-child(even) td:not(.ref-note-cell):not(.ref-reason-cell) {
+        .page-2 .univ-ref-table tbody tr:nth-child(even) td:not(.ref-note-cell):not(.ref-reason-cell) {
             background: #fafbfd;
         }
-        .page-1 .univ-ref-cell-inner {
+        .page-2 .univ-ref-cell-inner {
             display: inline-flex;
             flex-direction: column;
             align-items: center;
             gap: 1px;
         }
-        .page-1 .univ-ref-mark {
+        .page-2 .univ-ref-mark {
             font-size: var(--rpt-font-caption);
             line-height: 1;
         }
-        .page-1 .univ-ref-grade {
+        .page-2 .univ-ref-grade {
             font-weight: 800;
             letter-spacing: -0.02em;
         }
-        .page-1 .univ-ref-sub {
+        .page-2 .univ-ref-sub {
             font-size: var(--rpt-font-caption);
             font-weight: 600;
             color: #64748b;
         }
-        .page-1 .ref-cell-official .univ-ref-grade { color: #b91c1c; }
-        .page-1 .ref-cell-estimate .univ-ref-grade { color: #c2410c; }
-        .page-1 .ref-cell-none .univ-ref-grade { color: #475569; }
-        .page-1 .univ-ref-disclaimer {
+        .page-2 .ref-cell-official .univ-ref-grade { color: #b91c1c; }
+        .page-2 .ref-cell-estimate .univ-ref-grade { color: #c2410c; }
+        .page-2 .ref-cell-none .univ-ref-grade { color: #475569; }
+        .page-2 .univ-ref-disclaimer {
             margin: 1.6mm 0 0;
             padding: 2mm 2.5mm;
             font-size: var(--rpt-font-caption);
@@ -1440,7 +1482,7 @@
             }
         }
 
-        .page-1 .univ-ref-loading-cell {
+        .page-2 .univ-ref-loading-cell {
             text-align: center;
             padding: 22px 8px !important;
             color: #6b7280;
@@ -1495,9 +1537,9 @@
             color: var(--school-navy-light);
             letter-spacing: -0.01em;
         }
-        .page-1 .ref-cell-fit-up .univ-ref-grade { color: #b91c1c; }
-        .page-1 .ref-cell-fit-ok .univ-ref-grade { color: #c2410c; }
-        .page-1 .ref-cell-fit-safe .univ-ref-grade { color: #15803d; }
+        .page-2 .ref-cell-fit-up .univ-ref-grade { color: #b91c1c; }
+        .page-2 .ref-cell-fit-ok .univ-ref-grade { color: #c2410c; }
+        .page-2 .ref-cell-fit-safe .univ-ref-grade { color: #15803d; }
 
         @page {
             size: A4 portrait;
@@ -1683,24 +1725,33 @@
 
             <div class="query-card query-card-print">
                 <div class="query-card-title">인쇄 항목 선택</div>
-                <p class="query-card-desc">조회 시 선택한 항목만 보고서·인쇄에 포함됩니다.</p>
-                <div class="print-options-grid">
-                    <label class="print-opt-label" for="printOptScore">
-                        <input type="checkbox" id="printOptScore" checked>
-                        <span>과목별 성적</span>
-                    </label>
-                    <label class="print-opt-label" for="printOptRadar">
-                        <input type="checkbox" id="printOptRadar" checked>
-                        <span>한눈에 보기</span>
-                    </label>
-                    <label class="print-opt-label" for="printOptDist">
-                        <input type="checkbox" id="printOptDist" checked>
-                        <span>자신의 성적 상·하위 각 10명 성적 분포</span>
-                    </label>
-                    <label class="print-opt-label" for="printOptUniv">
-                        <input type="checkbox" id="printOptUniv" checked>
-                        <span>지원 대학</span>
-                    </label>
+                <div class="print-options-pages">
+                    <div class="print-options-page-col">
+                        <p class="print-options-page-label">1페이지</p>
+                        <div class="print-options-grid">
+                            <label class="print-opt-label" for="printOptScore">
+                                <input type="checkbox" id="printOptScore" checked>
+                                <span>과목별 성적</span>
+                            </label>
+                            <label class="print-opt-label" for="printOptRadar">
+                                <input type="checkbox" id="printOptRadar" checked>
+                                <span>한눈에 보기</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="print-options-page-col">
+                        <p class="print-options-page-label">2페이지</p>
+                        <div class="print-options-grid">
+                            <label class="print-opt-label" for="printOptDist">
+                                <input type="checkbox" id="printOptDist" checked>
+                                <span>자신의 성적 상·하위 각 10명 성적 분포</span>
+                            </label>
+                            <label class="print-opt-label" for="printOptUniv">
+                                <input type="checkbox" id="printOptUniv" checked>
+                                <span>지원 대학</span>
+                            </label>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1788,8 +1839,26 @@
                 <div class="avg-grade-pill">평균등급 <span id="infoAvgGrade" class="info-avg-grade">0.00</span></div>
             </div>
             </div>
+            <div class="report-zone report-zone-maxcut report-block report-block-maxcut">
+            <h3>최고 점수 및 등급 컷 (<span class="total-count">-</span>명)</h3>
+            <div class="report-panel">
+            <table id="maxCutTable">
+                <thead>
+                    <tr id="maxCutTableHead"><th class="row-label">구분</th></tr>
+                </thead>
+                <tbody>
+                    <tr id="rowMax"><th class="row-label">최고점수</th></tr>
+                    <tr id="rowCut1"><th class="row-label">1등급</th></tr>
+                    <tr id="rowCut2"><th class="row-label">2등급</th></tr>
+                    <tr id="rowCut3"><th class="row-label">3등급</th></tr>
+                    <tr id="rowCut4"><th class="row-label">4등급</th></tr>
+                </tbody>
+            </table>
+            </div>
+            </div>
             </section>
 
+            <div class="report-page-one-split">
             <section class="report-zone report-zone-score">
             <div class="report-block report-block-main">
             <h3 class="report-section-title">과목별 성적</h3>
@@ -1815,27 +1884,6 @@
                 <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 9등급제 상대평가(중간석차·누적 백분율)</span>
             </div>
             </div>
-
-            </section>
-
-            <section class="report-zone report-zone-aux">
-            <div class="report-block report-block-maxcut">
-            <h3>최고 점수 및 등급 컷 (<span class="total-count">-</span>명)</h3>
-            <div class="report-panel">
-            <table id="maxCutTable">
-                <thead>
-                    <tr id="maxCutTableHead"><th class="row-label">구분</th></tr>
-                </thead>
-                <tbody>
-                    <tr id="rowMax"><th class="row-label">최고점수</th></tr>
-                    <tr id="rowCut1"><th class="row-label">1등급</th></tr>
-                    <tr id="rowCut2"><th class="row-label">2등급</th></tr>
-                    <tr id="rowCut3"><th class="row-label">3등급</th></tr>
-                    <tr id="rowCut4"><th class="row-label">4등급</th></tr>
-                </tbody>
-            </table>
-            </div>
-            </div>
             </section>
 
             <section class="report-zone report-zone-radar">
@@ -1852,6 +1900,34 @@
                     </div>
                 </div>
             </div>
+            </div>
+            </section>
+            </div>
+            <footer class="page-footer">
+                <p class="page-footer-num" aria-label="페이지 번호"></p>
+            </footer>
+        </div>
+
+        <div class="page page-2">
+            <div class="page-top-accent" aria-hidden="true">
+                <span class="page-top-accent-navy"></span>
+                <span class="page-top-accent-mid"></span>
+                <span class="page-top-accent-gold"></span>
+            </div>
+            <div class="page-body report-page-two">
+            <section class="report-zone report-zone-dist">
+            <div class="page-doc-header">
+                <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
+                <h1 id="distPageTitle">학생 주변 성적분포</h1>
+            </div>
+            <p id="distTableNote" class="dist-table-note">(※ 동일 점수는 괄호 안 인원으로 표시)</p>
+            <div class="report-panel">
+            <table id="distributionTable">
+                <thead>
+                    <tr id="distTableHead"><th class="row-label" style="width: 12%;">구분</th></tr>
+                </thead>
+                <tbody id="distTableBody"></tbody>
+            </table>
             </div>
             </section>
 
@@ -1884,31 +1960,6 @@
             <p class="univ-ref-disclaimer">본 표는 AI 참고용 상담 자료입니다. 수능최저·모집인원 변경 여부는 반드시 각 대학 입학처 공식 모집요강에서 최종 확인하세요.</p>
             </div>
             </section>
-            <footer class="page-footer">
-                <p class="page-footer-num" aria-label="페이지 번호"></p>
-            </footer>
-        </div>
-
-        <div class="page page-2">
-            <div class="page-top-accent" aria-hidden="true">
-                <span class="page-top-accent-navy"></span>
-                <span class="page-top-accent-mid"></span>
-                <span class="page-top-accent-gold"></span>
-            </div>
-            <div class="page-body report-page-two">
-            <div class="page-doc-header">
-                <img src="assets/namak-logo.png" alt="" class="page-logo" width="56" height="56">
-                <h1 id="distPageTitle">학생 주변 성적분포</h1>
-            </div>
-            <p id="distTableNote" class="dist-table-note">(※ 동일 점수는 괄호 안 인원으로 표시)</p>
-            <div class="report-panel">
-            <table id="distributionTable">
-                <thead>
-                    <tr id="distTableHead"><th class="row-label" style="width: 12%;">구분</th></tr>
-                </thead>
-                <tbody id="distTableBody"></tbody>
-            </table>
-            </div>
             </div>
             <footer class="page-footer">
                 <p class="page-footer-num" aria-label="페이지 번호"></p>
@@ -4240,21 +4291,46 @@ function cloneReportForPrint(printOpts) {
     const clone = template.cloneNode(true);
     clone.style.display = 'block';
     clone.removeAttribute('id');
+
+    const page1 = clone.querySelector('.page-1');
+    const page2 = clone.querySelector('.page-2');
+    const split = clone.querySelector('.report-page-one-split');
+    const maxcut = clone.querySelector('.report-zone-maxcut');
+
     if (!opts.score) {
-        clone.querySelectorAll('.report-zone-score, .report-zone-aux').forEach(function(el) { el.remove(); });
+        const scoreZone = clone.querySelector('.report-zone-score');
+        if (scoreZone) scoreZone.remove();
     }
     if (!opts.radar) {
         const radarZone = clone.querySelector('.report-zone-radar');
         if (radarZone) radarZone.remove();
     }
+    if (split) {
+        const hasScore = !!split.querySelector('.report-zone-score');
+        const hasRadar = !!split.querySelector('.report-zone-radar');
+        if (!hasScore && !hasRadar) {
+            split.remove();
+        } else if (hasScore !== hasRadar) {
+            split.classList.add('is-single-col');
+        }
+    }
+    if (!opts.score && !opts.radar) {
+        if (maxcut) maxcut.remove();
+        if (page1) page1.remove();
+    }
+
     if (!opts.dist) {
-        const page2 = clone.querySelector('.page-2');
-        if (page2) page2.remove();
+        const distZone = clone.querySelector('.report-zone-dist');
+        if (distZone) distZone.remove();
     }
     if (!opts.univ) {
         const univZone = clone.querySelector('.report-zone-univ-ref');
         if (univZone) univZone.remove();
     }
+    if (!opts.dist && !opts.univ && page2) {
+        page2.remove();
+    }
+
     const elementsWithId = clone.querySelectorAll('[id]');
     elementsWithId.forEach(function(el) { el.removeAttribute('id'); });
     return clone;
