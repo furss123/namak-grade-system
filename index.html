@@ -520,7 +520,27 @@
         @media (max-width: 720px) {
             .query-layout { grid-template-columns: 1fr; }
         }
-        .query-layout .query-card { margin-bottom: 0; }
+        .query-layout .query-card {
+            margin-bottom: 0;
+            padding-top: calc(var(--space-4) - 2.5mm);
+            padding-bottom: calc(var(--space-4) - 2.5mm);
+        }
+        .query-layout .query-card-title {
+            margin-bottom: calc(var(--space-3) - 1mm);
+        }
+        .query-layout .query-card-desc {
+            margin-bottom: calc(var(--space-3) - 1mm);
+            line-height: 1.4;
+        }
+        .query-layout .input-area input,
+        .query-layout .query-select {
+            padding-top: calc(11px - 0.5mm);
+            padding-bottom: calc(11px - 0.5mm);
+        }
+        .query-layout .search-btn {
+            padding-top: calc(11px - 0.5mm);
+            padding-bottom: calc(11px - 0.5mm);
+        }
         .query-card-print { margin-bottom: 0; }
         .print-options-pages {
             display: grid;
@@ -544,16 +564,17 @@
         }
         .print-opt-label {
             display: flex;
-            align-items: flex-start;
+            align-items: center;
             gap: 10px;
-            font-size: var(--text-sm);
+            font-size: calc(var(--text-sm) - 1pt);
             color: var(--school-text);
             cursor: pointer;
-            padding: 10px 14px;
+            padding: calc(10px - 1mm) 14px;
+            min-height: calc(18px + 2 * (10px - 1mm));
             border: 1px solid var(--school-border-light);
             border-radius: var(--radius-sm);
             background: #fff;
-            line-height: 1.45;
+            line-height: 1.35;
             transition: border-color 0.2s var(--ease), background 0.2s var(--ease), box-shadow 0.2s var(--ease);
         }
         .print-opt-label:hover {
@@ -567,8 +588,15 @@
             box-shadow: inset 0 0 0 1px rgba(61, 107, 158, 0.12);
         }
         .print-opt-label input[type="checkbox"] {
-            width: 18px; height: 18px; margin-top: 2px; flex-shrink: 0;
+            width: calc(18px - 2mm);
+            height: calc(18px - 2mm);
+            margin: 0;
+            flex-shrink: 0;
             accent-color: var(--school-navy);
+            align-self: center;
+        }
+        .print-opt-label > span {
+            align-self: center;
         }
         .query-select,
         .input-area input {
