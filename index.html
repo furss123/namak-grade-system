@@ -1087,8 +1087,10 @@
             width: 100% !important;
             max-width: 100% !important;
         }
-        body.pdf-exporting .pdf-export-overlay {
-            display: flex !important;
+        .pdf-export-overlay {
+            display: none !important;
+            visibility: hidden !important;
+            pointer-events: none !important;
         }
         #pdfCaptureSandbox {
             position: fixed;
@@ -1101,41 +1103,6 @@
             pointer-events: none;
             z-index: -1;
         }
-        .pdf-export-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            z-index: 99998;
-            background: color-mix(in srgb, var(--theme-bg-page) 88%, transparent);
-            align-items: center;
-            justify-content: center;
-            pointer-events: all;
-        }
-        .pdf-export-overlay-inner {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 14px;
-        }
-        .pdf-export-overlay-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(30, 58, 95, 0.2);
-            border-top-color: var(--school-navy, #1e3a5f);
-            border-radius: 50%;
-            animation: pdf-btn-spin 0.7s linear infinite;
-        }
-        .pdf-export-overlay-msg {
-            margin: 0;
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--theme-text);
-        }
-        html[data-theme="dark"] .pdf-export-overlay-spinner {
-            border-color: rgba(148, 163, 184, 0.35);
-            border-top-color: var(--school-navy-light);
-        }
-
         /* Screen UI dark: upload panels */
         html[data-theme="dark"] .upload-row {
             --upload-panel-bg: linear-gradient(155deg, #334155 0%, #1e293b 100%);
@@ -5771,7 +5738,21 @@ function waitForImagesInRoot(root) {
     }));
 }
 
-/** PDF 캡처용: 보이는 레이아웃에서 페이지 맞춤·이미지 로드 대기 */
+/** PDF 캡처용: 화면에 보이는 보고서는 건드리지 않고 이미지 로드만 대기 */
+function preparePdfCaptureLayoutForExport(printContainer) {
+    if (!printContainer) return Promise.resolve();
+    return waitForImagesInRoot(printContainer).then(function() {
+        return new Promise(function(resolve) {
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    setTimeout(resolve, 40);
+                });
+            });
+        });
+    });
+}
+
+/** 인쇄·재구성용: 페이지 맞춤·이미지 로드 대기 */
 function preparePdfCaptureLayout(printContainer) {
     if (!printContainer) return Promise.resolve();
     fitReportPagesInRoot(printContainer);
@@ -5983,6 +5964,13 @@ function createPdfCaptureClone(pageEl, captureW, captureH, targetDoc) {
         'opacity:1'
     ].join(';');
     getPdfCaptureSandbox(doc).appendChild(clone);
+    if (clone.classList.contains('page')) {
+        applyReportPageFitScale(clone);
+    } else {
+        clone.querySelectorAll('.page-1, .page-2').forEach(function(pageEl) {
+            applyReportPageFitScale(pageEl);
+        });
+    }
     return clone;
 }
 
@@ -6057,18 +6045,6 @@ function setPdfBtnLoading(loading) {
     }
 }
 
-function setPdfExportOverlayVisible(visible) {
-    const overlay = document.getElementById('pdfExportOverlay');
-    if (!overlay) return;
-    if (visible) {
-        overlay.removeAttribute('hidden');
-        overlay.setAttribute('aria-hidden', 'false');
-    } else {
-        overlay.setAttribute('hidden', '');
-        overlay.setAttribute('aria-hidden', 'true');
-    }
-}
-
 /**
  * PDF 저장: 각 .page를 html2canvas로 캡처 후 jsPDF에 페이지별로 합침.
  * (html2pdf.js 래퍼의 toCanvas/toPdf는 이 환경에서 빈 결과를 반환함)
@@ -6119,7 +6095,7 @@ async function savePdfDocument(pdfDoc, filename) {
 async function runPdfExportInMainDocument(printContainer, filename) {
     if (!printContainer) throw new Error('PDF capture container missing');
     await ensurePdfLibsLoaded();
-    await preparePdfCaptureLayout(printContainer);
+    await preparePdfCaptureLayoutForExport(printContainer);
     await runHtml2PdfSave(printContainer, filename, null);
 }
 
@@ -6145,16 +6121,18 @@ async function runPdfExportInWorkerWindow(workerWin, sourceContainer, filename) 
  */
 async function saveReportAsPdf() {
     if (pdfExportInProgress) return;
+    if (!isFileUploaded || !studentData.length) {
+        alert('먼저 학생을 조회해 주세요.');
+        return;
+    }
+    const printContainer = document.getElementById('printContainer');
+    if (!printContainer || !printContainer.querySelector('.page')) {
+        alert('먼저 학생을 조회해 주세요.');
+        return;
+    }
     setPdfBtnLoading(true);
+    pdfExportInProgress = true;
     try {
-        if (!prepareSelectedReportForOutput()) return;
-        const printContainer = document.getElementById('printContainer');
-        if (!printContainer || !printContainer.children.length) {
-            alert('저장할 보고서가 없습니다.');
-            return;
-        }
-        pdfExportInProgress = true;
-        await waitForPrintContainerLayout();
         const filename = getReportPdfFilename();
         await runPdfExportInMainDocument(printContainer, filename);
     } catch (err) {
@@ -6345,12 +6323,6 @@ document.getElementById('studentId').addEventListener('input', function() {
 })();
 </script>
 
-<div id="pdfExportOverlay" class="pdf-export-overlay no-print" role="status" aria-live="polite" aria-hidden="true" hidden>
-    <div class="pdf-export-overlay-inner">
-        <span class="pdf-export-overlay-spinner" aria-hidden="true"></span>
-        <p class="pdf-export-overlay-msg">PDF 생성 중…</p>
-    </div>
-</div>
 
 </body>
 </html>
