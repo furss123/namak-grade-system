@@ -1082,13 +1082,6 @@
         .page-1 .report-block-univ-ref h3 {
             font-size: var(--rpt-font-h);
         }
-        .page-1 .univ-ref-note {
-            margin: 0 0 1.2mm 0;
-            font-size: var(--rpt-font-caption);
-            color: var(--school-muted);
-            font-weight: 600;
-            line-height: 1.35;
-        }
         .page-1 .univ-ref-legend {
             display: flex;
             flex-wrap: wrap;
@@ -1382,34 +1375,6 @@
             }
         }
 
-        .page-1 .univ-ref-ai-bar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px 10px;
-            align-items: center;
-            margin: 0 0 6px;
-            font-size: calc(10px + 1pt);
-            font-weight: 600;
-            color: var(--school-navy-dark);
-        }
-        .page-1 .univ-ref-ai-pill {
-            background: var(--school-navy);
-            color: #fff;
-            padding: 2px 8px;
-            border-radius: 999px;
-        }
-        .page-1 .univ-ref-ai-pill.muted {
-            background: #f3f4f6;
-            color: #374151;
-        }
-        .page-1 .univ-ref-ai-pill.ok {
-            background: #ecfdf5;
-            color: #047857;
-        }
-        .page-1 .univ-ref-ai-pill.warn {
-            background: #fef2f2;
-            color: #b91c1c;
-        }
         .page-1 .univ-ref-loading-cell {
             text-align: center;
             padding: 18px 8px !important;
@@ -1789,11 +1754,6 @@
                 <span><span class="univ-ref-strategy-tag up">상향</span> 도전 지원</span>
                 <span><span class="univ-ref-strategy-tag ok">적정</span> 안정 지원</span>
                 <span><span class="univ-ref-strategy-tag safe">하향</span> 보험 지원</span>
-            </div>
-            <p class="univ-ref-note">※ 5등급제 환산 평균등급 기준 · 수도권(인서울 포함) / 광주·전남 권역 · 입학처·어디가 교차 확인 권장</p>
-            <div class="univ-ref-ai-bar" id="univ-ref-ai-bar" aria-live="polite">
-                <span class="univ-ref-ai-pill">내 평균등급 <span id="univ-ref-student-grade">-</span></span>
-                <span class="univ-ref-ai-pill muted" id="univ-ref-ai-status">학생 조회 시 AI가 표를 자동 갱신합니다 (비로그인·게스트)</span>
             </div>
             <div class="report-panel">
             <table class="univ-ref-table" id="univRefTable">
@@ -3055,18 +3015,6 @@ function renderStaticUnivRefPlaceholder() {
         '</td></tr>';
 }
 
-function setUnivRefAiStatus(text, tone) {
-    const el = document.getElementById('univ-ref-ai-status');
-    if (!el) return;
-    el.textContent = text;
-    el.className = 'univ-ref-ai-pill' + (tone ? ' ' + tone : ' muted');
-}
-
-function setUnivRefStudentGrade(avgGrade) {
-    const el = document.getElementById('univ-ref-student-grade');
-    if (el) el.textContent = avgGrade != null ? avgGrade.toFixed(2) : '-';
-}
-
 function showUnivRefTableLoading(providerLabel, attemptIndex) {
     const body = document.getElementById('univRefTableBody');
     if (!body) return;
@@ -3079,21 +3027,17 @@ function showUnivRefTableLoading(providerLabel, attemptIndex) {
         '<span class="univ-ref-spinner" aria-hidden="true"></span>' +
         label + '로 지원 대학 분석 중' + attemptText + '…' +
         '</td></tr>';
-    setUnivRefAiStatus(label + ' 연결 중…', 'muted');
 }
 
 function resetUniversityRecommendations() {
     lastCalculatedAvgGrade = null;
     lastUnivRefFetchKey = null;
     univRefFetchInFlight = false;
-    setUnivRefStudentGrade(null);
-    setUnivRefAiStatus('학생 조회 시 AI가 표를 자동 갱신합니다 (비로그인·게스트)', 'muted');
     renderStaticUnivRefPlaceholder();
 }
 
 function onGradeCalculated(avgGrade) {
     lastCalculatedAvgGrade = avgGrade;
-    setUnivRefStudentGrade(avgGrade);
     const key = avgGrade.toFixed(2);
     if (lastUnivRefFetchKey === key && univRefFetchInFlight) return;
     lastUnivRefFetchKey = key;
@@ -3214,23 +3158,15 @@ function mapAiResponseToRecommendRows(parsed) {
 function showUnivRefTableError(err, avgGrade) {
     renderStaticUnivRefPlaceholder();
     const msg = err && err.message ? err.message : '연결 실패';
-    setUnivRefAiStatus('⚠️ AI 갱신 실패 (' + msg + ')', 'warn');
-    console.error('[대학 참고표 AI]', err);
-    if (avgGrade != null) {
-        setUnivRefStudentGrade(avgGrade);
-    }
+    console.error('[대학 참고표 AI]', err, avgGrade);
 }
 
-function renderUnivRefFromAiData(data, provider) {
-    const studentGrade = Number(data.studentGrade) || lastCalculatedAvgGrade || 0;
+function renderUnivRefFromAiData(data) {
     const rows = mapAiResponseToRecommendRows(data);
     if (!rows || !rows.length) {
         throw new Error('표 데이터 없음');
     }
     renderUnivRefRecommendRows(rows);
-    const shortModel = provider.model ? String(provider.model).split('/').pop() : '';
-    setUnivRefAiStatus('✓ ' + provider.label + (shortModel ? ' · ' + shortModel : '') + ' 분석 완료', 'ok');
-    setUnivRefStudentGrade(studentGrade);
 }
 
 function extractJsonFromModelText(text) {
@@ -3267,7 +3203,6 @@ async function fetchUnivRefTableFromAI(avgGrade) {
     let lastError = null;
 
     showUnivRefTableLoading(null, 0);
-    setUnivRefAiStatus('비로그인(게스트) 인증 중…', 'muted');
 
     try {
         await ensurePuterGuestAuthForUnivAi();
@@ -3303,7 +3238,7 @@ async function fetchUnivRefTableFromAI(avgGrade) {
                 }
 
                 const parsed = extractJsonFromModelText(raw);
-                renderUnivRefFromAiData(parsed, provider);
+                renderUnivRefFromAiData(parsed);
                 return;
             } catch (err) {
                 lastError = err;
