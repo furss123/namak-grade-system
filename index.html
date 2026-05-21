@@ -1395,23 +1395,58 @@
 
         .page-1 .univ-ref-loading-cell {
             text-align: center;
-            padding: 18px 8px !important;
+            padding: 22px 8px !important;
             color: #6b7280;
             font-weight: 600;
         }
-        .page-1 .univ-ref-loading-cell .univ-ref-spinner {
-            display: inline-block;
-            width: 22px;
-            height: 22px;
-            margin-right: 8px;
-            vertical-align: middle;
-            border: 3px solid #e5e7eb;
-            border-top-color: #2563eb;
-            border-radius: 50%;
-            animation: univ-ref-spin 0.8s linear infinite;
+        .univ-ref-progress-wrap {
+            display: inline-flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
         }
-        @keyframes univ-ref-spin {
-            to { transform: rotate(360deg); }
+        .univ-ref-progress-ring-host {
+            position: relative;
+            width: 96px;
+            height: 96px;
+        }
+        .univ-ref-progress-ring {
+            width: 96px;
+            height: 96px;
+            transform: rotate(-90deg);
+            display: block;
+        }
+        .univ-ref-progress-track {
+            fill: none;
+            stroke: #e8edf4;
+            stroke-width: 9;
+        }
+        .univ-ref-progress-bar {
+            fill: none;
+            stroke: #2563eb;
+            stroke-width: 9;
+            stroke-linecap: round;
+            stroke-dasharray: 326.726;
+            stroke-dashoffset: 326.726;
+            transition: stroke-dashoffset 0.35s ease;
+        }
+        .univ-ref-progress-pct {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: calc(15px + 1pt);
+            font-weight: 800;
+            color: var(--school-navy-dark);
+            letter-spacing: -0.02em;
+            transform: rotate(0deg);
+        }
+        .univ-ref-progress-label {
+            font-size: calc(11px + 1pt);
+            font-weight: 700;
+            color: var(--school-navy-light);
+            letter-spacing: -0.01em;
         }
         .page-1 .ref-cell-fit-up .univ-ref-grade { color: #b91c1c; }
         .page-1 .ref-cell-fit-ok .univ-ref-grade { color: #c2410c; }
@@ -1850,6 +1885,7 @@
         </div>
     </footer>
 
+<script src="https://js.puter.com/v2/"></script>
 <script>
 const APP_VERSION = '1.1.0';
 const APP_RELEASE_DATE = '2026-05-20';
@@ -2923,73 +2959,92 @@ function hideReportActionSection() {
     document.getElementById('reportActionSection').style.display = 'none';
 }
 
-/** DuckDuckGo AI Chat — 30초 이내 완료 (타임아웃 + 캐시 + 로컬 폴백) */
-const DDG_AI_MODEL = 'claude-3-haiku-20240307';
+/** Perplexity (Puter.js) — 비로그인 게스트 · 30초 이내 · 캐시 · 로컬 폴백 */
+const PERPLEXITY_MODEL = 'perplexity/sonar';
 const UNIV_AI_TOTAL_MS = 30000;
-const UNIV_AI_CHAT_MS = 26000;
-const UNIV_AI_STATUS_MS = 4000;
-const UNIV_AI_CACHE_KEY = 'univRefAiCache_v2';
-let ddgVqdCache = null;
-let ddgSwReady = false;
+const UNIV_AI_CACHE_KEY = 'univRefAiCache_v3';
+const UNIV_REF_PROGRESS_LEN = 326.726;
+let puterUnivAiGuestAuthPromise = null;
 let univRefAiMemoryCache = {};
-let univRefLoadingTimer = null;
+let univRefProgressTimer = null;
+let univRefProgressValue = 0;
 
-function getAppBasePath() {
-    const path = window.location.pathname || '/';
-    if (path.endsWith('/')) return path;
-    if (/\.[a-z0-9]+$/i.test(path)) return path.replace(/\/[^/]*$/, '/') || '/';
-    return path + '/';
+function installPuterGuestAuthPatch() {
+    if (typeof puter === 'undefined' || puter.__univAiGuestAuthPatch) return;
+    puter.__univAiGuestAuthPatch = true;
+    if (!puter.ui || typeof puter.ui.authenticateWithPuter !== 'function') return;
+    puter.ui.authenticateWithPuter = async function authenticateAsGuestOnly() {
+        if (puter.env !== 'web') return;
+        if (puter.authToken) return;
+        await ensurePuterGuestAuthForUnivAi();
+    };
 }
 
-function getDdgProxyUrl(segment) {
-    return getAppBasePath() + 'ddg-proxy/' + segment;
-}
-
-async function registerDdgServiceWorker() {
-    if (!('serviceWorker' in navigator)) return false;
+function initPuterUnivAiGuestMode() {
+    if (typeof puter === 'undefined' || !puter.auth) return;
+    installPuterGuestAuthPatch();
     try {
-        const base = getAppBasePath();
-        await navigator.serviceWorker.register(base + 'ddg-ai-sw.js', { scope: base });
-        await navigator.serviceWorker.ready;
-        ddgSwReady = true;
-        return true;
+        puter.auth.signOut();
     } catch (e) {
-        console.warn('[DuckDuckGo AI] Service Worker 등록 실패', e);
-        ddgSwReady = false;
-        return false;
+        console.warn('[Puter] 기존 로그인 세션 제거', e);
     }
 }
 
-async function ddgFetchVqd(forceRefresh) {
-    if (!ddgSwReady) throw new Error('DuckDuckGo AI 프록시를 사용할 수 없습니다 (HTTPS·Service Worker 필요)');
-    if (!forceRefresh && ddgVqdCache) return ddgVqdCache;
-    const res = await fetch(getDdgProxyUrl('status'), {
-        method: 'GET',
-        headers: { 'x-vqd-accept': '1' }
+async function ensurePuterGuestAuthForUnivAi() {
+    if (typeof puter === 'undefined' || !puter.auth || !puter.ai) {
+        throw new Error('Perplexity AI 라이브러리 로드 실패');
+    }
+    installPuterGuestAuthPatch();
+    if (puter.auth.isSignedIn()) return;
+    if (!puterUnivAiGuestAuthPromise) {
+        puterUnivAiGuestAuthPromise = puter.auth.signIn({ attempt_temp_user_creation: true })
+            .finally(function() {
+                puterUnivAiGuestAuthPromise = null;
+            });
+    }
+    await puterUnivAiGuestAuthPromise;
+}
+
+function extractPuterChatText(result) {
+    if (!result) return '';
+    const msg = result.message || result;
+    const content = msg.content;
+    if (typeof content === 'string') return content;
+    if (Array.isArray(content)) {
+        return content.map(function(part) {
+            if (typeof part === 'string') return part;
+            return part && (part.text || part.content || '');
+        }).join('');
+    }
+    if (typeof result === 'string') return result;
+    return '';
+}
+
+async function perplexityAiChat(userContent, onProgress) {
+    await ensurePuterGuestAuthForUnivAi();
+    if (onProgress) onProgress(15, 'Perplexity 연결됨');
+    const messages = [{ role: 'user', content: userContent }];
+    const response = await puter.ai.chat(messages, {
+        model: PERPLEXITY_MODEL,
+        stream: true,
+        max_tokens: 2800,
+        temperature: 0.2
     });
-    if (!res.ok) throw new Error('DuckDuckGo 연결 실패 (' + res.status + ')');
-    const vqd = res.headers.get('x-vqd-4');
-    if (!vqd) throw new Error('DuckDuckGo 인증 토큰을 받지 못했습니다');
-    ddgVqdCache = vqd;
-    return vqd;
-}
-
-async function parseDdgSseResponse(res) {
-    const text = await res.text();
     let full = '';
-    const lines = text.split('\n');
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (!line.startsWith('data:')) continue;
-        const data = line.slice(5).trim();
-        if (data === '[DONE]') break;
-        try {
-            const chunk = JSON.parse(data);
-            if (chunk && chunk.message) full += chunk.message;
-        } catch (e) { /* skip malformed chunk */ }
+    if (response && typeof response[Symbol.asyncIterator] === 'function') {
+        for await (const part of response) {
+            const piece = part && (part.text != null ? part.text : extractPuterChatText(part));
+            if (piece) full += piece;
+            if (onProgress) {
+                const streamPct = Math.min(94, 18 + Math.floor(full.length / 70));
+                onProgress(streamPct, 'Perplexity 분석 중…');
+            }
+        }
+    } else {
+        full = extractPuterChatText(response);
+        if (onProgress) onProgress(85, 'Perplexity 응답 수신…');
     }
-    const newVqd = res.headers.get('x-vqd-4');
-    if (newVqd) ddgVqdCache = newVqd;
+    if (!full || !full.trim()) throw new Error('Perplexity 빈 응답');
     return full;
 }
 
@@ -3086,46 +3141,6 @@ function buildLocalUnivRefFallback(avgGrade) {
     ];
 }
 
-async function ddgAiChat(userContent) {
-    let vqd = await withTimeout(ddgFetchVqd(false), UNIV_AI_STATUS_MS, 'DuckDuckGo 연결 시간 초과');
-    const payload = JSON.stringify({
-        model: DDG_AI_MODEL,
-        messages: [{ role: 'user', content: userContent }],
-        canUseTools: false,
-        canUseApproxLocation: false
-    });
-
-    async function postChat(token) {
-        const controller = new AbortController();
-        const timer = setTimeout(function() { controller.abort(); }, UNIV_AI_CHAT_MS);
-        try {
-            return await fetch(getDdgProxyUrl('chat'), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'x-vqd-4': token
-                },
-                body: payload,
-                signal: controller.signal
-            });
-        } finally {
-            clearTimeout(timer);
-        }
-    }
-
-    let res = await postChat(vqd);
-
-    if (res.status === 418 || res.status === 429) {
-        vqd = await withTimeout(ddgFetchVqd(true), UNIV_AI_STATUS_MS, 'DuckDuckGo 재연결 시간 초과');
-        res = await postChat(vqd);
-    }
-
-    if (!res.ok) throw new Error('DuckDuckGo AI 응답 오류 (' + res.status + ')');
-    const raw = await parseDdgSseResponse(res);
-    if (!raw || !raw.trim()) throw new Error('DuckDuckGo AI 빈 응답');
-    return raw;
-}
-
 const UNIV_REF_STRATEGY_ORDER = { '상향': 0, '적정': 1, '하향': 2 };
 
 let lastCalculatedAvgGrade = null;
@@ -3188,29 +3203,66 @@ function renderStaticUnivRefPlaceholder() {
 
 var univRefLoadingStartedAt = 0;
 
+function setUnivRefProgress(pct, label) {
+    const next = Math.max(univRefProgressValue, Math.min(100, Math.round(pct)));
+    univRefProgressValue = next;
+    const bar = document.getElementById('univRefProgressBar');
+    const pctEl = document.getElementById('univRefProgressPct');
+    const labelEl = document.getElementById('univRefProgressLabel');
+    if (bar) {
+        bar.style.strokeDashoffset = String(UNIV_REF_PROGRESS_LEN * (1 - next / 100));
+    }
+    if (pctEl) pctEl.textContent = next + '%';
+    if (labelEl && label) labelEl.textContent = label;
+}
+
+function stopUnivRefProgressAnimator() {
+    if (univRefProgressTimer) {
+        clearInterval(univRefProgressTimer);
+        univRefProgressTimer = null;
+    }
+}
+
+function startUnivRefProgressAnimator() {
+    stopUnivRefProgressAnimator();
+    univRefProgressTimer = setInterval(function() {
+        if (!document.getElementById('univRefProgressBar')) {
+            stopUnivRefProgressAnimator();
+            return;
+        }
+        const elapsed = Date.now() - univRefLoadingStartedAt;
+        const timePct = Math.min(88, Math.floor((elapsed / UNIV_AI_TOTAL_MS) * 88));
+        if (timePct > univRefProgressValue) {
+            setUnivRefProgress(timePct, 'Perplexity 분석 중…');
+        }
+    }, 160);
+}
+
 function showUnivRefTableLoading() {
     const body = document.getElementById('univRefTableBody');
     if (!body) return;
     univRefLoadingStartedAt = Date.now();
+    univRefProgressValue = 0;
     body.innerHTML =
         '<tr><td colspan="5" class="univ-ref-loading-cell">' +
-        '<span class="univ-ref-spinner" aria-hidden="true"></span>' +
-        '<span id="univRefLoadingText">지원 대학 분석 중… (0초 / 30초)</span>' +
+        '<div class="univ-ref-progress-wrap" role="status" aria-live="polite">' +
+        '<div class="univ-ref-progress-ring-host">' +
+        '<svg class="univ-ref-progress-ring" viewBox="0 0 120 120" aria-hidden="true">' +
+        '<circle class="univ-ref-progress-track" cx="60" cy="60" r="52"></circle>' +
+        '<circle class="univ-ref-progress-bar" id="univRefProgressBar" cx="60" cy="60" r="52"></circle>' +
+        '</svg>' +
+        '<span class="univ-ref-progress-pct" id="univRefProgressPct">0%</span>' +
+        '</div>' +
+        '<span class="univ-ref-progress-label" id="univRefProgressLabel">Perplexity 준비 중…</span>' +
+        '</div>' +
         '</td></tr>';
-    if (univRefLoadingTimer) clearInterval(univRefLoadingTimer);
-    univRefLoadingTimer = setInterval(function() {
-        const el = document.getElementById('univRefLoadingText');
-        if (!el) return;
-        const sec = Math.min(30, Math.floor((Date.now() - univRefLoadingStartedAt) / 1000));
-        el.textContent = '지원 대학 분석 중… (' + sec + '초 / 30초)';
-    }, 500);
+    setUnivRefProgress(0, 'Perplexity 준비 중…');
+    startUnivRefProgressAnimator();
 }
 
 function stopUnivRefLoadingTimer() {
-    if (univRefLoadingTimer) {
-        clearInterval(univRefLoadingTimer);
-        univRefLoadingTimer = null;
-    }
+    stopUnivRefProgressAnimator();
+    setUnivRefProgress(100, '완료');
 }
 
 function resetUniversityRecommendations() {
@@ -3344,17 +3396,18 @@ async function fetchUnivRefTableFromAI(avgGrade) {
     const deadline = Date.now() + UNIV_AI_TOTAL_MS;
 
     try {
-        if (!ddgSwReady) {
-            const ok = await withTimeout(
-                registerDdgServiceWorker(),
-                Math.max(2000, deadline - Date.now()),
-                'AI 준비 시간 초과'
-            );
-            if (!ok) throw new Error('HTTPS 접속이 필요합니다 (GitHub Pages 권장)');
-        }
+        initPuterUnivAiGuestMode();
+        setUnivRefProgress(5, 'Perplexity 연결 중…');
         const prompt = buildUnivRefTablePrompts(avgGrade);
         const remaining = Math.max(3000, deadline - Date.now());
-        const raw = await withTimeout(ddgAiChat(prompt), remaining, '30초 분석 시간 초과');
+        const raw = await withTimeout(
+            perplexityAiChat(prompt, function(pct, label) {
+                setUnivRefProgress(pct, label);
+            }),
+            remaining,
+            '30초 분석 시간 초과'
+        );
+        setUnivRefProgress(96, '결과 정리 중…');
         const parsed = extractJsonFromModelText(raw);
         const rows = renderUnivRefFromAiData(parsed);
         applyUnivRefRows(rows, avgGrade);
@@ -3915,9 +3968,8 @@ document.getElementById('studentId').addEventListener('input', function() {
     }
     initUnivRefTable();
     initAppFooter();
-    registerDdgServiceWorker().then(function() {
-        runDefaultSinglePreview({ scroll: false });
-    });
+    initPuterUnivAiGuestMode();
+    runDefaultSinglePreview({ scroll: false });
     initPageScrollNav();
     requestAnimationFrame(function() {
         scrollToPageTop(true);
