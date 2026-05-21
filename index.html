@@ -1983,6 +1983,7 @@
             filter: brightness(1.08);
         }
         .page-action-pdf {
+            position: relative;
             color: #fff;
             background: linear-gradient(180deg, #e53935 0%, #c62828 100%);
         }
@@ -1993,14 +1994,8 @@
         .page-action-pdf:focus-visible {
             outline-color: #ffcdd2;
         }
-        .page-action-pdf {
-            position: relative;
-        }
         .page-action-pdf.is-loading .page-action-pdf-label,
         .page-action-pdf.is-loading svg {
-            visibility: hidden;
-        }
-        .page-action-pdf.is-loading .page-action-pdf-label {
             visibility: hidden;
         }
         .page-action-pdf.is-loading .pdf-spinner {
@@ -5290,46 +5285,73 @@ function waitForPrintContainerLayout() {
     });
 }
 
+var pdfExportInProgress = false;
+
+function yieldToPaint() {
+    return new Promise(function(resolve) {
+        requestAnimationFrame(function() {
+            requestAnimationFrame(resolve);
+        });
+    });
+}
+
+function setPdfBtnLoading(loading) {
+    const pdfBtn = document.getElementById('pdfActionBtn');
+    if (!pdfBtn) return;
+    if (loading) {
+        pdfBtn.disabled = true;
+        pdfBtn.setAttribute('aria-busy', 'true');
+        pdfBtn.classList.add('is-loading');
+        pdfBtn.setAttribute('aria-label', 'PDF 저장 중');
+    } else {
+        pdfBtn.disabled = false;
+        pdfBtn.removeAttribute('aria-busy');
+        pdfBtn.classList.remove('is-loading');
+        pdfBtn.setAttribute('aria-label', 'PDF로 저장하기');
+    }
+}
+
 /**
  * PDF 저장: html2pdf로 브라우저 다운로드(Save As). 인쇄 대화상자(window.print)는 사용하지 않음.
  */
-function saveReportAsPdf() {
+async function saveReportAsPdf() {
+    if (pdfExportInProgress) return;
     if (!prepareSelectedReportForOutput()) return;
     const printContainer = document.getElementById('printContainer');
     if (!printContainer || !printContainer.children.length) {
         alert('저장할 보고서가 없습니다.');
         return;
     }
-    const pdfBtn = document.getElementById('pdfActionBtn');
-    if (pdfBtn) pdfBtn.disabled = true;
+    pdfExportInProgress = true;
+    setPdfBtnLoading(true);
     document.body.classList.add('pdf-exporting');
     window.scrollTo(0, 0);
     printContainer.classList.add('pdf-export-capture');
     const filename = getReportPdfFilename();
-    waitForPrintContainerLayout()
-        .then(function() { return ensureHtml2PdfLoaded(); })
-        .then(function() {
-            return html2pdf()
-                .set({
-                    margin: 0,
-                    filename: filename,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { scale: 2, useCORS: true, logging: false },
-                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-                    pagebreak: { mode: ['css', 'legacy'], before: '.page + .page' }
-                })
-                .from(printContainer)
-                .save();
-        })
-        .catch(function(err) {
-            console.warn('PDF 저장 실패:', err);
-            alert('PDF를 저장할 수 없습니다. PDF 라이브러리 로드 실패이거나 생성 중 오류가 발생했습니다.\n네트워크 연결을 확인한 뒤 다시 시도해 주세요.');
-        })
-        .finally(function() {
-            document.body.classList.remove('pdf-exporting');
-            printContainer.classList.remove('pdf-export-capture');
-            if (pdfBtn) pdfBtn.disabled = false;
-        });
+    try {
+        await yieldToPaint();
+        await waitForPrintContainerLayout();
+        await ensureHtml2PdfLoaded();
+        await html2pdf()
+            .set({
+                margin: 0,
+                filename: filename,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true, logging: false },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+                pagebreak: { mode: ['css', 'legacy'], before: '.page + .page' }
+            })
+            .from(printContainer)
+            .save();
+    } catch (err) {
+        console.warn('PDF 저장 실패:', err);
+        alert('PDF를 저장할 수 없습니다. PDF 라이브러리 로드 실패이거나 생성 중 오류가 발생했습니다.\n네트워크 연결을 확인한 뒤 다시 시도해 주세요.');
+    } finally {
+        document.body.classList.remove('pdf-exporting');
+        printContainer.classList.remove('pdf-export-capture');
+        pdfExportInProgress = false;
+        setPdfBtnLoading(false);
+    }
 }
 
 function searchSingleStudent(studentIdOverride, options) {
