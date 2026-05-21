@@ -1254,17 +1254,94 @@
         html[data-theme="dark"] .page-scroll-btn {
             color: #e2e8f0;
         }
+        html[data-theme="dark"] .query-card-title {
+            color: #e2e8f0;
+        }
+        html[data-theme="dark"] .print-options-page-label {
+            color: #cbd5e1;
+        }
+        html[data-theme="dark"] .stats-grade-dist {
+            border-top-color: var(--theme-border);
+        }
+        html[data-theme="dark"] .stats-grade-dist-chart {
+            box-shadow: var(--shadow-sm);
+        }
+        html[data-theme="dark"] .stats-grade-dist-bar {
+            border-color: var(--theme-border);
+        }
+        html[data-theme="dark"] .stats-table tbody td.stats-row-label {
+            border-right-color: var(--theme-border);
+        }
+        html[data-theme="dark"] .stats-table tbody tr.stats-row-divider td {
+            border-top-color: var(--theme-border);
+        }
+        html[data-theme="dark"] .app-footer-version span {
+            color: #94b8d8;
+        }
 
-        /* Reports / print: always light (paper) */
+        /* Reports / print: always light (paper) — screen dark mode does not affect output */
         html[data-theme="dark"] #reportTemplate,
         html[data-theme="dark"] #printContainer {
             color-scheme: only light;
+            background: transparent;
             color: var(--school-text);
         }
         html[data-theme="dark"] #reportTemplate .page,
         html[data-theme="dark"] #printContainer .page {
+            background: #fff !important;
+            color: var(--school-text);
+            border-color: var(--school-border-light);
+        }
+        html[data-theme="dark"] #reportTemplate .page-body,
+        html[data-theme="dark"] #printContainer .page-body {
             background: #fff;
             color: var(--school-text);
+        }
+
+        /* PDF 변환 전용 팝업: 항상 라이트 */
+        html.pdf-export-worker-doc,
+        html.pdf-export-worker-doc body {
+            margin: 0;
+            padding: 0;
+            background: #fff;
+            color: var(--school-text);
+            color-scheme: only light;
+            font-family: 'Pretendard', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
+        }
+        html.pdf-export-worker-doc body {
+            padding: 10px;
+        }
+        html.pdf-export-worker-doc #printContainer {
+            max-width: none;
+            width: 210mm;
+            margin: 0 auto;
+            padding: 0;
+        }
+        html.pdf-export-worker-doc #printContainer .report-wrapper {
+            display: block !important;
+            margin: 0;
+        }
+        html.pdf-export-worker-doc #printContainer .page {
+            margin: 0 auto 12px;
+            box-shadow: none;
+        }
+        .pdf-worker-status {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.92);
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--school-navy-dark);
+        }
+        .pdf-worker-status.is-error {
+            color: #b91c1c;
+            padding: 24px;
+            text-align: center;
+            line-height: 1.5;
         }
 
         #printContainer .page {
@@ -5680,6 +5757,81 @@ function getPdfCaptureRoot(printContainer) {
     return printContainer.children.length ? printContainer : null;
 }
 
+function copyDocumentStylesTo(targetDoc) {
+    if (!targetDoc || !targetDoc.head) return;
+    document.querySelectorAll('style').forEach(function(node) {
+        targetDoc.head.appendChild(node.cloneNode(true));
+    });
+    document.querySelectorAll('link[rel="stylesheet"]').forEach(function(node) {
+        targetDoc.head.appendChild(node.cloneNode(true));
+    });
+}
+
+function openPdfExportWorkerWindow() {
+    const w = window.open(
+        '',
+        'namak_pdf_export',
+        'noopener,noreferrer,width=860,height=940,menubar=no,toolbar=no,location=no,status=no'
+    );
+    if (!w) {
+        alert('팝업이 차단되었습니다. 이 사이트의 팝업을 허용한 뒤 다시 시도해 주세요.');
+        return null;
+    }
+    const doc = w.document;
+    doc.open();
+    doc.write(
+        '<!DOCTYPE html><html lang="ko" class="pdf-export-worker-doc" data-theme="light">' +
+        '<head><meta charset="utf-8"><title>PDF 변환</title></head>' +
+        '<body></body></html>'
+    );
+    doc.close();
+    copyDocumentStylesTo(doc);
+    return w;
+}
+
+function setPdfWorkerStatus(workerDoc, message, isError) {
+    if (!workerDoc || !workerDoc.body) return null;
+    let el = workerDoc.getElementById('pdfWorkerStatus');
+    if (!el) {
+        el = workerDoc.createElement('div');
+        el.id = 'pdfWorkerStatus';
+        el.className = 'pdf-worker-status';
+        el.setAttribute('role', 'status');
+        el.setAttribute('aria-live', 'polite');
+        workerDoc.body.insertBefore(el, workerDoc.body.firstChild);
+    }
+    el.textContent = message || '';
+    el.classList.toggle('is-error', !!isError);
+    return el;
+}
+
+function removePdfWorkerStatus(workerDoc) {
+    const el = workerDoc && workerDoc.getElementById('pdfWorkerStatus');
+    if (el && el.parentNode) el.parentNode.removeChild(el);
+}
+
+function ensurePdfLibsInWindow(win) {
+    return ensurePdfLibsLoaded().then(function() {
+        if (!win || win.closed) return;
+        if (typeof html2canvas === 'function' && typeof win.html2canvas !== 'function') {
+            win.html2canvas = html2canvas;
+        }
+        if (window.jspdf && !win.jspdf) {
+            win.jspdf = window.jspdf;
+        }
+    });
+}
+
+function getHtml2canvasForWindow(win) {
+    if (win && !win.closed && typeof win.html2canvas === 'function') return win.html2canvas;
+    return html2canvas;
+}
+
+function getJsPdfConstructorForWindow(win) {
+    const lib = (win && !win.closed && win.jspdf) ? win.jspdf : window.jspdf;
+    return lib && lib.jsPDF;
+}
+
 /** html2canvas clone: scale/transform이 빈 캔버스를 만드는 경우 방지 */
 function pdfHtml2canvasOnclone(doc, clonedNode) {
     if (!clonedNode || !clonedNode.querySelectorAll) return;
@@ -5740,10 +5892,13 @@ function buildPdfHtml2canvasOptions(captureW, captureH) {
     };
 }
 
-/** html2canvas용: 화면 밖·overflow/transform 영향을 피하기 위해 body에 고정 배치한 클론 */
-function createPdfCaptureClone(pageEl, captureW, captureH) {
-    const clone = pageEl.cloneNode(true);
-    pdfHtml2canvasOnclone(document, clone);
+/** html2canvas용: overflow/transform 영향을 피하기 위해 대상 document body에 고정 배치한 클론 */
+function createPdfCaptureClone(pageEl, captureW, captureH, targetDoc) {
+    const doc = targetDoc || pageEl.ownerDocument || document;
+    const clone = pageEl.ownerDocument === doc
+        ? pageEl.cloneNode(true)
+        : doc.importNode(pageEl, true);
+    pdfHtml2canvasOnclone(doc, clone);
     clone.querySelectorAll('.page-body').forEach(function(body) {
         body.classList.remove('page-body-fit');
         body.style.transform = 'none';
@@ -5770,7 +5925,7 @@ function createPdfCaptureClone(pageEl, captureW, captureH) {
         'visibility:visible',
         'opacity:1'
     ].join(';');
-    document.body.appendChild(clone);
+    doc.body.appendChild(clone);
     return clone;
 }
 
@@ -5789,14 +5944,18 @@ function alertPdfCaptureDiagnostic(pageIndex, size, canvas) {
     alert(msg);
 }
 
-async function capturePageToCanvas(pageEl, pageIndex) {
+async function capturePageToCanvas(pageEl, pageIndex, captureWin) {
     const size = getPdfPageCaptureSize(pageEl);
-    const clone = createPdfCaptureClone(pageEl, size.captureW, size.captureH);
+    const captureDoc = (captureWin && !captureWin.closed && captureWin.document)
+        ? captureWin.document
+        : (pageEl.ownerDocument || document);
+    const clone = createPdfCaptureClone(pageEl, size.captureW, size.captureH, captureDoc);
+    const html2canvasFn = getHtml2canvasForWindow(captureWin);
     await yieldToPaint();
     await new Promise(function(resolve) { setTimeout(resolve, 40); });
     let canvas;
     try {
-        canvas = await html2canvas(clone, buildPdfHtml2canvasOptions(size.captureW, size.captureH));
+        canvas = await html2canvasFn(clone, buildPdfHtml2canvasOptions(size.captureW, size.captureH));
     } finally {
         removePdfCaptureClone(clone);
     }
@@ -5857,21 +6016,39 @@ function setPdfExportOverlayVisible(visible) {
  * PDF 저장: 각 .page를 html2canvas로 캡처 후 jsPDF에 페이지별로 합침.
  * (html2pdf.js 래퍼의 toCanvas/toPdf는 이 환경에서 빈 결과를 반환함)
  */
-async function runHtml2PdfSave(printContainer, filename) {
+async function runHtml2PdfSave(printContainer, filename, captureWin) {
     if (!printContainer) throw new Error('PDF capture container missing');
     const pages = Array.from(printContainer.querySelectorAll('.page'));
     assertPdfPagesMeasurable(pages);
-    await ensurePdfLibsLoaded();
+    await ensurePdfLibsInWindow(captureWin);
 
-    const jsPDF = window.jspdf.jsPDF;
-    const pdfDoc = new jsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
+    const JsPDF = getJsPdfConstructorForWindow(captureWin);
+    if (!JsPDF) throw new Error('jsPDF not available');
+    const pdfDoc = new JsPDF({ unit: 'mm', format: 'a4', orientation: 'portrait' });
 
     for (let i = 0; i < pages.length; i++) {
-        const captured = await capturePageToCanvas(pages[i], i);
+        const captured = await capturePageToCanvas(pages[i], i, captureWin);
         capturePageToPdf(pdfDoc, captured.canvas, i);
     }
 
     pdfDoc.save(filename);
+}
+
+/** 메인 화면은 그대로 두고 팝업 창에서만 PDF 캡처·저장 */
+async function runPdfExportInWorkerWindow(workerWin, sourceContainer, filename) {
+    if (!workerWin || workerWin.closed) throw new Error('PDF worker window closed');
+    const workerDoc = workerWin.document;
+    setPdfWorkerStatus(workerDoc, 'PDF 생성 중…', false);
+
+    const printContainer = workerDoc.createElement('div');
+    printContainer.id = 'printContainer';
+    printContainer.className = 'pdf-export-capture';
+    printContainer.innerHTML = sourceContainer.innerHTML;
+    workerDoc.body.appendChild(printContainer);
+
+    await ensurePdfLibsInWindow(workerWin);
+    await preparePdfCaptureLayout(printContainer);
+    await runHtml2PdfSave(printContainer, filename, workerWin);
 }
 
 /**
@@ -5880,35 +6057,38 @@ async function runHtml2PdfSave(printContainer, filename) {
 async function saveReportAsPdf() {
     if (pdfExportInProgress) return;
     setPdfBtnLoading(true);
-    await yieldToPaint();
-    await new Promise(function(resolve) { setTimeout(resolve, 50); });
-    let printContainer = null;
+    let workerWin = null;
     try {
         if (!prepareSelectedReportForOutput()) return;
-        printContainer = document.getElementById('printContainer');
-        if (!printContainer || !printContainer.children.length) {
+        const sourceContainer = document.getElementById('printContainer');
+        if (!sourceContainer || !sourceContainer.children.length) {
             alert('저장할 보고서가 없습니다.');
             return;
         }
         pdfExportInProgress = true;
-        await yieldToPaint();
-        document.body.classList.add('pdf-exporting');
-        setPdfExportOverlayVisible(true);
-        window.scrollTo(0, 0);
-        printContainer.classList.add('pdf-export-capture');
-        const filename = getReportPdfFilename();
         await waitForPrintContainerLayout();
-        await yieldToPaint();
-        setPdfExportOverlayVisible(false);
-        await yieldToPaint();
-        await runHtml2PdfSave(printContainer, filename);
+        workerWin = openPdfExportWorkerWindow();
+        if (!workerWin) return;
+        const filename = getReportPdfFilename();
+        await runPdfExportInWorkerWindow(workerWin, sourceContainer, filename);
+        setPdfWorkerStatus(workerWin.document, 'PDF 저장 완료. 창을 닫습니다…', false);
+        await new Promise(function(resolve) { setTimeout(resolve, 400); });
     } catch (err) {
         console.warn('PDF 저장 실패:', err);
-        alert('PDF를 저장할 수 없습니다. PDF 라이브러리 로드 실패이거나 생성 중 오류가 발생했습니다.\n네트워크 연결을 확인한 뒤 다시 시도해 주세요.');
+        if (workerWin && !workerWin.closed) {
+            setPdfWorkerStatus(
+                workerWin.document,
+                'PDF를 저장할 수 없습니다.\n네트워크·팝업 설정을 확인한 뒤 다시 시도해 주세요.',
+                true
+            );
+            await new Promise(function(resolve) { setTimeout(resolve, 2800); });
+        } else {
+            alert('PDF를 저장할 수 없습니다. PDF 라이브러리 로드 실패이거나 생성 중 오류가 발생했습니다.\n팝업 허용·네트워크 연결을 확인한 뒤 다시 시도해 주세요.');
+        }
     } finally {
-        document.body.classList.remove('pdf-exporting');
-        setPdfExportOverlayVisible(false);
-        if (printContainer) printContainer.classList.remove('pdf-export-capture');
+        if (workerWin && !workerWin.closed) {
+            try { workerWin.close(); } catch (e) { /* ignore */ }
+        }
         pdfExportInProgress = false;
         setPdfBtnLoading(false);
     }
