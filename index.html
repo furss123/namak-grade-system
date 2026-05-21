@@ -220,8 +220,8 @@
         .school-logo {
             position: relative;
             z-index: 1;
-            width: 135px;
-            height: 135px;
+            width: 78px;
+            height: 78px;
             border-radius: 50%;
             object-fit: contain;
             background: #fff;
@@ -239,7 +239,7 @@
             gap: clamp(3px, 0.5vw, 5px);
             min-width: 0;
             flex: 1 1 auto;
-            min-height: 135px;
+            min-height: 78px;
             text-align: left;
         }
         .header-school {
@@ -292,13 +292,13 @@
                 padding: var(--space-4) var(--space-5);
             }
             .school-logo {
-                width: 100px;
-                height: 100px;
+                width: 64px;
+                height: 64px;
             }
             .site-header-text {
                 align-items: flex-start;
                 text-align: left;
-                min-height: 100px;
+                min-height: 64px;
             }
             .site-header-text h1 {
                 font-size: calc(clamp(1.12rem, 4.2vw, 1.28rem) + 4pt);
@@ -1839,9 +1839,10 @@
         .page-2 .dist-student-name.dist-name-size-sm { font-size: calc(8.5px + 1.5pt); }
         .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 1.5pt); }
         .page-1 .report-radar-layout {
-            --radar-chart-pad-y: 6mm;
+            --radar-chart-pad-top: 6mm;
+            --radar-chart-pad-bottom: 8mm;
             --radar-graph-h: calc(69mm * 1.2);
-            --radar-panel-h: calc(var(--radar-graph-h) + 2 * var(--radar-chart-pad-y));
+            --radar-panel-h: calc(var(--radar-graph-h) + var(--radar-chart-pad-top) + var(--radar-chart-pad-bottom));
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
@@ -1855,12 +1856,14 @@
             background: #fafbfd;
             border: 1px solid #d4dde8;
             border-radius: 5px;
-            padding: var(--radar-chart-pad-y) 2.5mm;
+            padding: var(--radar-chart-pad-top) 3mm var(--radar-chart-pad-bottom);
             box-sizing: border-box;
             width: 100%;
-            height: var(--radar-panel-h);
+            height: auto;
             min-height: var(--radar-panel-h);
             align-self: stretch;
+            overflow: visible;
+            flex-shrink: 0;
         }
         .page-1 .report-radar-chart svg {
             width: 100%;
@@ -1869,6 +1872,7 @@
             max-height: var(--radar-graph-h);
             overflow: visible;
             flex-shrink: 0;
+            display: block;
         }
         .page-1 .page-body.report-page-one.page-body-fit,
         .page-2 .page-body.report-page-two.page-body-fit {
@@ -2185,9 +2189,10 @@
         .page-1 .score-grade-manual-row {
             display: grid;
             grid-template-columns: max-content minmax(0, 1fr);
-            align-items: center;
+            align-items: start;
             column-gap: 3mm;
             row-gap: 1.2mm;
+            min-height: min-content;
         }
         .page-1 .score-grade-manual-row + .score-grade-manual-row {
             margin-top: 0.8mm;
@@ -2196,26 +2201,32 @@
         }
         .page-1 .score-grade-manual-label {
             grid-column: 1;
+            flex-shrink: 0;
+            align-self: start;
             padding: 0.5mm 2mm;
             border-radius: 3px;
             background: var(--school-navy-dark);
             color: #fff;
             font-size: var(--rpt-font-caption);
             font-weight: 700;
-            letter-spacing: -0.02em;
+            line-height: 1.35;
+            letter-spacing: 0;
             white-space: nowrap;
         }
         .page-1 .score-grade-manual-desc {
             grid-column: 2;
             display: flex;
             flex-wrap: wrap;
-            align-items: center;
+            align-items: flex-start;
             gap: 1.2mm 3mm;
             min-width: 0;
         }
         .page-1 .score-grade-manual-item {
             color: var(--school-muted);
             min-width: 0;
+            line-height: 1.45;
+            word-break: keep-all;
+            overflow-wrap: anywhere;
         }
         .page-1 .score-grade-manual-item strong {
             color: var(--school-navy);
@@ -2582,7 +2593,7 @@
 
     <header class="site-header no-print">
         <div class="site-header-inner">
-            <img src="assets/namak-logo.png" alt="남악고등학교" class="school-logo" width="135" height="135">
+            <img src="assets/namak-logo.png" alt="남악고등학교" class="school-logo" width="78" height="78">
             <div class="site-header-text">
                 <p class="header-school">남악고등학교</p>
                 <h1>1학년 <span class="header-em">성적 조회</span> 시스템</h1>
@@ -2822,7 +2833,9 @@
                 </div>
                 <div class="score-grade-manual-row">
                     <span class="score-grade-manual-label">윗등급 차</span>
-                    <span class="score-grade-manual-item"><strong>※</strong> 상위 등급 컷과의 차이</span>
+                    <div class="score-grade-manual-desc">
+                        <span class="score-grade-manual-item"><strong>※</strong> 상위 등급 컷과의 차이</span>
+                    </div>
                 </div>
             </div>
             </div>
@@ -2834,7 +2847,7 @@
             <h3>한눈에 보기</h3>
             <div class="report-radar-layout">
                 <div class="report-radar-chart">
-                    <svg id="gradeRadarChart" viewBox="0 0 240 240" role="img" aria-label="과목별 등급 레이더 차트"></svg>
+                    <svg id="gradeRadarChart" viewBox="-34 -34 308 308" role="img" aria-label="과목별 등급 레이더 차트"></svg>
                 </div>
                 <div class="report-radar-side">
                     <div class="report-grade-goal-panel">
@@ -5356,8 +5369,11 @@ function renderStudentGradeRadar(subjectRows) {
     const NS = 'http://www.w3.org/2000/svg';
     const cx = 120;
     const cy = 120;
-    const maxR = 86;
+    const maxR = 82;
+    const labelR = maxR + 18;
     const n = subjectRows.length;
+
+    svgEl.setAttribute('viewBox', '-34 -34 308 308');
     const angles = subjectRows.map((_, i) => -Math.PI / 2 + (2 * Math.PI * i) / n);
     const scores = subjectRows.map((row) => 6 - row.grade);
 
@@ -5410,7 +5426,7 @@ function renderStudentGradeRadar(subjectRows) {
         dot.setAttribute('fill', '#1e3a5f');
         svgEl.appendChild(dot);
 
-        const labPt = polar(maxR + 20, i);
+        const labPt = polar(labelR, i);
         const text = document.createElementNS(NS, 'text');
         text.setAttribute('x', String(labPt.x));
         text.setAttribute('y', String(labPt.y));
@@ -5419,20 +5435,20 @@ function renderStudentGradeRadar(subjectRows) {
         text.setAttribute('fill', '#1e3a5f');
         text.setAttribute('font-family', 'Pretendard, Malgun Gothic, sans-serif');
         text.setAttribute('stroke', '#fff');
-        text.setAttribute('stroke-width', '2.5');
+        text.setAttribute('stroke-width', '2');
         text.setAttribute('paint-order', 'stroke fill');
 
         const nameSpan = document.createElementNS(NS, 'tspan');
         nameSpan.setAttribute('x', String(labPt.x));
-        nameSpan.setAttribute('dy', '-0.55em');
-        nameSpan.setAttribute('font-size', '15');
+        nameSpan.setAttribute('dy', '-0.5em');
+        nameSpan.setAttribute('font-size', '14.5');
         nameSpan.setAttribute('font-weight', '700');
         nameSpan.textContent = row.subject;
 
         const gradeSpan = document.createElementNS(NS, 'tspan');
         gradeSpan.setAttribute('x', String(labPt.x));
-        gradeSpan.setAttribute('dy', '1.15em');
-        gradeSpan.setAttribute('font-size', '16.5');
+        gradeSpan.setAttribute('dy', '1.1em');
+        gradeSpan.setAttribute('font-size', '15.5');
         gradeSpan.setAttribute('font-weight', '800');
         gradeSpan.textContent = row.grade + '등급';
 
