@@ -1885,7 +1885,6 @@
         </div>
     </footer>
 
-<script src="https://js.puter.com/v2/"></script>
 <script>
 const APP_VERSION = '1.1.0';
 const APP_RELEASE_DATE = '2026-05-20';
@@ -3075,93 +3074,124 @@ function hideReportActionSection() {
     document.getElementById('reportActionSection').style.display = 'none';
 }
 
-/** Perplexity (Puter.js) — 비로그인 게스트 · 30초 이내 · 캐시 · 로컬 폴백 */
-const PERPLEXITY_MODEL = 'perplexity/sonar';
+/** DuckDuckGo AI Chat — 로그인 팝업 없음 · Service Worker 프록시 · 30초 · 캐시 · 폴백 */
+const DDG_AI_MODEL = 'claude-3-haiku-20240307';
 const UNIV_AI_TOTAL_MS = 30000;
-const UNIV_AI_CACHE_KEY = 'univRefAiCache_v3';
+const UNIV_AI_CHAT_MS = 26000;
+const UNIV_AI_STATUS_MS = 4000;
+const UNIV_AI_CACHE_KEY = 'univRefAiCache_v4';
 const UNIV_REF_PROGRESS_LEN = 326.726;
-let puterUnivAiGuestAuthPromise = null;
+let ddgVqdCache = null;
+let ddgSwReady = false;
 let univRefAiMemoryCache = {};
 let univRefProgressTimer = null;
 let univRefProgressValue = 0;
 
-function installPuterGuestAuthPatch() {
-    if (typeof puter === 'undefined' || puter.__univAiGuestAuthPatch) return;
-    puter.__univAiGuestAuthPatch = true;
-    if (!puter.ui || typeof puter.ui.authenticateWithPuter !== 'function') return;
-    puter.ui.authenticateWithPuter = async function authenticateAsGuestOnly() {
-        if (puter.env !== 'web') return;
-        if (puter.authToken) return;
-        await ensurePuterGuestAuthForUnivAi();
-    };
+function getAppBasePath() {
+    const path = window.location.pathname || '/';
+    if (path.endsWith('/')) return path;
+    if (/\.[a-z0-9]+$/i.test(path)) return path.replace(/\/[^/]*$/, '/') || '/';
+    return path + '/';
 }
 
-function initPuterUnivAiGuestMode() {
-    if (typeof puter === 'undefined' || !puter.auth) return;
-    installPuterGuestAuthPatch();
+function getDdgProxyUrl(segment) {
+    return getAppBasePath() + 'ddg-proxy/' + segment;
+}
+
+async function registerDdgServiceWorker() {
+    if (!('serviceWorker' in navigator)) return false;
     try {
-        puter.auth.signOut();
+        const base = getAppBasePath();
+        await navigator.serviceWorker.register(base + 'ddg-ai-sw.js', { scope: base });
+        await navigator.serviceWorker.ready;
+        ddgSwReady = true;
+        return true;
     } catch (e) {
-        console.warn('[Puter] 기존 로그인 세션 제거', e);
+        console.warn('[DuckDuckGo AI] Service Worker 등록 실패', e);
+        ddgSwReady = false;
+        return false;
     }
 }
 
-async function ensurePuterGuestAuthForUnivAi() {
-    if (typeof puter === 'undefined' || !puter.auth || !puter.ai) {
-        throw new Error('Perplexity AI 라이브러리 로드 실패');
-    }
-    installPuterGuestAuthPatch();
-    if (puter.auth.isSignedIn()) return;
-    if (!puterUnivAiGuestAuthPromise) {
-        puterUnivAiGuestAuthPromise = puter.auth.signIn({ attempt_temp_user_creation: true })
-            .finally(function() {
-                puterUnivAiGuestAuthPromise = null;
-            });
-    }
-    await puterUnivAiGuestAuthPromise;
-}
-
-function extractPuterChatText(result) {
-    if (!result) return '';
-    const msg = result.message || result;
-    const content = msg.content;
-    if (typeof content === 'string') return content;
-    if (Array.isArray(content)) {
-        return content.map(function(part) {
-            if (typeof part === 'string') return part;
-            return part && (part.text || part.content || '');
-        }).join('');
-    }
-    if (typeof result === 'string') return result;
-    return '';
-}
-
-async function perplexityAiChat(userContent, onProgress) {
-    await ensurePuterGuestAuthForUnivAi();
-    if (onProgress) onProgress(15, 'Perplexity 연결됨');
-    const messages = [{ role: 'user', content: userContent }];
-    const response = await puter.ai.chat(messages, {
-        model: PERPLEXITY_MODEL,
-        stream: true,
-        max_tokens: 2800,
-        temperature: 0.2
+async function ddgFetchVqd(forceRefresh) {
+    if (!ddgSwReady) throw new Error('AI 프록시를 사용할 수 없습니다 (HTTPS·Service Worker 필요)');
+    if (!forceRefresh && ddgVqdCache) return ddgVqdCache;
+    const res = await fetch(getDdgProxyUrl('status'), {
+        method: 'GET',
+        headers: { 'x-vqd-accept': '1' }
     });
+    if (!res.ok) throw new Error('AI 연결 실패 (' + res.status + ')');
+    const vqd = res.headers.get('x-vqd-4');
+    if (!vqd) throw new Error('AI 인증 토큰을 받지 못했습니다');
+    ddgVqdCache = vqd;
+    return vqd;
+}
+
+async function parseDdgSseResponse(res, onProgress) {
+    const text = await res.text();
     let full = '';
-    if (response && typeof response[Symbol.asyncIterator] === 'function') {
-        for await (const part of response) {
-            const piece = part && (part.text != null ? part.text : extractPuterChatText(part));
-            if (piece) full += piece;
-            if (onProgress) {
-                const streamPct = Math.min(94, 18 + Math.floor(full.length / 70));
-                onProgress(streamPct, 'Perplexity 분석 중…');
+    const lines = text.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line.startsWith('data:')) continue;
+        const data = line.slice(5).trim();
+        if (data === '[DONE]') break;
+        try {
+            const chunk = JSON.parse(data);
+            if (chunk && chunk.message) {
+                full += chunk.message;
+                if (onProgress) {
+                    const streamPct = Math.min(92, 22 + Math.floor(full.length / 75));
+                    onProgress(streamPct, '지원 대학 분석 중…');
+                }
             }
-        }
-    } else {
-        full = extractPuterChatText(response);
-        if (onProgress) onProgress(85, 'Perplexity 응답 수신…');
+        } catch (e) { /* skip malformed chunk */ }
     }
-    if (!full || !full.trim()) throw new Error('Perplexity 빈 응답');
+    const newVqd = res.headers.get('x-vqd-4');
+    if (newVqd) ddgVqdCache = newVqd;
     return full;
+}
+
+async function ddgAiChat(userContent, onProgress) {
+    let vqd = await withTimeout(ddgFetchVqd(false), UNIV_AI_STATUS_MS, 'AI 연결 시간 초과');
+    if (onProgress) onProgress(14, 'AI 연결됨');
+    const payload = JSON.stringify({
+        model: DDG_AI_MODEL,
+        messages: [{ role: 'user', content: userContent }],
+        canUseTools: false,
+        canUseApproxLocation: false
+    });
+
+    async function postChat(token) {
+        const controller = new AbortController();
+        const timer = setTimeout(function() { controller.abort(); }, UNIV_AI_CHAT_MS);
+        try {
+            return await fetch(getDdgProxyUrl('chat'), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-vqd-4': token
+                },
+                body: payload,
+                signal: controller.signal
+            });
+        } finally {
+            clearTimeout(timer);
+        }
+    }
+
+    if (onProgress) onProgress(20, '지원 대학 분석 중…');
+    let res = await postChat(vqd);
+
+    if (res.status === 418 || res.status === 429) {
+        vqd = await withTimeout(ddgFetchVqd(true), UNIV_AI_STATUS_MS, 'AI 재연결 시간 초과');
+        res = await postChat(vqd);
+    }
+
+    if (!res.ok) throw new Error('AI 응답 오류 (' + res.status + ')');
+    const raw = await parseDdgSseResponse(res, onProgress);
+    if (!raw || !raw.trim()) throw new Error('AI 빈 응답');
+    return raw;
 }
 
 function withTimeout(promise, ms, message) {
@@ -3349,7 +3379,7 @@ function startUnivRefProgressAnimator() {
         const elapsed = Date.now() - univRefLoadingStartedAt;
         const timePct = Math.min(88, Math.floor((elapsed / UNIV_AI_TOTAL_MS) * 88));
         if (timePct > univRefProgressValue) {
-            setUnivRefProgress(timePct, 'Perplexity 분석 중…');
+            setUnivRefProgress(timePct, '지원 대학 분석 중…');
         }
     }, 160);
 }
@@ -3369,10 +3399,10 @@ function showUnivRefTableLoading() {
         '</svg>' +
         '<span class="univ-ref-progress-pct" id="univRefProgressPct">0%</span>' +
         '</div>' +
-        '<span class="univ-ref-progress-label" id="univRefProgressLabel">Perplexity 준비 중…</span>' +
+        '<span class="univ-ref-progress-label" id="univRefProgressLabel">분석 준비 중…</span>' +
         '</div>' +
         '</td></tr>';
-    setUnivRefProgress(0, 'Perplexity 준비 중…');
+    setUnivRefProgress(0, '분석 준비 중…');
     startUnivRefProgressAnimator();
 }
 
@@ -3512,12 +3542,19 @@ async function fetchUnivRefTableFromAI(avgGrade) {
     const deadline = Date.now() + UNIV_AI_TOTAL_MS;
 
     try {
-        initPuterUnivAiGuestMode();
-        setUnivRefProgress(5, 'Perplexity 연결 중…');
+        if (!ddgSwReady) {
+            const ok = await withTimeout(
+                registerDdgServiceWorker(),
+                Math.max(2000, deadline - Date.now()),
+                'AI 준비 시간 초과'
+            );
+            if (!ok) throw new Error('HTTPS 접속이 필요합니다 (GitHub Pages 권장)');
+        }
+        setUnivRefProgress(5, 'AI 연결 중…');
         const prompt = buildUnivRefTablePrompts(avgGrade);
         const remaining = Math.max(3000, deadline - Date.now());
         const raw = await withTimeout(
-            perplexityAiChat(prompt, function(pct, label) {
+            ddgAiChat(prompt, function(pct, label) {
                 setUnivRefProgress(pct, label);
             }),
             remaining,
@@ -4095,7 +4132,7 @@ document.getElementById('studentId').addEventListener('input', function() {
     }
     initUnivRefTable();
     initAppFooter();
-    initPuterUnivAiGuestMode();
+    await registerDdgServiceWorker();
     if (!restoreAppViewFromSession(savedUi)) {
         runDefaultSinglePreview({ scroll: false });
     }
