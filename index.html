@@ -1993,6 +1993,37 @@
         .page-action-pdf:focus-visible {
             outline-color: #ffcdd2;
         }
+        .page-action-pdf {
+            position: relative;
+        }
+        .page-action-pdf.is-loading .page-action-pdf-label,
+        .page-action-pdf.is-loading svg {
+            visibility: hidden;
+        }
+        .page-action-pdf.is-loading .page-action-pdf-label {
+            visibility: hidden;
+        }
+        .page-action-pdf.is-loading .pdf-spinner {
+            display: block;
+        }
+        .pdf-spinner {
+            display: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid rgba(255, 255, 255, 0.35);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: pdf-btn-spin 0.7s linear infinite;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            margin-left: -11px;
+            margin-top: -11px;
+            flex-shrink: 0;
+        }
+        @keyframes pdf-btn-spin {
+            to { transform: rotate(360deg); }
+        }
         @media (max-width: 720px) {
             .page-chrome-actions {
                 right: 10px;
@@ -2535,7 +2566,8 @@
                     <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6z"/>
                     <path fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M14 2v6h6"/>
                 </svg>
-                <span>PDF 저장</span>
+                <span class="page-action-pdf-label">PDF 저장</span>
+                <span class="pdf-spinner" aria-hidden="true"></span>
             </button>
         </div>
     </aside>
