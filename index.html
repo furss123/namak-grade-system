@@ -1111,7 +1111,9 @@
             --rpt-font-sm: calc(8.5px + 0.5pt);
             --rpt-font-h: calc(10px + 1pt);
             --rpt-font-caption: calc(8px + 0.5pt);
-            --rpt-cell-pad: 2.5px 3px;
+            --rpt-cell-pad-x: 3px;
+            --rpt-cell-pad-y: calc(2.5px + 1mm);
+            --rpt-cell-pad: var(--rpt-cell-pad-y) var(--rpt-cell-pad-x);
         }
         .page-1 .page-body.report-page-one {
             display: flex;
@@ -1158,21 +1160,25 @@
             --rpt-font-base: calc(10px + 0.5pt);
             --rpt-font-sm: calc(9px + 0.5pt);
             --rpt-font-h: calc(11px + 1pt);
-            --rpt-cell-pad: 3px 4px;
+            --rpt-cell-pad-x: 4px;
+            --rpt-cell-pad-y: calc(3px + 1mm);
+            --rpt-cell-pad: var(--rpt-cell-pad-y) var(--rpt-cell-pad-x);
             --p1-stack-gap: var(--report-zone-gap);
         }
         .page-1.p1-opt-count-2 {
             --rpt-font-base: calc(8.5px + 0.5pt);
             --rpt-font-sm: calc(7.8px + 0.5pt);
             --rpt-font-h: calc(9.5px + 1pt);
-            --rpt-cell-pad: 2px 3px;
+            --rpt-cell-pad-x: 3px;
+            --rpt-cell-pad-y: calc(2px + 1mm);
+            --rpt-cell-pad: var(--rpt-cell-pad-y) var(--rpt-cell-pad-x);
             --p1-stack-gap: var(--report-zone-gap);
         }
         .page-1.p1-opt-count-1 .report-radar-layout {
-            --radar-graph-h: 50mm;
+            --radar-graph-h: 75mm;
         }
         .page-1.p1-opt-count-2 .report-radar-layout {
-            --radar-graph-h: 38mm;
+            --radar-graph-h: 57mm;
         }
         .page-1.p1-opt-count-1 .report-block-main,
         .page-1.p1-opt-count-1 .report-block-radar {
@@ -1269,6 +1275,11 @@
             letter-spacing: -0.01em;
             box-sizing: border-box;
         }
+        .page-1 .report-block-maxcut > h3,
+        .page-1 .report-block-main > .report-section-title,
+        .page-1 .report-block-radar > h3 {
+            font-size: calc(var(--rpt-font-h) + 2pt);
+        }
         .page-1 .report-block h3::before,
         .page-1 .report-section-title::before {
             content: '';
@@ -1292,9 +1303,10 @@
         }
         .page-1 .report-block th,
         .page-1 .report-block td {
-            padding: var(--rpt-cell-pad);
+            padding: var(--rpt-cell-pad-y) var(--rpt-cell-pad-x);
             font-size: var(--rpt-font-base);
             line-height: 1.28;
+            vertical-align: middle;
             border-color: #dce4ee;
         }
         .page-1 .report-block thead th {
@@ -1302,17 +1314,16 @@
             color: #fff;
             font-weight: 600;
             border-color: #1a3352;
-            padding-top: 3px;
-            padding-bottom: 3px;
+            padding-top: calc(3px + 1mm);
+            padding-bottom: calc(3px + 1mm);
+            vertical-align: middle;
         }
         .page-1 .report-block tbody th.row-label {
             background: #f4f7fa;
             color: var(--school-navy-dark);
             font-weight: 600;
             width: 22%;
-        }
-        .page-1 .report-block-maxcut h3 {
-            font-size: var(--rpt-font-h);
+            vertical-align: middle;
         }
         .page-1 #rowMax th.row-label,
         .page-1 #rowMax td {
@@ -1450,8 +1461,8 @@
         .page-2 .dist-student-name.dist-name-size-sm { font-size: calc(8.5px + 0.5pt); }
         .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 0.5pt); }
         .page-1 .report-radar-layout {
-            --radar-chart-pad-y: 1mm;
-            --radar-graph-h: 46mm;
+            --radar-chart-pad-y: 3mm;
+            --radar-graph-h: 69mm;
             --radar-panel-h: calc(var(--radar-graph-h) + 2 * var(--radar-chart-pad-y));
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1503,7 +1514,7 @@
         .page-1 .report-grade-goal-panel {
             --goal-font-caption: calc(var(--rpt-font-caption) + 1pt);
             --goal-font-cell: calc(var(--rpt-font-sm) + 1pt);
-            --goal-cell-pad-y: 1.7mm;
+            --goal-cell-pad-y: 3.7mm;
             display: flex;
             flex-direction: column;
             height: 100%;
