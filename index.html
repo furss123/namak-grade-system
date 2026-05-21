@@ -37,6 +37,7 @@
             --report-pad-bottom: 5mm;
             --report-zone-gap: 2.6mm;
             --report-footer-h: 9mm;
+            --site-footer-h: 32px;
         }
 
         @page { size: A4; margin: 0; }
@@ -45,7 +46,7 @@
 
         body {
             font-family: 'Pretendard', 'Malgun Gothic', 'Apple SD Gothic Neo', sans-serif;
-            font-size: 14px; line-height: 1.55; margin: 0; padding: 0;
+            font-size: 14px; line-height: 1.55; margin: 0; padding: 0 0 var(--site-footer-h);
             background: #e8edf3;
             color: var(--school-text);
             min-height: 100vh;
@@ -118,13 +119,17 @@
             border-top: 1px solid var(--school-border);
             box-shadow: 0 -2px 10px rgba(15, 36, 64, 0.05);
         }
-        #siteFooterRoot.is-hidden-for-reports { display: none !important; }
+        #siteFooterRoot {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 850;
+            margin-top: 0;
+        }
         #printContainer .report-document-footer,
         #printContainer .batch-end-footer {
-            margin-top: 12px;
-            border-radius: var(--radius-md);
-            max-width: 100%;
-            flex-shrink: 0;
+            display: none !important;
         }
         .site-footer-inner {
             flex: 1; width: 100%;
@@ -1564,10 +1569,6 @@
             .site-header, .app-layout, .no-print,
             #siteFooterRoot, #reportActionSection,
             #reportTemplate { display: none !important; visibility: hidden !important; }
-            #printContainer .report-document-footer,
-            #printContainer .report-document-footer * {
-                visibility: visible !important;
-            }
             #printContainer {
                 display: block !important;
                 position: absolute; left: 0; top: 0; width: 100%;
@@ -1621,18 +1622,6 @@
             #printContainer .page-footer-meta {
                 display: none !important;
                 visibility: hidden !important;
-            }
-            #printContainer .report-document-footer,
-            #printContainer .batch-end-footer {
-                display: flex !important;
-                visibility: visible !important;
-                page-break-before: auto;
-                break-before: auto;
-                margin-top: 8px !important;
-                border-top: 1px solid var(--school-border) !important;
-                box-shadow: none !important;
-                -webkit-print-color-adjust: exact !important;
-                print-color-adjust: exact !important;
             }
             #printContainer .report-panel,
             #printContainer .student-info,
@@ -2047,40 +2036,16 @@ function initAppFooter() {
     stripCopyrightFromPageFooters(document.getElementById('reportTemplate'));
 }
 
-function buildAppFooterElement() {
-    const footer = document.createElement('footer');
-    footer.className = 'site-footer app-footer report-document-footer batch-end-footer';
-    footer.setAttribute('role', 'contentinfo');
-    footer.innerHTML =
-        '<div class="site-footer-inner">' +
-            '<div class="site-footer-bar">' +
-                '<p class="app-footer-copy"></p>' +
-                '<p class="app-footer-version"><span></span></p>' +
-            '</div>' +
-        '</div>';
-    fillAppFooterElement(footer);
-    return footer;
-}
-
-/** 저작권·버전 푸터: 보고서 목록 맨 아래 1회만 (화면·인쇄 공통) */
-function syncScreenFooterAfterReports(studentCount) {
+/** 저작권·버전: 화면 최하단 고정 1줄만 (#siteFooterRoot). 보고서·인쇄 영역 중복 제거 */
+function syncScreenFooterAfterReports() {
     const siteRoot = document.getElementById('siteFooterRoot');
+    if (siteRoot) siteRoot.classList.remove('is-hidden-for-reports');
     const printContainer = document.getElementById('printContainer');
-    if (printContainer) {
-        printContainer.querySelectorAll('.report-document-footer, .batch-end-footer').forEach(function(el) {
-            el.remove();
-        });
-    }
-    const reportCount = printContainer
-        ? printContainer.querySelectorAll('.report-wrapper').length
-        : 0;
-    const hasReports = studentCount > 0 && reportCount > 0;
-    if (hasReports) {
-        if (siteRoot) siteRoot.classList.add('is-hidden-for-reports');
-        if (printContainer) printContainer.appendChild(buildAppFooterElement());
-    } else if (siteRoot) {
-        siteRoot.classList.remove('is-hidden-for-reports');
-    }
+    if (!printContainer) return;
+    printContainer.querySelectorAll('.report-document-footer, .batch-end-footer').forEach(function(el) {
+        el.remove();
+    });
+    stripCopyrightFromPageFooters(printContainer);
 }
 
 function stripCopyrightFromPageFooters(root) {
@@ -4000,7 +3965,7 @@ function initUnivRefTable() {
 
 function clearPrintContainer() {
     document.getElementById('printContainer').innerHTML = '';
-    syncScreenFooterAfterReports(0);
+    syncScreenFooterAfterReports();
 }
 
 function resetResults() {
@@ -4404,7 +4369,7 @@ function appendReportsToPrintContainer(studentIds, printOpts) {
         populateTemplate(id, { includeDistribution: printOpts.dist });
         printContainer.appendChild(cloneReportForPrint(printOpts));
     });
-    syncScreenFooterAfterReports(studentIds.length);
+    syncScreenFooterAfterReports();
 }
 
 function printSelectedReport() {
