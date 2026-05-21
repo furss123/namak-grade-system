@@ -1832,7 +1832,6 @@
         </div>
     </footer>
 
-<script src="https://js.puter.com/v2/"></script>
 <script>
 const APP_VERSION = '1.1.0';
 const APP_RELEASE_DATE = '2026-05-20';
@@ -2906,53 +2905,104 @@ function hideReportActionSection() {
     document.getElementById('reportActionSection').style.display = 'none';
 }
 
-/** Puter.js — API 키 없이 순차 자동 시도 (사용자 지정 순서) */
-const REC_AI_PROVIDERS = [
-    { id: 'perplexity', label: 'Perplexity', model: 'perplexity/sonar' },
-    { id: 'claude', label: 'Claude', model: 'anthropic/claude-sonnet-4-6' },
-    { id: 'gemini', label: 'Gemini', model: 'google/gemini-2.5-flash' },
-    { id: 'openai', label: 'ChatGPT', model: 'openai/gpt-4.1-mini' },
-    { id: 'deepseek', label: 'DeepSeek', model: 'deepseek/deepseek-v4-flash' }
-];
+/** DuckDuckGo AI Chat — gpt-4o-mini 단일 호출 (비로그인, Service Worker 프록시) */
+const DDG_AI_MODEL = 'gpt-4o-mini';
+let ddgVqdCache = null;
+let ddgSwReady = false;
 
-/** Puter 대입 분석 AI — 정식 로그인 대신 임시(게스트) 사용자만 사용 */
-let puterUnivAiGuestAuthPromise = null;
-
-function installPuterGuestAuthPatch() {
-    if (typeof puter === 'undefined' || puter.__univAiGuestAuthPatch) return;
-    puter.__univAiGuestAuthPatch = true;
-    if (!puter.ui || typeof puter.ui.authenticateWithPuter !== 'function') return;
-    puter.ui.authenticateWithPuter = async function authenticateAsGuestOnly() {
-        if (puter.env !== 'web') return;
-        if (puter.authToken) return;
-        await ensurePuterGuestAuthForUnivAi();
-    };
+function getAppBasePath() {
+    const path = window.location.pathname || '/';
+    if (path.endsWith('/')) return path;
+    if (/\.[a-z0-9]+$/i.test(path)) return path.replace(/\/[^/]*$/, '/') || '/';
+    return path + '/';
 }
 
-function initPuterUnivAiGuestMode() {
-    if (typeof puter === 'undefined' || !puter.auth) return;
-    installPuterGuestAuthPatch();
+function getDdgProxyUrl(segment) {
+    return getAppBasePath() + 'ddg-proxy/' + segment;
+}
+
+async function registerDdgServiceWorker() {
+    if (!('serviceWorker' in navigator)) return false;
     try {
-        puter.auth.signOut();
+        const base = getAppBasePath();
+        await navigator.serviceWorker.register(base + 'ddg-ai-sw.js', { scope: base });
+        await navigator.serviceWorker.ready;
+        ddgSwReady = true;
+        return true;
     } catch (e) {
-        console.warn('[Puter] 기존 로그인 세션 제거', e);
+        console.warn('[DuckDuckGo AI] Service Worker 등록 실패', e);
+        ddgSwReady = false;
+        return false;
     }
 }
 
-async function ensurePuterGuestAuthForUnivAi() {
-    if (typeof puter === 'undefined' || !puter.auth) {
-        throw new Error('AI 라이브러리 로드 실패');
-    }
-    installPuterGuestAuthPatch();
-    if (puter.auth.isSignedIn()) return;
+async function ddgFetchVqd(forceRefresh) {
+    if (!ddgSwReady) throw new Error('DuckDuckGo AI 프록시를 사용할 수 없습니다 (HTTPS·Service Worker 필요)');
+    if (!forceRefresh && ddgVqdCache) return ddgVqdCache;
+    const res = await fetch(getDdgProxyUrl('status'), {
+        method: 'GET',
+        headers: { 'x-vqd-accept': '1' }
+    });
+    if (!res.ok) throw new Error('DuckDuckGo 연결 실패 (' + res.status + ')');
+    const vqd = res.headers.get('x-vqd-4');
+    if (!vqd) throw new Error('DuckDuckGo 인증 토큰을 받지 못했습니다');
+    ddgVqdCache = vqd;
+    return vqd;
+}
 
-    if (!puterUnivAiGuestAuthPromise) {
-        puterUnivAiGuestAuthPromise = puter.auth.signIn({ attempt_temp_user_creation: true })
-            .finally(function() {
-                puterUnivAiGuestAuthPromise = null;
-            });
+async function parseDdgSseResponse(res) {
+    const text = await res.text();
+    let full = '';
+    const lines = text.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line.startsWith('data:')) continue;
+        const data = line.slice(5).trim();
+        if (data === '[DONE]') break;
+        try {
+            const chunk = JSON.parse(data);
+            if (chunk && chunk.message) full += chunk.message;
+        } catch (e) { /* skip malformed chunk */ }
     }
-    await puterUnivAiGuestAuthPromise;
+    const newVqd = res.headers.get('x-vqd-4');
+    if (newVqd) ddgVqdCache = newVqd;
+    return full;
+}
+
+async function ddgAiChat(userContent) {
+    let vqd = await ddgFetchVqd(false);
+    const payload = JSON.stringify({
+        model: DDG_AI_MODEL,
+        messages: [{ role: 'user', content: userContent }],
+        canUseTools: false,
+        canUseApproxLocation: false
+    });
+
+    let res = await fetch(getDdgProxyUrl('chat'), {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'x-vqd-4': vqd
+        },
+        body: payload
+    });
+
+    if (res.status === 418 || res.status === 429) {
+        vqd = await ddgFetchVqd(true);
+        res = await fetch(getDdgProxyUrl('chat'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-vqd-4': vqd
+            },
+            body: payload
+        });
+    }
+
+    if (!res.ok) throw new Error('DuckDuckGo AI 응답 오류 (' + res.status + ')');
+    const raw = await parseDdgSseResponse(res);
+    if (!raw || !raw.trim()) throw new Error('DuckDuckGo AI 빈 응답');
+    return raw;
 }
 
 const UNIV_REF_STRATEGY_ORDER = { '상향': 0, '적정': 1, '하향': 2 };
@@ -3015,17 +3065,13 @@ function renderStaticUnivRefPlaceholder() {
         '</td></tr>';
 }
 
-function showUnivRefTableLoading(providerLabel, attemptIndex) {
+function showUnivRefTableLoading() {
     const body = document.getElementById('univRefTableBody');
     if (!body) return;
-    const attemptText = attemptIndex != null
-        ? ' (' + (attemptIndex + 1) + '/' + REC_AI_PROVIDERS.length + ')'
-        : '';
-    const label = providerLabel ? escapeRecHtml(providerLabel) : 'AI';
     body.innerHTML =
         '<tr><td colspan="5" class="univ-ref-loading-cell">' +
         '<span class="univ-ref-spinner" aria-hidden="true"></span>' +
-        label + '로 지원 대학 분석 중' + attemptText + '…' +
+        'DuckDuckGo AI로 지원 대학 분석 중…' +
         '</td></tr>';
 }
 
@@ -3042,21 +3088,6 @@ function onGradeCalculated(avgGrade) {
     if (lastUnivRefFetchKey === key && univRefFetchInFlight) return;
     lastUnivRefFetchKey = key;
     fetchUnivRefTableFromAI(avgGrade);
-}
-
-function extractPuterChatText(result) {
-    if (!result) return '';
-    const msg = result.message || result;
-    const content = msg.content;
-    if (typeof content === 'string') return content;
-    if (Array.isArray(content)) {
-        return content.map(function(part) {
-            if (typeof part === 'string') return part;
-            return part && (part.text || part.content || '');
-        }).join('');
-    }
-    if (typeof result === 'string') return result;
-    return '';
 }
 
 function buildUnivRefTablePrompts(avgGrade) {
@@ -3094,11 +3125,10 @@ function buildUnivRefTablePrompts(avgGrade) {
         '  ]',
         '}',
         '',
-        '열 의미: strategy=지원전략, region=권역, university=대학·학과, gradeReflection=내신반영특징, reason=추천사유',
-        '최소 6행(상향2+적정2+하향2 이상). 수능최저·면접 등 치명 변수는 reason에 간략 언급.'
+        '열: strategy, region, university, gradeReflection, reason. 최소 6행. reason 1문장.'
     ].join('\n');
 
-    return { system: systemPrompt, user: userPrompt };
+    return systemPrompt + '\n\n' + userPrompt;
 }
 
 function normalizeRecommendRows(parsed) {
@@ -3187,69 +3217,22 @@ function extractJsonFromModelText(text) {
 }
 
 async function fetchUnivRefTableFromAI(avgGrade) {
-    if (typeof puter === 'undefined' || !puter.ai || typeof puter.ai.chat !== 'function') {
-        showUnivRefTableError(new Error('AI 라이브러리 로드 실패'), avgGrade);
-        return;
-    }
-
     if (univRefFetchInFlight) return;
     univRefFetchInFlight = true;
 
-    const prompts = buildUnivRefTablePrompts(avgGrade);
-    const messages = [
-        { role: 'system', content: prompts.system },
-        { role: 'user', content: prompts.user }
-    ];
-    let lastError = null;
-
-    showUnivRefTableLoading(null, 0);
+    showUnivRefTableLoading();
 
     try {
-        await ensurePuterGuestAuthForUnivAi();
-    } catch (authErr) {
-        univRefFetchInFlight = false;
-        const authMsg = authErr && authErr.message ? authErr.message : String(authErr);
-        showUnivRefTableError(
-            new Error('비로그인 AI 인증 실패: ' + authMsg + ' (팝업 차단 시 브라우저에서 허용해 주세요)'),
-            avgGrade
-        );
-        return;
-    }
-
-    try {
-        for (let i = 0; i < REC_AI_PROVIDERS.length; i++) {
-            const provider = REC_AI_PROVIDERS[i];
-            showUnivRefTableLoading(provider.label, i);
-
-            try {
-                const chatOptions = {
-                    model: provider.model,
-                    max_tokens: 4000,
-                    temperature: 0.2
-                };
-                if (provider.id === 'openai') {
-                    chatOptions.tools = [{ type: 'web_search' }];
-                }
-
-                const result = await puter.ai.chat(messages, chatOptions);
-                const raw = extractPuterChatText(result);
-                if (!raw || !raw.trim()) {
-                    throw new Error(provider.label + ': 빈 응답');
-                }
-
-                const parsed = extractJsonFromModelText(raw);
-                renderUnivRefFromAiData(parsed);
-                return;
-            } catch (err) {
-                lastError = err;
-                console.warn('[대학 참고표 AI]', provider.label, err);
-            }
+        if (!ddgSwReady) {
+            const ok = await registerDdgServiceWorker();
+            if (!ok) throw new Error('DuckDuckGo AI를 쓰려면 HTTPS로 접속해 주세요 (GitHub Pages 권장)');
         }
-
-        showUnivRefTableError(
-            lastError || new Error('Perplexity·Claude·Gemini·ChatGPT·DeepSeek 연결 실패'),
-            avgGrade
-        );
+        const prompt = buildUnivRefTablePrompts(avgGrade);
+        const raw = await ddgAiChat(prompt);
+        const parsed = extractJsonFromModelText(raw);
+        renderUnivRefFromAiData(parsed);
+    } catch (err) {
+        showUnivRefTableError(err, avgGrade);
     } finally {
         univRefFetchInFlight = false;
     }
@@ -3800,10 +3783,11 @@ document.getElementById('studentId').addEventListener('input', function() {
         const loaded = await loadBundledSchoolData();
         if (!loaded) loadDemoData();
     }
-    initPuterUnivAiGuestMode();
     initUnivRefTable();
     initAppFooter();
-    runDefaultSinglePreview({ scroll: false });
+    registerDdgServiceWorker().then(function() {
+        runDefaultSinglePreview({ scroll: false });
+    });
     initPageScrollNav();
     requestAnimationFrame(function() {
         scrollToPageTop(true);
