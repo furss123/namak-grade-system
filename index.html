@@ -912,6 +912,10 @@
         .page-1 .report-page-one-split.is-single-col {
             grid-template-columns: 1fr;
         }
+        .page-1 .report-page-one-split.has-score-only .report-zone-score,
+        .page-1 .report-page-one-split.has-radar-only .report-zone-radar {
+            width: 100%;
+        }
         .page-1 .report-page-one-split .report-zone-score,
         .page-1 .report-page-one-split .report-zone-radar {
             min-width: 0;
@@ -1034,6 +1038,11 @@
             flex-shrink: 0;
             min-width: 0;
         }
+        .page-2.layout-p2-dist-only .report-zone-dist,
+        .page-2.layout-p2-univ-only .report-zone-univ-ref {
+            flex: 1;
+            min-height: 0;
+        }
         .page-2 .page-doc-header h1 {
             font-size: calc(15px + 4pt);
         }
@@ -1081,7 +1090,8 @@
             gap: 2.6mm;
             align-items: start;
         }
-        .page-1 .report-page-one-split .report-radar-layout {
+        /* 1페이지 5:5(과목별+한눈에): 오른쪽 칸에서 차트·목표점수 세로 배치 */
+        .page-1 .report-page-one-split.has-both-cols .report-radar-layout {
             grid-template-columns: 1fr;
             --radar-panel-h: 42mm;
         }
@@ -4327,40 +4337,51 @@ function cloneReportForPrint(printOpts) {
     const page1 = clone.querySelector('.page-1');
     const page2 = clone.querySelector('.page-2');
     const split = clone.querySelector('.report-page-one-split');
-    const maxcut = clone.querySelector('.report-zone-maxcut');
+    const showPage1 = !!(opts.score || opts.radar);
+    const showPage2 = !!(opts.dist || opts.univ);
 
-    if (!opts.score) {
-        const scoreZone = clone.querySelector('.report-zone-score');
-        if (scoreZone) scoreZone.remove();
-    }
-    if (!opts.radar) {
-        const radarZone = clone.querySelector('.report-zone-radar');
-        if (radarZone) radarZone.remove();
-    }
-    if (split) {
-        const hasScore = !!split.querySelector('.report-zone-score');
-        const hasRadar = !!split.querySelector('.report-zone-radar');
-        if (!hasScore && !hasRadar) {
-            split.remove();
-        } else if (hasScore !== hasRadar) {
-            split.classList.add('is-single-col');
+    if (!showPage1) {
+        if (page1) page1.remove();
+    } else if (page1) {
+        if (!opts.score) {
+            const scoreZone = clone.querySelector('.report-zone-score');
+            if (scoreZone) scoreZone.remove();
+        }
+        if (!opts.radar) {
+            const radarZone = clone.querySelector('.report-zone-radar');
+            if (radarZone) radarZone.remove();
+        }
+        if (split) {
+            const hasScore = !!split.querySelector('.report-zone-score');
+            const hasRadar = !!split.querySelector('.report-zone-radar');
+            split.classList.remove('is-single-col', 'has-score-only', 'has-radar-only', 'has-both-cols');
+            if (!hasScore && !hasRadar) {
+                split.remove();
+            } else if (hasScore && hasRadar) {
+                split.classList.add('has-both-cols');
+            } else if (hasScore) {
+                split.classList.add('is-single-col', 'has-score-only');
+            } else if (hasRadar) {
+                split.classList.add('is-single-col', 'has-radar-only');
+            }
         }
     }
-    if (!opts.score && !opts.radar) {
-        if (maxcut) maxcut.remove();
-        if (page1) page1.remove();
-    }
 
-    if (!opts.dist) {
-        const distZone = clone.querySelector('.report-zone-dist');
-        if (distZone) distZone.remove();
-    }
-    if (!opts.univ) {
-        const univZone = clone.querySelector('.report-zone-univ-ref');
-        if (univZone) univZone.remove();
-    }
-    if (!opts.dist && !opts.univ && page2) {
-        page2.remove();
+    if (!showPage2) {
+        if (page2) page2.remove();
+    } else if (page2) {
+        page2.classList.remove('layout-p2-dist-only', 'layout-p2-univ-only', 'layout-p2-both');
+        if (!opts.dist) {
+            const distZone = clone.querySelector('.report-zone-dist');
+            if (distZone) distZone.remove();
+        }
+        if (!opts.univ) {
+            const univZone = clone.querySelector('.report-zone-univ-ref');
+            if (univZone) univZone.remove();
+        }
+        if (opts.dist && opts.univ) page2.classList.add('layout-p2-both');
+        else if (opts.dist) page2.classList.add('layout-p2-dist-only');
+        else if (opts.univ) page2.classList.add('layout-p2-univ-only');
     }
 
     const elementsWithId = clone.querySelectorAll('[id]');
