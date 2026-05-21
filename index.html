@@ -1160,7 +1160,6 @@
             --rpt-font-h: calc(11px + 1pt);
             --rpt-cell-pad: 3px 4px;
             --p1-stack-gap: var(--report-zone-gap);
-            --radar-panel-h: 52mm;
         }
         .page-1.p1-opt-count-2 {
             --rpt-font-base: calc(8.5px + 0.5pt);
@@ -1168,7 +1167,12 @@
             --rpt-font-h: calc(9.5px + 1pt);
             --rpt-cell-pad: 2px 3px;
             --p1-stack-gap: var(--report-zone-gap);
-            --radar-panel-h: 36mm;
+        }
+        .page-1.p1-opt-count-1 .report-radar-layout {
+            --radar-graph-h: 50mm;
+        }
+        .page-1.p1-opt-count-2 .report-radar-layout {
+            --radar-graph-h: 38mm;
         }
         .page-1.p1-opt-count-1 .report-block-main,
         .page-1.p1-opt-count-1 .report-block-radar {
@@ -1446,7 +1450,9 @@
         .page-2 .dist-student-name.dist-name-size-sm { font-size: calc(8.5px + 0.5pt); }
         .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 0.5pt); }
         .page-1 .report-radar-layout {
-            --radar-panel-h: 44mm;
+            --radar-chart-pad-y: 1mm;
+            --radar-graph-h: 46mm;
+            --radar-panel-h: calc(var(--radar-graph-h) + 2 * var(--radar-chart-pad-y));
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
@@ -1460,7 +1466,7 @@
             background: #fafbfd;
             border: 1px solid #d4dde8;
             border-radius: 5px;
-            padding: 2.5mm;
+            padding: var(--radar-chart-pad-y) 2.5mm;
             box-sizing: border-box;
             width: 100%;
             height: var(--radar-panel-h);
@@ -1470,9 +1476,10 @@
         .page-1 .report-radar-chart svg {
             width: 100%;
             max-width: 100%;
-            max-height: var(--radar-panel-h);
-            height: auto;
+            height: var(--radar-graph-h);
+            max-height: var(--radar-graph-h);
             overflow: visible;
+            flex-shrink: 0;
         }
         .page-1 .page-body.report-page-one.page-body-fit,
         .page-2 .page-body.report-page-two.page-body-fit {
@@ -1494,6 +1501,9 @@
             max-height: var(--radar-panel-h);
         }
         .page-1 .report-grade-goal-panel {
+            --goal-font-caption: calc(var(--rpt-font-caption) + 1pt);
+            --goal-font-cell: calc(var(--rpt-font-sm) + 1pt);
+            --goal-cell-pad-y: 1.7mm;
             display: flex;
             flex-direction: column;
             height: 100%;
@@ -1515,13 +1525,16 @@
             flex-shrink: 0;
             margin: 0;
             padding: 1.4mm 2mm;
-            font-size: var(--rpt-font-caption);
+            font-size: var(--goal-font-caption);
             font-weight: 700;
             color: var(--school-navy);
             background: #f4f7fa;
             border-bottom: 1px solid #e2e8f0;
             letter-spacing: -0.01em;
             text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .page-1 .report-grade-goal-table {
             width: 100%;
@@ -1529,14 +1542,18 @@
             border-collapse: collapse;
             table-layout: fixed;
         }
+        .page-1 .report-grade-goal-table thead tr,
+        .page-1 .report-grade-goal-table tbody tr {
+            height: 1px;
+        }
         .page-1 .report-grade-goal-table .col-subject { width: 26%; }
         .page-1 .report-grade-goal-table .col-grade { width: 18%; }
         .page-1 .report-grade-goal-table .col-score { width: 28%; }
         .page-1 .report-grade-goal-table .col-goal { width: 28%; }
         .page-1 .report-grade-goal-table th,
         .page-1 .report-grade-goal-table td {
-            padding: 1.2mm 2px;
-            font-size: var(--rpt-font-sm);
+            padding: var(--goal-cell-pad-y) 2px;
+            font-size: var(--goal-font-cell);
             line-height: 1.25;
             text-align: center;
             vertical-align: middle;
@@ -1547,12 +1564,14 @@
             color: #fff;
             font-weight: 600;
             border-color: #1a3352;
+            vertical-align: middle;
         }
         .page-1 .report-grade-goal-table tbody th.subject-name {
             background: #f4f7fa;
             color: var(--school-navy-dark);
             font-weight: 600;
             text-align: center;
+            vertical-align: middle;
             padding-left: 2px;
             padding-right: 2px;
         }
@@ -4780,14 +4799,14 @@ function renderStudentGradeRadar(subjectRows) {
         const nameSpan = document.createElementNS(NS, 'tspan');
         nameSpan.setAttribute('x', String(labPt.x));
         nameSpan.setAttribute('dy', '-0.55em');
-        nameSpan.setAttribute('font-size', '11');
+        nameSpan.setAttribute('font-size', '12');
         nameSpan.setAttribute('font-weight', '700');
         nameSpan.textContent = row.subject;
 
         const gradeSpan = document.createElementNS(NS, 'tspan');
         gradeSpan.setAttribute('x', String(labPt.x));
         gradeSpan.setAttribute('dy', '1.15em');
-        gradeSpan.setAttribute('font-size', '12.5');
+        gradeSpan.setAttribute('font-size', '13.5');
         gradeSpan.setAttribute('font-weight', '800');
         gradeSpan.textContent = row.grade + '등급';
 
