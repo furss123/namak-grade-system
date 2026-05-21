@@ -1793,7 +1793,7 @@
             <p class="univ-ref-note">※ 5등급제 환산 평균등급 기준 · 수도권(인서울 포함) / 광주·전남 권역 · 입학처·어디가 교차 확인 권장</p>
             <div class="univ-ref-ai-bar" id="univ-ref-ai-bar" aria-live="polite">
                 <span class="univ-ref-ai-pill">내 평균등급 <span id="univ-ref-student-grade">-</span></span>
-                <span class="univ-ref-ai-pill muted" id="univ-ref-ai-status">학생 조회 시 AI가 표를 자동 갱신합니다</span>
+                <span class="univ-ref-ai-pill muted" id="univ-ref-ai-status">학생 조회 시 AI가 표를 자동 갱신합니다 (비로그인·게스트)</span>
             </div>
             <div class="report-panel">
             <table class="univ-ref-table" id="univRefTable">
@@ -2955,6 +2955,46 @@ const REC_AI_PROVIDERS = [
     { id: 'deepseek', label: 'DeepSeek', model: 'deepseek/deepseek-v4-flash' }
 ];
 
+/** Puter 대입 분석 AI — 정식 로그인 대신 임시(게스트) 사용자만 사용 */
+let puterUnivAiGuestAuthPromise = null;
+
+function installPuterGuestAuthPatch() {
+    if (typeof puter === 'undefined' || puter.__univAiGuestAuthPatch) return;
+    puter.__univAiGuestAuthPatch = true;
+    if (!puter.ui || typeof puter.ui.authenticateWithPuter !== 'function') return;
+    puter.ui.authenticateWithPuter = async function authenticateAsGuestOnly() {
+        if (puter.env !== 'web') return;
+        if (puter.authToken) return;
+        await ensurePuterGuestAuthForUnivAi();
+    };
+}
+
+function initPuterUnivAiGuestMode() {
+    if (typeof puter === 'undefined' || !puter.auth) return;
+    installPuterGuestAuthPatch();
+    try {
+        puter.auth.signOut();
+    } catch (e) {
+        console.warn('[Puter] 기존 로그인 세션 제거', e);
+    }
+}
+
+async function ensurePuterGuestAuthForUnivAi() {
+    if (typeof puter === 'undefined' || !puter.auth) {
+        throw new Error('AI 라이브러리 로드 실패');
+    }
+    installPuterGuestAuthPatch();
+    if (puter.auth.isSignedIn()) return;
+
+    if (!puterUnivAiGuestAuthPromise) {
+        puterUnivAiGuestAuthPromise = puter.auth.signIn({ attempt_temp_user_creation: true })
+            .finally(function() {
+                puterUnivAiGuestAuthPromise = null;
+            });
+    }
+    await puterUnivAiGuestAuthPromise;
+}
+
 const UNIV_REF_STRATEGY_ORDER = { '상향': 0, '적정': 1, '하향': 2 };
 
 let lastCalculatedAvgGrade = null;
@@ -3047,7 +3087,7 @@ function resetUniversityRecommendations() {
     lastUnivRefFetchKey = null;
     univRefFetchInFlight = false;
     setUnivRefStudentGrade(null);
-    setUnivRefAiStatus('학생 조회 시 AI가 표를 자동 갱신합니다', 'muted');
+    setUnivRefAiStatus('학생 조회 시 AI가 표를 자동 갱신합니다 (비로그인·게스트)', 'muted');
     renderStaticUnivRefPlaceholder();
 }
 
@@ -3227,6 +3267,19 @@ async function fetchUnivRefTableFromAI(avgGrade) {
     let lastError = null;
 
     showUnivRefTableLoading(null, 0);
+    setUnivRefAiStatus('비로그인(게스트) 인증 중…', 'muted');
+
+    try {
+        await ensurePuterGuestAuthForUnivAi();
+    } catch (authErr) {
+        univRefFetchInFlight = false;
+        const authMsg = authErr && authErr.message ? authErr.message : String(authErr);
+        showUnivRefTableError(
+            new Error('비로그인 AI 인증 실패: ' + authMsg + ' (팝업 차단 시 브라우저에서 허용해 주세요)'),
+            avgGrade
+        );
+        return;
+    }
 
     try {
         for (let i = 0; i < REC_AI_PROVIDERS.length; i++) {
@@ -3812,9 +3865,10 @@ document.getElementById('studentId').addEventListener('input', function() {
         const loaded = await loadBundledSchoolData();
         if (!loaded) loadDemoData();
     }
-    runDefaultSinglePreview({ scroll: false });
+    initPuterUnivAiGuestMode();
     initUnivRefTable();
     initAppFooter();
+    runDefaultSinglePreview({ scroll: false });
     initPageScrollNav();
     requestAnimationFrame(function() {
         scrollToPageTop(true);
