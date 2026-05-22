@@ -2891,7 +2891,7 @@
             <h3>한눈에 보기</h3>
             <div class="report-radar-layout">
                 <div class="report-radar-chart">
-                    <svg id="gradeRadarChart" viewBox="4 0 232 228" role="img" aria-label="과목별 9등급·5등급 비교 레이더 차트"></svg>
+                    <svg id="gradeRadarChart" viewBox="4 0 232 228" preserveAspectRatio="xMidYMid meet" role="img" aria-label="과목별 9등급·5등급 비교 레이더 차트"></svg>
                 </div>
                 <div class="report-radar-side">
                     <div class="report-grade-goal-panel">
@@ -5529,6 +5529,35 @@ function appendRadarLegend(svgEl, NS, cx, baseY) {
     svgEl.appendChild(g);
 }
 
+function fitRadarViewBox(svgEl, pad, fallback) {
+    let vbX;
+    let vbY;
+    let vbW;
+    let vbH;
+    try {
+        const bb = svgEl.getBBox();
+        if (bb.width > 1 && bb.height > 1) {
+            vbX = bb.x - pad;
+            vbY = bb.y - pad;
+            vbW = bb.width + pad * 2;
+            vbH = bb.height + pad * 2;
+        }
+    } catch (e) { /* getBBox unavailable until laid out */ }
+    if (vbW == null && fallback) {
+        vbX = fallback.x;
+        vbY = fallback.y;
+        vbW = fallback.w;
+        vbH = fallback.h;
+    }
+    if (vbW == null) return;
+    svgEl.setAttribute('viewBox', vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH);
+    svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    const chartBox = svgEl.closest('.report-radar-chart');
+    if (chartBox) {
+        chartBox.style.setProperty('--radar-aspect', vbW + ' / ' + vbH);
+    }
+}
+
 function appendRadarDataSeries(svgEl, NS, pts, seriesKey) {
     const s = RADAR_SERIES[seriesKey];
     const poly = document.createElementNS(NS, 'polygon');
@@ -5572,44 +5601,18 @@ function renderStudentGradeRadar(subjectRows) {
         };
     }
 
-    let contentMinX = cx - maxR;
-    let contentMaxX = cx + maxR;
-    let contentMinY = cy - maxR;
-    let contentMaxY = cy + maxR;
     let lowestLabelBottom = 0;
     subjectRows.forEach(function(row, i) {
         const labPt = polar(labelR, i);
         const sinA = Math.sin(angles[i]);
         const labelY = getRadarSubjectLabelY(labPt, sinA);
-        const top = labelY - RADAR_SUBJECT_FONT * (sinA > 0.55 ? 0.85 : sinA > 0.2 ? 0.45 : 0.55);
         const bottom = labelY + RADAR_SUBJECT_FONT * (sinA > 0.55 ? 0.72 : 0.52);
-        const halfW = row.subject.length * RADAR_SUBJECT_FONT * 0.62;
-        if (labPt.x - halfW < contentMinX) contentMinX = labPt.x - halfW;
-        if (labPt.x + halfW > contentMaxX) contentMaxX = labPt.x + halfW;
-        if (top < contentMinY) contentMinY = top;
-        if (bottom > contentMaxY) contentMaxY = bottom;
         if (bottom > lowestLabelBottom) lowestLabelBottom = bottom;
     });
 
-    const estVbH = Math.max(contentMaxY - contentMinY + 36, (labelR + vbPad) * 2);
+    const estVbH = (labelR + vbPad) * 2 + 36;
     const legendGapSvg = radarMmToSvgUnits(RADAR_LABEL_LEGEND_GAP_MM, svgEl, estVbH);
     const legendY = lowestLabelBottom + legendGapSvg;
-    contentMaxY = legendY + RADAR_LEGEND_HEIGHT;
-    const legendHalfW = 52;
-    if (cx - legendHalfW < contentMinX) contentMinX = cx - legendHalfW;
-    if (cx + legendHalfW > contentMaxX) contentMaxX = cx + legendHalfW;
-    if (cx + 20 > contentMaxX) contentMaxX = cx + 20;
-    const vbX = contentMinX - vbPad;
-    const vbY = contentMinY - vbPad;
-    const vbW = contentMaxX - contentMinX + vbPad * 2;
-    const vbH = contentMaxY - contentMinY + vbPad * 2;
-
-    svgEl.setAttribute('viewBox', vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH);
-    svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-    const chartBox = svgEl.closest('.report-radar-chart');
-    if (chartBox) {
-        chartBox.style.setProperty('--radar-aspect', vbW + ' / ' + vbH);
-    }
 
     svgEl.innerHTML = '';
 
@@ -5683,6 +5686,7 @@ function renderStudentGradeRadar(subjectRows) {
     });
 
     appendRadarLegend(svgEl, NS, cx, legendY);
+    fitRadarViewBox(svgEl, vbPad);
 
     const title = document.createElementNS(NS, 'title');
     title.textContent = subjectRows.map((row) =>
