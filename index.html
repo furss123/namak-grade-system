@@ -5393,11 +5393,29 @@ const GRADE9_SCALE = 9;
 const GRADE5_SCALE = 5;
 const GRADE9_RING_LABELS = [1, 3, 5, 7, 9];
 const RADAR_SERIES = {
-    g9: { stroke: '#1e3a5f', fill: 'rgba(30, 58, 95, 0.16)', dot: '#1e3a5f', dash: null, label: '9등급제', dotR: 3.2 },
-    g5: { stroke: '#c2410c', fill: 'none', dot: '#c2410c', dash: '5 3.5', label: '5등급제', dotR: 2.6 }
+    g9: { stroke: '#1e3a5f', fill: 'rgba(30, 58, 95, 0.16)', dot: '#1e3a5f', dash: null, label: '9등급', dotR: 3.2 },
+    g5: { stroke: '#c2410c', fill: 'none', dot: '#c2410c', dash: '5 3.5', label: '5등급', dotR: 2.6 }
 };
 const RADAR_SUBJECT_FONT = 11;
-const RADAR_LEGEND_GAP = 30;
+const RADAR_LEGEND_HEIGHT = 10;
+const RADAR_LABEL_LEGEND_GAP_MM = 3;
+
+function radarMmToSvgUnits(mm, svgEl, vbHeight) {
+    const chartBox = svgEl.closest('.report-radar-chart');
+    let renderMm = 99.36;
+    if (chartBox) {
+        const layout = chartBox.closest('.report-radar-layout');
+        const raw = getComputedStyle(layout || chartBox).getPropertyValue('--radar-svg-h').trim();
+        if (raw.endsWith('mm')) renderMm = parseFloat(raw) || renderMm;
+    }
+    return vbHeight * (mm / renderMm);
+}
+
+function getRadarSubjectLabelY(labPt, sinA) {
+    if (sinA > 0.55) return labPt.y - 14;
+    if (sinA > 0.2) return labPt.y - 5;
+    return labPt.y;
+}
 
 function gradeToRadarRadius(grade, scale, maxR) {
     const g = Math.min(scale, Math.max(1, Number(grade) || scale));
@@ -5408,8 +5426,8 @@ function appendRadarLegend(svgEl, NS, cx, baseY) {
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'radar-legend');
     const items = [
-        { key: 'g9', x: cx - 48 },
-        { key: 'g5', x: cx + 6 }
+        { key: 'g5', x: cx - 42 },
+        { key: 'g9', x: cx + 4 }
     ];
     items.forEach(function(item) {
         const s = RADAR_SERIES[item.key];
@@ -5470,21 +5488,12 @@ function renderStudentGradeRadar(subjectRows) {
     const cy = 106;
     const maxR = 90;
     const labelR = maxR + 10;
-    const legendY = cy + maxR + RADAR_LEGEND_GAP;
     const n = subjectRows.length;
-
     const vbPad = 6;
-    const vbBottomPad = 18;
+    const vbBottomPad = 10;
     const vbX = cx - labelR - vbPad;
     const vbY = cy - labelR - vbPad;
     const vbW = (labelR + vbPad) * 2;
-    const vbH = legendY + vbBottomPad - vbY;
-    svgEl.setAttribute('viewBox', vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH);
-    svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
-    const chartBox = svgEl.closest('.report-radar-chart');
-    if (chartBox) {
-        chartBox.style.setProperty('--radar-aspect', vbW + ' / ' + vbH);
-    }
     const angles = subjectRows.map((_, i) => -Math.PI / 2 + (2 * Math.PI * i) / n);
 
     function polar(r, idx) {
@@ -5492,6 +5501,26 @@ function renderStudentGradeRadar(subjectRows) {
             x: cx + r * Math.cos(angles[idx]),
             y: cy + r * Math.sin(angles[idx])
         };
+    }
+
+    let lowestLabelBottom = 0;
+    subjectRows.forEach(function(row, i) {
+        const labPt = polar(labelR, i);
+        const labelY = getRadarSubjectLabelY(labPt, Math.sin(angles[i]));
+        const bottom = labelY + RADAR_SUBJECT_FONT * 0.52;
+        if (bottom > lowestLabelBottom) lowestLabelBottom = bottom;
+    });
+
+    const estVbH = (labelR + vbPad) * 2 + 36;
+    const legendGapSvg = radarMmToSvgUnits(RADAR_LABEL_LEGEND_GAP_MM, svgEl, estVbH);
+    const legendY = lowestLabelBottom + legendGapSvg;
+    const vbH = legendY + RADAR_LEGEND_HEIGHT + vbBottomPad - vbY;
+
+    svgEl.setAttribute('viewBox', vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH);
+    svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    const chartBox = svgEl.closest('.report-radar-chart');
+    if (chartBox) {
+        chartBox.style.setProperty('--radar-aspect', vbW + ' / ' + vbH);
     }
 
     svgEl.innerHTML = '';
@@ -5548,10 +5577,7 @@ function renderStudentGradeRadar(subjectRows) {
 
     subjectRows.forEach((row, i) => {
         const labPt = polar(labelR, i);
-        const sinA = Math.sin(angles[i]);
-        let labelY = labPt.y;
-        if (sinA > 0.55) labelY = labPt.y - 14;
-        else if (sinA > 0.2) labelY = labPt.y - 5;
+        const labelY = getRadarSubjectLabelY(labPt, Math.sin(angles[i]));
         const text = document.createElementNS(NS, 'text');
         text.setAttribute('x', String(labPt.x));
         text.setAttribute('y', String(labelY));
