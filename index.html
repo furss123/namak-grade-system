@@ -1865,7 +1865,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
-            align-items: start;
+            align-items: stretch;
             width: 100%;
             flex: 0 0 auto;
             min-height: auto;
@@ -1883,7 +1883,7 @@
             height: var(--radar-graph-h);
             min-height: var(--radar-graph-h);
             max-height: var(--radar-graph-h);
-            align-self: start;
+            align-self: stretch;
             overflow: hidden;
         }
         .page-1 .report-radar-chart svg {
@@ -1937,12 +1937,13 @@
             background: #fff;
             box-sizing: border-box;
         }
-        .page-1 #gradeRadarSummary {
+        .page-1 .grade-radar-summary {
             flex: 1 1 0;
             min-height: 0;
-            height: auto;
+            height: 0;
             overflow: hidden;
-            display: block;
+            display: flex;
+            flex-direction: column;
             box-sizing: border-box;
         }
         .page-1 .report-grade-goal-panel .panel-caption-bottom {
@@ -1971,7 +1972,7 @@
             height: auto;
         }
         .page-1 .report-grade-goal-table tbody tr {
-            height: 1%;
+            height: auto;
         }
         .page-1 .report-grade-goal-table .col-subject { width: 26%; }
         .page-1 .report-grade-goal-table .col-grade { width: 18%; }
@@ -2895,7 +2896,7 @@
                 </div>
                 <div class="report-radar-side">
                     <div class="report-grade-goal-panel">
-                        <div id="gradeRadarSummary"></div>
+                        <div id="gradeRadarSummary" class="grade-radar-summary"></div>
                         <div class="score-grade-manual-block report-grade-goal-manual-note" role="note" aria-label="등급·목표 점수 안내">
                             <div class="score-grade-manual-row score-grade-manual-row-grade">
                                 <span class="score-grade-manual-label">등급 표기</span>
@@ -5601,18 +5602,38 @@ function renderStudentGradeRadar(subjectRows) {
         };
     }
 
+    let contentMinX = cx - maxR;
+    let contentMaxX = cx + maxR;
+    let contentMinY = cy - maxR;
+    let contentMaxY = cy + maxR;
     let lowestLabelBottom = 0;
     subjectRows.forEach(function(row, i) {
         const labPt = polar(labelR, i);
         const sinA = Math.sin(angles[i]);
         const labelY = getRadarSubjectLabelY(labPt, sinA);
+        const top = labelY - RADAR_SUBJECT_FONT * (sinA > 0.55 ? 0.85 : sinA > 0.2 ? 0.45 : 0.55);
         const bottom = labelY + RADAR_SUBJECT_FONT * (sinA > 0.55 ? 0.72 : 0.52);
+        const halfW = row.subject.length * RADAR_SUBJECT_FONT * 0.62;
+        if (labPt.x - halfW < contentMinX) contentMinX = labPt.x - halfW;
+        if (labPt.x + halfW > contentMaxX) contentMaxX = labPt.x + halfW;
+        if (top < contentMinY) contentMinY = top;
+        if (bottom > contentMaxY) contentMaxY = bottom;
         if (bottom > lowestLabelBottom) lowestLabelBottom = bottom;
     });
 
-    const estVbH = (labelR + vbPad) * 2 + 36;
+    const estVbH = Math.max(contentMaxY - contentMinY + 36, (labelR + vbPad) * 2);
     const legendGapSvg = radarMmToSvgUnits(RADAR_LABEL_LEGEND_GAP_MM, svgEl, estVbH);
     const legendY = lowestLabelBottom + legendGapSvg;
+    contentMaxY = legendY + RADAR_LEGEND_HEIGHT;
+    const legendHalfW = 52;
+    if (cx - legendHalfW < contentMinX) contentMinX = cx - legendHalfW;
+    if (cx + legendHalfW > contentMaxX) contentMaxX = cx + legendHalfW;
+    const vbFallback = {
+        x: contentMinX - vbPad,
+        y: contentMinY - vbPad,
+        w: contentMaxX - contentMinX + vbPad * 2,
+        h: contentMaxY - contentMinY + vbPad * 2
+    };
 
     svgEl.innerHTML = '';
 
@@ -5686,7 +5707,13 @@ function renderStudentGradeRadar(subjectRows) {
     });
 
     appendRadarLegend(svgEl, NS, cx, legendY);
-    fitRadarViewBox(svgEl, vbPad);
+    fitRadarViewBox(svgEl, vbPad, vbFallback);
+    requestAnimationFrame(function() {
+        requestAnimationFrame(function() {
+            fitRadarViewBox(svgEl, vbPad, vbFallback);
+            syncRadarSideLayout();
+        });
+    });
 
     const title = document.createElementNS(NS, 'title');
     title.textContent = subjectRows.map((row) =>
@@ -5731,7 +5758,8 @@ function syncRadarSideLayout(root) {
     scope.querySelectorAll('.report-radar-layout').forEach(function(layout) {
         const chart = layout.querySelector('.report-radar-chart');
         const side = layout.querySelector('.report-radar-side');
-        const summaryEl = layout.querySelector('#gradeRadarSummary');
+        const panel = side && side.querySelector('.report-grade-goal-panel');
+        const summaryEl = layout.querySelector('.grade-radar-summary');
         const table = summaryEl && summaryEl.querySelector('.report-grade-goal-table');
         if (!chart || !side) return;
 
@@ -5747,16 +5775,27 @@ function syncRadarSideLayout(root) {
             return;
         }
 
-        if (!summaryEl || !table) return;
+        if (!summaryEl || !table || !panel) return;
 
         const tbody = table.tBodies[0];
         if (!tbody || !tbody.rows.length) return;
 
+        const noteEl = panel.querySelector('.report-grade-goal-manual-note');
+        const noteH = noteEl ? noteEl.offsetHeight : 0;
         const headH = table.tHead ? table.tHead.offsetHeight : 0;
-        const bodyH = Math.max(0, summaryEl.clientHeight - headH);
+        const bodyH = Math.max(0, chartH - headH - noteH);
         const rowH = bodyH / tbody.rows.length;
+
+        summaryEl.style.height = bodyH + 'px';
+        summaryEl.style.minHeight = bodyH + 'px';
+        summaryEl.style.maxHeight = bodyH + 'px';
+        table.style.height = bodyH + headH + 'px';
+
         Array.prototype.forEach.call(tbody.rows, function(tr) {
             tr.style.height = rowH > 0 ? rowH + 'px' : '';
+        });
+        Array.prototype.forEach.call(table.querySelectorAll('tbody th, tbody td'), function(cell) {
+            cell.style.height = rowH > 0 ? rowH + 'px' : '';
         });
     });
 }
