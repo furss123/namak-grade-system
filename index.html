@@ -1509,7 +1509,7 @@
             --radar-graph-h: 108mm;
         }
         .page-1.p1-opt-count-2 .report-radar-layout {
-            --radar-graph-h: 88mm;
+            --radar-graph-h: 94mm;
         }
         .page-1.p1-opt-count-1 .report-block-main,
         .page-1.p1-opt-count-1 .report-block-radar {
@@ -1820,8 +1820,8 @@
         .page-2 .dist-student-name.dist-name-size-sm { font-size: calc(8.5px + 1.5pt); }
         .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 1.5pt); }
         .page-1 .report-radar-layout {
-            --radar-chart-pad-top: 0;
-            --radar-chart-pad-bottom: 0;
+            --radar-chart-pad-top: 2mm;
+            --radar-chart-pad-bottom: 5mm;
             --radar-box-trim: 3mm;
             --radar-graph-h: 96mm;
             --radar-aspect: 212 / 226;
@@ -1838,12 +1838,12 @@
             background: #fafbfd;
             border: 1px solid #d4dde8;
             border-radius: 5px;
-            padding: var(--radar-chart-pad-top) 0 var(--radar-chart-pad-bottom);
+            padding: var(--radar-chart-pad-top) 2mm var(--radar-chart-pad-bottom);
             box-sizing: border-box;
             width: calc(100% - var(--radar-box-trim));
             max-width: calc(100% - var(--radar-box-trim));
             margin-inline: auto;
-            height: 100%;
+            height: auto;
             min-height: var(--radar-graph-h);
             align-self: stretch;
             overflow: visible;
@@ -1853,8 +1853,8 @@
             width: calc(100% + var(--radar-box-trim));
             max-width: calc(100% + var(--radar-box-trim));
             margin: 0 calc(var(--radar-box-trim) / -2);
-            height: 100%;
-            max-height: 100%;
+            height: auto;
+            max-height: none;
             aspect-ratio: var(--radar-aspect);
             overflow: visible;
             flex-shrink: 0;
@@ -3108,14 +3108,28 @@ const DEFAULT_SINGLE_STUDENT_ID = '1101';
 const STUDENT_ID_PRESET_VALUES = ['1101', '1401'];
 
 const DEMO_SUBJECTS = ['국어', '수학', '영어', '한국사', '통합사회', '통합과학'];
-const DEMO_LAST_NAMES = ['김', '이', '박', '최', '정', '강', '조', '윤', '장', '임'];
-const DEMO_FIRST_NAMES = ['민준', '서연', '도윤', '지우', '예준', '하은', '주원', '지민', '시우', '수아', '현우', '지아', '건우', '서윤', '우진', '채원', '선우', '유나', '연우', '다은'];
+/** 성(姓) + 전남 지명 — 가상 인명 (예: 김남악, 서무안, 김장흥) */
+const DEMO_REGION_NAMES = [
+    '남악', '무안', '장흥', '목포', '여수', '순천', '광양', '나주', '담양', '곡성',
+    '구례', '고흥', '보성', '화순', '강진', '해남', '영암', '함평', '영광', '장성',
+    '완도', '진도', '신안', '도양', '벌교', '주암', '월산', '백아', '보림', '삼호'
+];
+
+const DEMO_SURNAME_PATTERN = ['김', '서', '김', '서', '이', '박', '최', '정', '김', '강', '조', '윤', '서', '장', '임'];
+
+function demoStudentName(nameIdx) {
+    const surname = DEMO_SURNAME_PATTERN[nameIdx % DEMO_SURNAME_PATTERN.length];
+    const region = DEMO_REGION_NAMES[nameIdx % DEMO_REGION_NAMES.length];
+    return surname + region;
+}
 
 function demoScoreFor(classNum, studentNum, subjectIndex) {
-    const seed = classNum * 1000 + studentNum * 17 + subjectIndex * 31;
-    const spread = (seed % 37) - 18;
-    const bases = [78, 74, 76, 72, 75, 73];
-    return Math.min(99, Math.max(42, Math.round((bases[subjectIndex] + spread + (classNum % 5)) * 100) / 100));
+    const seed = classNum * 1009 + studentNum * 67 + subjectIndex * 23;
+    const dec = (seed % 10) / 10;
+    const spread = ((seed * 7) % 57) - 28;
+    const bases = [78.4, 74.2, 76.7, 72.5, 75.1, 73.3];
+    const raw = bases[subjectIndex] + spread * 0.42 + (classNum % 6) * 0.55 + (studentNum % 9) * 0.33 + dec;
+    return Math.min(99.9, Math.max(41.2, Math.round(raw * 10) / 10));
 }
 
 function generateDemoStudentData() {
@@ -3128,7 +3142,7 @@ function generateDemoStudentData() {
             const studentId = String(gradeYear) + String(ban) + String(num).padStart(2, '0');
             const row = {
                 '학번': studentId,
-                '이름': DEMO_LAST_NAMES[nameIdx % DEMO_LAST_NAMES.length] + DEMO_FIRST_NAMES[nameIdx % DEMO_FIRST_NAMES.length],
+                '이름': demoStudentName(nameIdx),
                 '학년': gradeYear,
                 '반': ban,
                 '번호': num
@@ -5397,8 +5411,8 @@ const RADAR_SERIES = {
     g5: { stroke: '#c2410c', fill: 'none', dot: '#c2410c', dash: '5 3.5', label: '5등급', dotR: 2.6 }
 };
 const RADAR_SUBJECT_FONT = 11;
-const RADAR_LEGEND_HEIGHT = 10;
-const RADAR_LABEL_LEGEND_GAP_MM = 5;
+const RADAR_LEGEND_HEIGHT = 14;
+const RADAR_LABEL_LEGEND_GAP_MM = 6;
 const RADAR_LEGEND_ITEM_GAP_MM = 1.5;
 const RADAR_LEGEND_ITEM_GAP_BASE = 16;
 
@@ -5414,8 +5428,8 @@ function radarMmToSvgUnits(mm, svgEl, vbHeight) {
 }
 
 function getRadarSubjectLabelY(labPt, sinA) {
-    if (sinA > 0.55) return labPt.y - 14;
-    if (sinA > 0.2) return labPt.y - 5;
+    if (sinA > 0.55) return labPt.y - 18;
+    if (sinA > 0.2) return labPt.y - 6;
     return labPt.y;
 }
 
@@ -5500,7 +5514,7 @@ function renderStudentGradeRadar(subjectRows) {
     const labelR = maxR + 10;
     const n = subjectRows.length;
     const vbPad = 6;
-    const vbBottomPad = 10;
+    const vbBottomPad = 20;
     const vbX = cx - labelR - vbPad;
     const vbY = cy - labelR - vbPad;
     const vbW = (labelR + vbPad) * 2;
@@ -5516,8 +5530,9 @@ function renderStudentGradeRadar(subjectRows) {
     let lowestLabelBottom = 0;
     subjectRows.forEach(function(row, i) {
         const labPt = polar(labelR, i);
-        const labelY = getRadarSubjectLabelY(labPt, Math.sin(angles[i]));
-        const bottom = labelY + RADAR_SUBJECT_FONT * 0.52;
+        const sinA = Math.sin(angles[i]);
+        const labelY = getRadarSubjectLabelY(labPt, sinA);
+        const bottom = labelY + RADAR_SUBJECT_FONT * (sinA > 0.55 ? 0.72 : 0.52);
         if (bottom > lowestLabelBottom) lowestLabelBottom = bottom;
     });
 
