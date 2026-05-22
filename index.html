@@ -1976,13 +1976,26 @@
         .page-1 .report-grade-goal-table .grade-badge-7 { background: #f1f5f9; color: #475569; }
         .page-1 .report-grade-goal-table .grade-badge-8 { background: #f8fafc; color: #64748b; }
         .page-1 .report-grade-goal-table .grade-badge-9 { background: #f1f5f9; color: #94a3b8; }
-        .page-1 .report-grade-goal-table .grade-badge-sub {
-            display: block;
-            margin-top: 1px;
-            font-size: 0.82em;
+        .page-1 .report-grade-goal-table .grade-badge-paren {
+            display: inline;
+            margin-left: 2px;
+            font-size: 0.92em;
             font-weight: 700;
             color: #64748b;
             line-height: 1.2;
+            vertical-align: middle;
+        }
+        .page-1 .report-grade-goal-panel .panel-caption-note {
+            flex-shrink: 0;
+            margin: 0;
+            padding: 1.2mm 2mm 0.6mm;
+            font-size: var(--goal-font-caption);
+            font-weight: 600;
+            color: #64748b;
+            background: #f8fafc;
+            border-top: 1px solid #e8edf4;
+            text-align: center;
+            letter-spacing: -0.01em;
         }
         .page-1 .report-grade-goal-table .goal-cell {
             background: #fffbeb;
@@ -2554,6 +2567,7 @@
             #printContainer .score-grade-manual-label,
             #printContainer .report-radar-chart svg,
             #printContainer .report-grade-goal-table .grade-badge,
+            #printContainer .report-grade-goal-panel .panel-caption-note,
             #printContainer .report-grade-goal-table .goal-cell,
             #printContainer .univ-ref-table thead th,
             #printContainer .univ-ref-table tbody th.univ-name,
@@ -2828,6 +2842,7 @@
                 <div class="report-radar-side">
                     <div class="report-grade-goal-panel">
                         <div id="gradeRadarSummary"></div>
+                        <p class="panel-caption panel-caption-note">괄호 ( ) 안 숫자는 9등급제</p>
                         <p class="panel-caption panel-caption-bottom">한 등급 올리기 목표 점수 (원점수 + 윗등급 차×2)</p>
                     </div>
                 </div>
@@ -5535,16 +5550,14 @@ function renderStudentGradeRadar(subjectRows) {
         table.className = 'report-grade-goal-table';
         table.innerHTML =
             '<colgroup><col class="col-subject"><col class="col-grade"><col class="col-score"><col class="col-goal"></colgroup>' +
-            '<thead><tr><th>과목</th><th>9등급</th><th>원점수</th><th>목표 점수</th></tr></thead>';
+            '<thead><tr><th>과목</th><th>5등급</th><th>원점수</th><th>목표 점수</th></tr></thead>';
         const tbody = document.createElement('tbody');
         subjectRows.forEach((row) => {
             const tr = document.createElement('tr');
             const goalClass = row.goal.hasGoal ? 'goal-cell' : 'goal-cell-muted';
             const gradeCell =
-                '<span class="grade-badge grade-badge-' + row.grade9 + '">' + row.grade9 + '</span>' +
-                (row.grade !== row.grade9
-                    ? '<span class="grade-badge-sub">(5등급 ' + row.grade + ')</span>'
-                    : '');
+                '<span class="grade-badge grade-badge-' + row.grade + '">' + row.grade + '</span>' +
+                '<span class="grade-badge-paren">(' + row.grade9 + ')</span>';
             tr.innerHTML =
                 '<th class="subject-name">' + row.subject + '</th>' +
                 '<td>' + gradeCell + '</td>' +
