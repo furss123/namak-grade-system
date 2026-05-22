@@ -2823,7 +2823,7 @@
             <h3>한눈에 보기</h3>
             <div class="report-radar-layout">
                 <div class="report-radar-chart">
-                    <svg id="gradeRadarChart" viewBox="-38 -38 316 326" role="img" aria-label="과목별 9등급제 레이더 차트"></svg>
+                    <svg id="gradeRadarChart" viewBox="-38 -38 316 348" role="img" aria-label="과목별 9등급·5등급 비교 레이더 차트"></svg>
                 </div>
                 <div class="report-radar-side">
                     <div class="report-grade-goal-panel">
@@ -5351,15 +5351,72 @@ function populateTemplate(studentIdStr, options) {
 }
 
 const GRADE9_SCALE = 9;
+const GRADE5_SCALE = 5;
 const GRADE9_RING_LABELS = [1, 3, 5, 7, 9];
-const GRADE9_DOT_COLORS = {
-    1: '#b91c1c', 2: '#c2410c', 3: '#15803d', 4: '#166534', 5: '#1d4ed8',
-    6: '#3730a3', 7: '#475569', 8: '#64748b', 9: '#94a3b8'
+const RADAR_SERIES = {
+    g9: { stroke: '#1e3a5f', fill: 'rgba(30, 58, 95, 0.2)', dot: '#1e3a5f', dash: null, label: '9등급제' },
+    g5: { stroke: '#c2410c', fill: 'rgba(194, 65, 12, 0.1)', dot: '#c2410c', dash: '6 4', label: '5등급제' }
 };
 
-function grade9ToRadarRadius(grade9, maxR) {
-    const g = Math.min(GRADE9_SCALE, Math.max(1, Number(grade9) || GRADE9_SCALE));
-    return ((GRADE9_SCALE + 1 - g) / GRADE9_SCALE) * maxR;
+function gradeToRadarRadius(grade, scale, maxR) {
+    const g = Math.min(scale, Math.max(1, Number(grade) || scale));
+    return ((scale + 1 - g) / scale) * maxR;
+}
+
+function appendRadarLegend(svgEl, NS, cx, baseY) {
+    const g = document.createElementNS(NS, 'g');
+    g.setAttribute('class', 'radar-legend');
+    const items = [
+        { key: 'g9', x: cx - 52 },
+        { key: 'g5', x: cx + 8 }
+    ];
+    items.forEach(function(item) {
+        const s = RADAR_SERIES[item.key];
+        const row = document.createElementNS(NS, 'g');
+        row.setAttribute('transform', 'translate(' + item.x + ',' + baseY + ')');
+        const sample = document.createElementNS(NS, 'line');
+        sample.setAttribute('x1', '0');
+        sample.setAttribute('y1', '0');
+        sample.setAttribute('x2', '22');
+        sample.setAttribute('y2', '0');
+        sample.setAttribute('stroke', s.stroke);
+        sample.setAttribute('stroke-width', '2.5');
+        if (s.dash) sample.setAttribute('stroke-dasharray', s.dash);
+        row.appendChild(sample);
+        const label = document.createElementNS(NS, 'text');
+        label.setAttribute('x', '28');
+        label.setAttribute('y', '4');
+        label.setAttribute('fill', '#334155');
+        label.setAttribute('font-size', '10.5');
+        label.setAttribute('font-weight', '700');
+        label.setAttribute('font-family', 'Pretendard, Malgun Gothic, sans-serif');
+        label.textContent = s.label;
+        row.appendChild(label);
+        g.appendChild(row);
+    });
+    svgEl.appendChild(g);
+}
+
+function appendRadarDataSeries(svgEl, NS, pts, seriesKey) {
+    const s = RADAR_SERIES[seriesKey];
+    const poly = document.createElementNS(NS, 'polygon');
+    poly.setAttribute('points', pts.map((p) => p.x + ',' + p.y).join(' '));
+    poly.setAttribute('fill', s.fill);
+    poly.setAttribute('stroke', s.stroke);
+    poly.setAttribute('stroke-width', seriesKey === 'g9' ? '2.2' : '2');
+    poly.setAttribute('stroke-linejoin', 'round');
+    if (s.dash) poly.setAttribute('stroke-dasharray', s.dash);
+    svgEl.appendChild(poly);
+    pts.forEach(function(pt) {
+        const dot = document.createElementNS(NS, 'circle');
+        dot.setAttribute('cx', String(pt.x));
+        dot.setAttribute('cy', String(pt.y));
+        dot.setAttribute('r', seriesKey === 'g9' ? '3.5' : '3');
+        dot.setAttribute('fill', s.dot);
+        dot.setAttribute('stroke', '#fff');
+        dot.setAttribute('stroke-width', '1.1');
+        svgEl.appendChild(dot);
+    });
 }
 
 function renderStudentGradeRadar(subjectRows) {
@@ -5369,12 +5426,12 @@ function renderStudentGradeRadar(subjectRows) {
 
     const NS = 'http://www.w3.org/2000/svg';
     const cx = 120;
-    const cy = 120;
-    const maxR = 78;
-    const labelR = maxR + 20;
+    const cy = 118;
+    const maxR = 74;
+    const labelR = maxR + 18;
     const n = subjectRows.length;
 
-    svgEl.setAttribute('viewBox', '-38 -38 316 326');
+    svgEl.setAttribute('viewBox', '-38 -38 316 348');
     const angles = subjectRows.map((_, i) => -Math.PI / 2 + (2 * Math.PI * i) / n);
 
     function polar(r, idx) {
@@ -5387,42 +5444,31 @@ function renderStudentGradeRadar(subjectRows) {
     svgEl.innerHTML = '';
 
     for (let g = 1; g <= GRADE9_SCALE; g++) {
-        const r = grade9ToRadarRadius(g, maxR);
+        const r = gradeToRadarRadius(g, GRADE9_SCALE, maxR);
         const pts = angles.map((_, i) => polar(r, i));
         const poly = document.createElementNS(NS, 'polygon');
         poly.setAttribute('points', pts.map((p) => p.x + ',' + p.y).join(' '));
         const isKeyRing = GRADE9_RING_LABELS.indexOf(g) !== -1;
-        poly.setAttribute('fill', g <= 4 ? 'rgba(34, 197, 94, 0.03)' : (g >= 7 ? 'rgba(148, 163, 184, 0.04)' : 'none'));
-        poly.setAttribute('stroke', isKeyRing ? '#b8c5d6' : '#e8edf4');
-        poly.setAttribute('stroke-width', g === 1 ? '1.1' : (isKeyRing ? '0.85' : '0.45'));
+        poly.setAttribute('fill', 'none');
+        poly.setAttribute('stroke', isKeyRing ? '#c5d0dc' : '#e8edf4');
+        poly.setAttribute('stroke-width', g === 1 ? '1' : (isKeyRing ? '0.75' : '0.4'));
         svgEl.appendChild(poly);
     }
 
     GRADE9_RING_LABELS.forEach(function(g) {
-        const r = grade9ToRadarRadius(g, maxR);
+        const r = gradeToRadarRadius(g, GRADE9_SCALE, maxR);
         const tick = document.createElementNS(NS, 'text');
-        tick.setAttribute('x', String(cx));
+        tick.setAttribute('x', String(cx + 10));
         tick.setAttribute('y', String(cy - r + 3.5));
-        tick.setAttribute('text-anchor', 'middle');
+        tick.setAttribute('text-anchor', 'start');
         tick.setAttribute('dominant-baseline', 'middle');
-        tick.setAttribute('fill', g === 1 ? '#b91c1c' : (g >= 7 ? '#64748b' : '#475569'));
-        tick.setAttribute('font-size', g === 1 || g === 9 ? '10' : '9');
-        tick.setAttribute('font-weight', g === 1 || g === 5 || g === 9 ? '800' : '700');
+        tick.setAttribute('fill', '#94a3b8');
+        tick.setAttribute('font-size', '8.5');
+        tick.setAttribute('font-weight', '700');
         tick.setAttribute('font-family', 'Pretendard, Malgun Gothic, sans-serif');
         tick.textContent = String(g);
         svgEl.appendChild(tick);
     });
-
-    const scaleHint = document.createElementNS(NS, 'text');
-    scaleHint.setAttribute('x', String(cx));
-    scaleHint.setAttribute('y', '8');
-    scaleHint.setAttribute('text-anchor', 'middle');
-    scaleHint.setAttribute('fill', '#64748b');
-    scaleHint.setAttribute('font-size', '9');
-    scaleHint.setAttribute('font-weight', '600');
-    scaleHint.setAttribute('font-family', 'Pretendard, Malgun Gothic, sans-serif');
-    scaleHint.textContent = '9등급제 · 바깥 1등급';
-    svgEl.appendChild(scaleHint);
 
     angles.forEach((_, i) => {
         const end = polar(maxR, i);
@@ -5431,83 +5477,46 @@ function renderStudentGradeRadar(subjectRows) {
         line.setAttribute('y1', String(cy));
         line.setAttribute('x2', String(end.x));
         line.setAttribute('y2', String(end.y));
-        line.setAttribute('stroke', '#cbd5e1');
-        line.setAttribute('stroke-width', '0.75');
+        line.setAttribute('stroke', '#dbe3ec');
+        line.setAttribute('stroke-width', '0.7');
         svgEl.appendChild(line);
     });
 
-    const dataPts = subjectRows.map((row, i) =>
-        polar(grade9ToRadarRadius(row.grade9, maxR), i)
+    const pts5 = subjectRows.map((row, i) =>
+        polar(gradeToRadarRadius(row.grade, GRADE5_SCALE, maxR), i)
     );
-    const dataPoly = document.createElementNS(NS, 'polygon');
-    dataPoly.setAttribute('points', dataPts.map((p) => p.x + ',' + p.y).join(' '));
-    dataPoly.setAttribute('fill', 'rgba(30, 58, 95, 0.22)');
-    dataPoly.setAttribute('stroke', '#1e3a5f');
-    dataPoly.setAttribute('stroke-width', '2');
-    dataPoly.setAttribute('stroke-linejoin', 'round');
-    svgEl.appendChild(dataPoly);
+    const pts9 = subjectRows.map((row, i) =>
+        polar(gradeToRadarRadius(row.grade9, GRADE9_SCALE, maxR), i)
+    );
+    appendRadarDataSeries(svgEl, NS, pts5, 'g5');
+    appendRadarDataSeries(svgEl, NS, pts9, 'g9');
 
     subjectRows.forEach((row, i) => {
-        const pt = dataPts[i];
-        const g9 = row.grade9;
-        const dotColor = GRADE9_DOT_COLORS[g9] || '#1e3a5f';
-        const dot = document.createElementNS(NS, 'circle');
-        dot.setAttribute('cx', String(pt.x));
-        dot.setAttribute('cy', String(pt.y));
-        dot.setAttribute('r', '4');
-        dot.setAttribute('fill', dotColor);
-        dot.setAttribute('stroke', '#fff');
-        dot.setAttribute('stroke-width', '1.2');
-        svgEl.appendChild(dot);
-
         const labPt = polar(labelR, i);
         const sinA = Math.sin(angles[i]);
         const isBottomLabel = sinA > 0.55;
-        const labelY = isBottomLabel ? labPt.y - 10 : labPt.y;
+        const labelY = isBottomLabel ? labPt.y - 6 : labPt.y;
         const text = document.createElementNS(NS, 'text');
         text.setAttribute('x', String(labPt.x));
         text.setAttribute('y', String(labelY));
         text.setAttribute('text-anchor', 'middle');
-        text.setAttribute('dominant-baseline', isBottomLabel ? 'auto' : 'middle');
+        text.setAttribute('dominant-baseline', 'middle');
         text.setAttribute('fill', '#1e3a5f');
+        text.setAttribute('font-size', '13.5');
+        text.setAttribute('font-weight', '700');
         text.setAttribute('font-family', 'Pretendard, Malgun Gothic, sans-serif');
         text.setAttribute('stroke', '#fff');
         text.setAttribute('stroke-width', '2');
         text.setAttribute('paint-order', 'stroke fill');
-
-        const nameSpan = document.createElementNS(NS, 'tspan');
-        nameSpan.setAttribute('x', String(labPt.x));
-        nameSpan.setAttribute('dy', isBottomLabel ? '0' : '-0.55em');
-        nameSpan.setAttribute('font-size', '13.5');
-        nameSpan.setAttribute('font-weight', '700');
-        nameSpan.textContent = row.subject;
-
-        const gradeSpan = document.createElementNS(NS, 'tspan');
-        gradeSpan.setAttribute('x', String(labPt.x));
-        gradeSpan.setAttribute('dy', isBottomLabel ? '1.05em' : '1.15em');
-        gradeSpan.setAttribute('font-size', '15');
-        gradeSpan.setAttribute('font-weight', '800');
-        gradeSpan.setAttribute('fill', dotColor);
-        gradeSpan.textContent = g9 + '등급';
-
-        text.appendChild(nameSpan);
-        text.appendChild(gradeSpan);
-        if (row.grade !== g9) {
-            const subSpan = document.createElementNS(NS, 'tspan');
-            subSpan.setAttribute('x', String(labPt.x));
-            subSpan.setAttribute('dy', '0.95em');
-            subSpan.setAttribute('font-size', '10.5');
-            subSpan.setAttribute('font-weight', '700');
-            subSpan.setAttribute('fill', '#64748b');
-            subSpan.textContent = '(5등급 ' + row.grade + ')';
-            text.appendChild(subSpan);
-        }
+        text.textContent = row.subject;
         svgEl.appendChild(text);
     });
 
+    appendRadarLegend(svgEl, NS, cx, cy + maxR + 28);
+
     const title = document.createElementNS(NS, 'title');
     title.textContent = subjectRows.map((row) =>
-        row.subject + ' 9등급 ' + row.grade9 + (row.grade !== row.grade9 ? ' (5등급 ' + row.grade + ')' : '') +
+        row.subject + ' 9등급 ' + row.grade9 + ' 5등급 ' + row.grade +
         (row.goal.hasGoal ? ' 목표' + row.goal.display : '')
     ).join(', ');
     svgEl.appendChild(title);
