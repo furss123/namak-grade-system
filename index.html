@@ -5396,7 +5396,8 @@ const RADAR_SERIES = {
     g9: { stroke: '#1e3a5f', fill: 'rgba(30, 58, 95, 0.16)', dot: '#1e3a5f', dash: null, label: '9등급제', dotR: 3.2 },
     g5: { stroke: '#c2410c', fill: 'none', dot: '#c2410c', dash: '5 3.5', label: '5등급제', dotR: 2.6 }
 };
-const RADAR_SUBJECT_FONT = 13;
+const RADAR_SUBJECT_FONT = 11;
+const RADAR_LEGEND_GAP = 30;
 
 function gradeToRadarRadius(grade, scale, maxR) {
     const g = Math.min(scale, Math.max(1, Number(grade) || scale));
@@ -5469,11 +5470,11 @@ function renderStudentGradeRadar(subjectRows) {
     const cy = 106;
     const maxR = 90;
     const labelR = maxR + 10;
-    const legendY = cy + maxR + 16;
+    const legendY = cy + maxR + RADAR_LEGEND_GAP;
     const n = subjectRows.length;
 
     const vbPad = 6;
-    const vbBottomPad = 10;
+    const vbBottomPad = 18;
     const vbX = cx - labelR - vbPad;
     const vbY = cy - labelR - vbPad;
     const vbW = (labelR + vbPad) * 2;
@@ -5548,8 +5549,9 @@ function renderStudentGradeRadar(subjectRows) {
     subjectRows.forEach((row, i) => {
         const labPt = polar(labelR, i);
         const sinA = Math.sin(angles[i]);
-        const isBottomLabel = sinA > 0.55;
-        const labelY = isBottomLabel ? labPt.y - 6 : labPt.y;
+        let labelY = labPt.y;
+        if (sinA > 0.55) labelY = labPt.y - 14;
+        else if (sinA > 0.2) labelY = labPt.y - 5;
         const text = document.createElementNS(NS, 'text');
         text.setAttribute('x', String(labPt.x));
         text.setAttribute('y', String(labelY));
