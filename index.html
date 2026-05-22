@@ -1538,10 +1538,10 @@
             --p1-stack-gap: var(--report-zone-gap);
         }
         .page-1.p1-opt-count-1 .report-radar-layout {
-            --radar-graph-h: 108mm;
+            --radar-graph-h: 98mm;
         }
         .page-1.p1-opt-count-2 .report-radar-layout {
-            --radar-graph-h: 94mm;
+            --radar-graph-h: 84mm;
         }
         .page-1.p1-opt-count-1 .report-block-main,
         .page-1.p1-opt-count-1 .report-block-radar,
@@ -1858,20 +1858,23 @@
         .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 1.5pt); }
         .page-1 .report-radar-layout {
             --radar-chart-pad-top: 2mm;
-            --radar-chart-pad-bottom: 7mm;
+            --radar-chart-pad-bottom: 5mm;
             --radar-box-trim: 3mm;
-            --radar-graph-h: 96mm;
+            --radar-graph-h: 86mm;
             --radar-aspect: 212 / 226;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
-            align-items: start;
+            align-items: stretch;
             width: 100%;
             flex: 0 0 auto;
             min-height: auto;
         }
         .page-1 .report-radar-chart {
-            display: block;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             background: #fafbfd;
             border: 1px solid #d4dde8;
             border-radius: 5px;
@@ -1879,18 +1882,20 @@
             box-sizing: border-box;
             width: 100%;
             margin-inline: auto;
-            height: auto;
-            min-height: 0;
-            align-self: start;
-            overflow: visible;
+            height: var(--radar-graph-h);
+            min-height: var(--radar-graph-h);
+            max-height: var(--radar-graph-h);
+            align-self: stretch;
+            overflow: hidden;
         }
         .page-1 .report-radar-chart svg {
             display: block;
             width: 100%;
             height: auto;
-            max-height: none;
+            max-height: calc(var(--radar-graph-h) - var(--radar-chart-pad-top) - var(--radar-chart-pad-bottom));
             margin: 0;
             aspect-ratio: var(--radar-aspect);
+            flex-shrink: 1;
             overflow: visible;
         }
         .page-1 .report-zone-radar,
@@ -1915,7 +1920,7 @@
             width: 100%;
             height: auto;
             min-height: var(--radar-graph-h);
-            align-self: start;
+            align-self: stretch;
         }
         .page-1 .report-grade-goal-panel {
             --goal-font-caption: calc(var(--rpt-font-sm) + 0.5pt);
