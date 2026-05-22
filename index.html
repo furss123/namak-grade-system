@@ -65,6 +65,7 @@
             --report-pad-top: 14mm;
             --report-pad-bottom: 2mm;
             --report-zone-gap: 3mm;
+            --report-student-maxcut-gap: 2mm;
             --report-block-gap: 2mm;
             --report-footer-h: 6mm;
             --report-fit-buffer: 1.5mm;
@@ -1482,8 +1483,8 @@
             gap: var(--report-zone-gap);
             flex-shrink: 0;
         }
-        .page-1 .report-zone-head .report-zone-maxcut {
-            margin-top: calc(2mm - var(--report-zone-gap));
+        .page-1 .report-zone-head > .report-panel-student + .report-zone-maxcut {
+            margin-top: calc(var(--report-student-maxcut-gap) - var(--report-zone-gap));
         }
         /* 1페이지 선택 항목 수(과목별·한눈에)에 따른 비율 */
         .page-1.p1-opt-count-1 {
@@ -5399,6 +5400,8 @@ const RADAR_SERIES = {
 const RADAR_SUBJECT_FONT = 11;
 const RADAR_LEGEND_HEIGHT = 10;
 const RADAR_LABEL_LEGEND_GAP_MM = 5;
+const RADAR_LEGEND_ITEM_GAP_MM = 1.5;
+const RADAR_LEGEND_ITEM_GAP_BASE = 16;
 
 function radarMmToSvgUnits(mm, svgEl, vbHeight) {
     const chartBox = svgEl.closest('.report-radar-chart');
@@ -5427,7 +5430,9 @@ function appendRadarLegend(svgEl, NS, cx, baseY) {
     g.setAttribute('class', 'radar-legend');
     const lineW = 18;
     const textGap = 5;
-    const itemGap = 16;
+    const vbParts = (svgEl.getAttribute('viewBox') || '').trim().split(/\s+/);
+    const vbH = vbParts.length >= 4 ? parseFloat(vbParts[3]) : 230;
+    const itemGap = RADAR_LEGEND_ITEM_GAP_BASE + radarMmToSvgUnits(RADAR_LEGEND_ITEM_GAP_MM, svgEl, vbH);
     const textW = { g5: 28, g9: 28 };
     const keys = ['g5', 'g9'];
     const totalW = keys.reduce(function(sum, key, idx) {
