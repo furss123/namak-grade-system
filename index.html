@@ -5599,12 +5599,10 @@ function renderStudentGradeRadar(subjectRows) {
     if (cx - legendHalfW < contentMinX) contentMinX = cx - legendHalfW;
     if (cx + legendHalfW > contentMaxX) contentMaxX = cx + legendHalfW;
     if (cx + 20 > contentMaxX) contentMaxX = cx + 20;
-    const halfSpanX = Math.max(cx - contentMinX, contentMaxX - cx);
-    const halfSpanY = Math.max(cy - contentMinY, contentMaxY - cy);
-    const vbX = cx - halfSpanX - vbPad;
-    const vbY = cy - halfSpanY - vbPad;
-    const vbW = (halfSpanX + vbPad) * 2;
-    const vbH = (halfSpanY + vbPad) * 2;
+    const vbX = contentMinX - vbPad;
+    const vbY = contentMinY - vbPad;
+    const vbW = contentMaxX - contentMinX + vbPad * 2;
+    const vbH = contentMaxY - contentMinY + vbPad * 2;
 
     svgEl.setAttribute('viewBox', vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH);
     svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
