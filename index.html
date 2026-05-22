@@ -1857,8 +1857,8 @@
         .page-2 .dist-student-name.dist-name-size-sm { font-size: calc(8.5px + 1.5pt); }
         .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 1.5pt); }
         .page-1 .report-radar-layout {
-            --radar-chart-pad-top: 2mm;
-            --radar-chart-pad-bottom: 5mm;
+            --radar-chart-pad-top: 3mm;
+            --radar-chart-pad-bottom: 3mm;
             --radar-box-trim: 3mm;
             --radar-graph-h: 86mm;
             --radar-aspect: 212 / 226;
@@ -1890,12 +1890,13 @@
         }
         .page-1 .report-radar-chart svg {
             display: block;
-            width: 100%;
+            width: auto;
+            max-width: 100%;
             height: auto;
             max-height: calc(var(--radar-graph-h) - var(--radar-chart-pad-top) - var(--radar-chart-pad-bottom));
-            margin: 0;
+            margin: auto;
             aspect-ratio: var(--radar-aspect);
-            flex-shrink: 1;
+            flex: 0 0 auto;
             overflow: visible;
         }
         .page-1 .report-zone-radar,
@@ -5552,10 +5553,6 @@ function renderStudentGradeRadar(subjectRows) {
     const labelR = maxR + 10;
     const n = subjectRows.length;
     const vbPad = 6;
-    const vbBottomPad = 24;
-    const vbX = cx - labelR - vbPad;
-    const vbY = cy - labelR - vbPad;
-    const vbW = (labelR + vbPad) * 2;
     const angles = subjectRows.map((_, i) => -Math.PI / 2 + (2 * Math.PI * i) / n);
 
     function polar(r, idx) {
@@ -5565,19 +5562,34 @@ function renderStudentGradeRadar(subjectRows) {
         };
     }
 
+    let contentMinX = cx - maxR;
+    let contentMaxX = cx + maxR;
+    let contentMinY = cy - maxR;
+    let contentMaxY = cy + maxR;
     let lowestLabelBottom = 0;
     subjectRows.forEach(function(row, i) {
         const labPt = polar(labelR, i);
         const sinA = Math.sin(angles[i]);
         const labelY = getRadarSubjectLabelY(labPt, sinA);
+        const top = labelY - RADAR_SUBJECT_FONT * (sinA > 0.55 ? 0.85 : sinA > 0.2 ? 0.45 : 0.55);
         const bottom = labelY + RADAR_SUBJECT_FONT * (sinA > 0.55 ? 0.72 : 0.52);
+        const halfW = row.subject.length * RADAR_SUBJECT_FONT * 0.52;
+        if (labPt.x - halfW < contentMinX) contentMinX = labPt.x - halfW;
+        if (labPt.x + halfW > contentMaxX) contentMaxX = labPt.x + halfW;
+        if (top < contentMinY) contentMinY = top;
+        if (bottom > contentMaxY) contentMaxY = bottom;
         if (bottom > lowestLabelBottom) lowestLabelBottom = bottom;
     });
 
-    const estVbH = (labelR + vbPad) * 2 + 36;
+    const estVbH = Math.max(contentMaxY - contentMinY + 36, (labelR + vbPad) * 2);
     const legendGapSvg = radarMmToSvgUnits(RADAR_LABEL_LEGEND_GAP_MM, svgEl, estVbH);
     const legendY = lowestLabelBottom + legendGapSvg;
-    const vbH = legendY + RADAR_LEGEND_HEIGHT + vbBottomPad - vbY;
+    contentMaxY = legendY + RADAR_LEGEND_HEIGHT;
+    if (cx + 20 > contentMaxX) contentMaxX = cx + 20;
+    const vbX = contentMinX - vbPad;
+    const vbY = contentMinY - vbPad;
+    const vbW = contentMaxX - contentMinX + vbPad * 2;
+    const vbH = contentMaxY - contentMinY + vbPad * 2;
 
     svgEl.setAttribute('viewBox', vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH);
     svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
