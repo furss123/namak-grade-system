@@ -5398,7 +5398,7 @@ const RADAR_SERIES = {
 };
 const RADAR_SUBJECT_FONT = 11;
 const RADAR_LEGEND_HEIGHT = 10;
-const RADAR_LABEL_LEGEND_GAP_MM = 3;
+const RADAR_LABEL_LEGEND_GAP_MM = 5;
 
 function radarMmToSvgUnits(mm, svgEl, vbHeight) {
     const chartBox = svgEl.closest('.report-radar-chart');
@@ -5425,25 +5425,30 @@ function gradeToRadarRadius(grade, scale, maxR) {
 function appendRadarLegend(svgEl, NS, cx, baseY) {
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'radar-legend');
-    const items = [
-        { key: 'g5', x: cx - 42 },
-        { key: 'g9', x: cx + 4 }
-    ];
-    items.forEach(function(item) {
-        const s = RADAR_SERIES[item.key];
+    const lineW = 18;
+    const textGap = 5;
+    const itemGap = 16;
+    const textW = { g5: 28, g9: 28 };
+    const keys = ['g5', 'g9'];
+    const totalW = keys.reduce(function(sum, key, idx) {
+        return sum + lineW + textGap + textW[key] + (idx < keys.length - 1 ? itemGap : 0);
+    }, 0);
+    let x = cx - totalW / 2;
+    keys.forEach(function(key, idx) {
+        const s = RADAR_SERIES[key];
         const row = document.createElementNS(NS, 'g');
-        row.setAttribute('transform', 'translate(' + item.x + ',' + baseY + ')');
+        row.setAttribute('transform', 'translate(' + x + ',' + baseY + ')');
         const sample = document.createElementNS(NS, 'line');
         sample.setAttribute('x1', '0');
         sample.setAttribute('y1', '0');
-        sample.setAttribute('x2', '20');
+        sample.setAttribute('x2', String(lineW));
         sample.setAttribute('y2', '0');
         sample.setAttribute('stroke', s.stroke);
         sample.setAttribute('stroke-width', '2.2');
         if (s.dash) sample.setAttribute('stroke-dasharray', s.dash);
         row.appendChild(sample);
         const label = document.createElementNS(NS, 'text');
-        label.setAttribute('x', '25');
+        label.setAttribute('x', String(lineW + textGap));
         label.setAttribute('y', '3.5');
         label.setAttribute('fill', '#475569');
         label.setAttribute('font-size', '9.5');
@@ -5452,6 +5457,7 @@ function appendRadarLegend(svgEl, NS, cx, baseY) {
         label.textContent = s.label;
         row.appendChild(label);
         g.appendChild(row);
+        x += lineW + textGap + textW[key] + (idx < keys.length - 1 ? itemGap : 0);
     });
     svgEl.appendChild(g);
 }
