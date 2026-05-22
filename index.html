@@ -1459,15 +1459,15 @@
             align-items: stretch;
             justify-content: flex-start;
             gap: var(--report-p1-section-gap);
-            flex: 1 1 auto;
-            min-height: 0;
+            flex: 0 0 auto;
+            min-height: auto;
             width: 100%;
         }
         .page-1 .report-page-one-split .report-zone-score,
         .page-1 .report-page-one-split .report-zone-radar {
-            flex: 0 1 auto;
+            flex: 0 0 auto;
             align-self: stretch;
-            min-height: 0;
+            min-height: auto;
             min-width: 0;
             width: 100%;
         }
@@ -1512,17 +1512,21 @@
             --radar-graph-h: 94mm;
         }
         .page-1.p1-opt-count-1 .report-block-main,
-        .page-1.p1-opt-count-1 .report-block-radar {
-            flex: 0 1 auto;
-            min-height: 0;
+        .page-1.p1-opt-count-1 .report-block-radar,
+        .page-1.p1-opt-count-2 .report-block-main,
+        .page-1.p1-opt-count-2 .report-block-radar {
+            flex: 0 0 auto;
+            min-height: auto;
             display: flex;
             flex-direction: column;
             justify-content: flex-start;
         }
         .page-1.p1-opt-count-1 .report-zone-score .report-panel,
-        .page-1.p1-opt-count-1 .report-block-radar .report-radar-layout {
-            flex: 0 1 auto;
-            min-height: 0;
+        .page-1.p1-opt-count-1 .report-block-radar .report-radar-layout,
+        .page-1.p1-opt-count-2 .report-zone-score .report-panel,
+        .page-1.p1-opt-count-2 .report-block-radar .report-radar-layout {
+            flex: 0 0 auto;
+            min-height: auto;
         }
         .page-1 .report-panel-student {
             padding: 0;
@@ -1573,13 +1577,14 @@
             align-items: stretch;
             justify-content: flex-start;
             gap: var(--report-block-gap);
-            min-height: 0;
+            min-height: auto;
+            overflow: visible;
         }
         .page-1 .report-block-radar {
             display: flex;
             flex-direction: column;
-            flex: 1;
-            min-height: 0;
+            flex: 0 0 auto;
+            min-height: auto;
         }
         .page-1 .report-block {
             margin: 0;
@@ -1828,8 +1833,10 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
-            align-items: stretch;
+            align-items: start;
             width: 100%;
+            flex: 0 0 auto;
+            min-height: auto;
         }
         .page-1 .report-radar-chart {
             display: flex;
@@ -1843,9 +1850,9 @@
             width: calc(100% - var(--radar-box-trim));
             max-width: calc(100% - var(--radar-box-trim));
             margin-inline: auto;
-            height: auto;
+            height: fit-content;
             min-height: var(--radar-graph-h);
-            align-self: stretch;
+            align-self: start;
             overflow: visible;
             flex-shrink: 0;
         }
@@ -1881,9 +1888,9 @@
             flex-direction: column;
             min-width: 0;
             width: 100%;
-            height: 100%;
+            height: auto;
             min-height: var(--radar-graph-h);
-            align-self: stretch;
+            align-self: start;
         }
         .page-1 .report-grade-goal-panel {
             --goal-font-caption: calc(var(--rpt-font-sm) + 0.5pt);
