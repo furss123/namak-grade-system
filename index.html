@@ -1823,8 +1823,9 @@
             --radar-chart-pad-bottom: 0;
             --radar-box-trim: 3mm;
             --radar-graph-h: calc(69mm * 1.44);
-            --radar-svg-h: calc(var(--radar-graph-h) + 9.6mm);
-            --radar-panel-h: calc(var(--radar-svg-h) - 9mm);
+            --radar-svg-h: var(--radar-graph-h);
+            --radar-panel-h: auto;
+            --radar-aspect: 212 / 226;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
@@ -1843,21 +1844,23 @@
             width: calc(100% - var(--radar-box-trim));
             max-width: calc(100% - var(--radar-box-trim));
             margin-inline: auto;
-            height: auto;
-            min-height: var(--radar-panel-h);
+            height: fit-content;
+            min-height: 0;
             align-self: stretch;
-            overflow: visible;
+            overflow: hidden;
             flex-shrink: 0;
         }
         .page-1 .report-radar-chart svg {
             width: calc(100% + var(--radar-box-trim));
             max-width: calc(100% + var(--radar-box-trim));
             margin: 0 calc(var(--radar-box-trim) / -2);
-            height: var(--radar-svg-h);
+            height: auto;
             max-height: var(--radar-svg-h);
+            aspect-ratio: var(--radar-aspect);
             overflow: visible;
             flex-shrink: 0;
             display: block;
+            vertical-align: top;
         }
         .page-1 .report-zone-radar,
         .page-1 .report-block-radar,
@@ -5450,11 +5453,17 @@ function renderStudentGradeRadar(subjectRows) {
     const n = subjectRows.length;
 
     const vbPad = 6;
+    const vbBottomPad = 10;
     const vbX = cx - labelR - vbPad;
     const vbY = cy - labelR - vbPad;
     const vbW = (labelR + vbPad) * 2;
-    const vbH = legendY + 14 - vbY;
+    const vbH = legendY + vbBottomPad - vbY;
     svgEl.setAttribute('viewBox', vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH);
+    svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+    const chartBox = svgEl.closest('.report-radar-chart');
+    if (chartBox) {
+        chartBox.style.setProperty('--radar-aspect', vbW + ' / ' + vbH);
+    }
     const angles = subjectRows.map((_, i) => -Math.PI / 2 + (2 * Math.PI * i) / n);
 
     function polar(r, idx) {
