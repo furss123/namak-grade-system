@@ -1988,11 +1988,16 @@
             line-height: 1.2;
             vertical-align: middle;
         }
-        .page-1 .report-grade-goal-panel .report-grade-goal-rank-note {
+        .page-1 .report-grade-goal-panel .report-grade-goal-manual-note {
             flex-shrink: 0;
             margin: 0;
             border-top: 1px solid #e8edf4;
             border-radius: 0 0 5px 5px;
+        }
+        .page-1 .report-grade-goal-panel .report-grade-goal-manual-note .score-grade-manual-row-goal .score-grade-manual-desc {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5mm;
         }
         .page-1 .report-grade-goal-table .goal-cell {
             background: #fffbeb;
@@ -2564,7 +2569,7 @@
             #printContainer .score-grade-manual-label,
             #printContainer .report-radar-chart svg,
             #printContainer .report-grade-goal-table .grade-badge,
-            #printContainer .report-grade-goal-panel .report-grade-goal-rank-note,
+            #printContainer .report-grade-goal-panel .report-grade-goal-manual-note,
             #printContainer .report-grade-goal-table .goal-cell,
             #printContainer .univ-ref-table thead th,
             #printContainer .univ-ref-table tbody th.univ-name,
@@ -2839,12 +2844,19 @@
                 <div class="report-radar-side">
                     <div class="report-grade-goal-panel">
                         <div id="gradeRadarSummary"></div>
-                        <div class="score-grade-manual-block report-grade-goal-rank-note" role="note" aria-label="석차 표기 안내">
-                            <div class="score-grade-manual-row">
-                                <span class="score-grade-manual-label">석차 표기</span>
+                        <div class="score-grade-manual-block report-grade-goal-manual-note" role="note" aria-label="등급·목표 점수 안내">
+                            <div class="score-grade-manual-row score-grade-manual-row-grade">
+                                <span class="score-grade-manual-label">등급 표기</span>
                                 <div class="score-grade-manual-desc">
-                                    <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 석차</span>
-                                    <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 동석차</span>
+                                    <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 5등급제</span>
+                                    <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 9등급제</span>
+                                </div>
+                            </div>
+                            <div class="score-grade-manual-row score-grade-manual-row-goal">
+                                <span class="score-grade-manual-label">목표 점수</span>
+                                <div class="score-grade-manual-desc">
+                                    <span class="score-grade-manual-item">한 등급 올리기 · <strong>원점수 + 윗등급 차×2</strong></span>
+                                    <span class="score-grade-manual-item">1등급이면 <strong>—</strong> (유지)</span>
                                 </div>
                             </div>
                         </div>
