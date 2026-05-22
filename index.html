@@ -1985,17 +1985,11 @@
             line-height: 1.2;
             vertical-align: middle;
         }
-        .page-1 .report-grade-goal-panel .panel-caption-note {
+        .page-1 .report-grade-goal-panel .report-grade-goal-rank-note {
             flex-shrink: 0;
             margin: 0;
-            padding: 1.2mm 2mm 0.6mm;
-            font-size: var(--goal-font-caption);
-            font-weight: 600;
-            color: #64748b;
-            background: #f8fafc;
             border-top: 1px solid #e8edf4;
-            text-align: center;
-            letter-spacing: -0.01em;
+            border-radius: 0 0 5px 5px;
         }
         .page-1 .report-grade-goal-table .goal-cell {
             background: #fffbeb;
@@ -2567,7 +2561,7 @@
             #printContainer .score-grade-manual-label,
             #printContainer .report-radar-chart svg,
             #printContainer .report-grade-goal-table .grade-badge,
-            #printContainer .report-grade-goal-panel .panel-caption-note,
+            #printContainer .report-grade-goal-panel .report-grade-goal-rank-note,
             #printContainer .report-grade-goal-table .goal-cell,
             #printContainer .univ-ref-table thead th,
             #printContainer .univ-ref-table tbody th.univ-name,
@@ -2842,8 +2836,15 @@
                 <div class="report-radar-side">
                     <div class="report-grade-goal-panel">
                         <div id="gradeRadarSummary"></div>
-                        <p class="panel-caption panel-caption-note">괄호 ( ) 안 숫자는 9등급제</p>
-                        <p class="panel-caption panel-caption-bottom">한 등급 올리기 목표 점수 (원점수 + 윗등급 차×2)</p>
+                        <div class="score-grade-manual-block report-grade-goal-rank-note" role="note" aria-label="석차 표기 안내">
+                            <div class="score-grade-manual-row">
+                                <span class="score-grade-manual-label">석차 표기</span>
+                                <div class="score-grade-manual-desc">
+                                    <span class="score-grade-manual-item"><strong>앞 숫자</strong> · 석차</span>
+                                    <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 동석차</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -5550,7 +5551,7 @@ function renderStudentGradeRadar(subjectRows) {
         table.className = 'report-grade-goal-table';
         table.innerHTML =
             '<colgroup><col class="col-subject"><col class="col-grade"><col class="col-score"><col class="col-goal"></colgroup>' +
-            '<thead><tr><th>과목</th><th>5등급</th><th>원점수</th><th>목표 점수</th></tr></thead>';
+            '<thead><tr><th>과목</th><th>등급</th><th>원점수</th><th>목표 점수</th></tr></thead>';
         const tbody = document.createElement('tbody');
         subjectRows.forEach((row) => {
             const tr = document.createElement('tr');
