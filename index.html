@@ -1506,10 +1506,10 @@
             --p1-stack-gap: var(--report-zone-gap);
         }
         .page-1.p1-opt-count-1 .report-radar-layout {
-            --radar-graph-h: calc(75mm * 1.44);
+            --radar-graph-h: 108mm;
         }
         .page-1.p1-opt-count-2 .report-radar-layout {
-            --radar-graph-h: calc(57mm * 1.44);
+            --radar-graph-h: 88mm;
         }
         .page-1.p1-opt-count-1 .report-block-main,
         .page-1.p1-opt-count-1 .report-block-radar {
@@ -1823,14 +1823,12 @@
             --radar-chart-pad-top: 0;
             --radar-chart-pad-bottom: 0;
             --radar-box-trim: 3mm;
-            --radar-graph-h: calc(69mm * 1.44);
-            --radar-svg-h: var(--radar-graph-h);
-            --radar-panel-h: auto;
+            --radar-graph-h: 96mm;
             --radar-aspect: 212 / 226;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
-            align-items: start;
+            align-items: stretch;
             width: 100%;
         }
         .page-1 .report-radar-chart {
@@ -1845,18 +1843,18 @@
             width: calc(100% - var(--radar-box-trim));
             max-width: calc(100% - var(--radar-box-trim));
             margin-inline: auto;
-            height: fit-content;
-            min-height: 0;
+            height: 100%;
+            min-height: var(--radar-graph-h);
             align-self: stretch;
-            overflow: hidden;
+            overflow: visible;
             flex-shrink: 0;
         }
         .page-1 .report-radar-chart svg {
             width: calc(100% + var(--radar-box-trim));
             max-width: calc(100% + var(--radar-box-trim));
             margin: 0 calc(var(--radar-box-trim) / -2);
-            height: auto;
-            max-height: var(--radar-svg-h);
+            height: 100%;
+            max-height: 100%;
             aspect-ratio: var(--radar-aspect);
             overflow: visible;
             flex-shrink: 0;
@@ -1883,8 +1881,9 @@
             flex-direction: column;
             min-width: 0;
             width: 100%;
-            height: auto;
-            align-self: start;
+            height: 100%;
+            min-height: var(--radar-graph-h);
+            align-self: stretch;
         }
         .page-1 .report-grade-goal-panel {
             --goal-font-caption: calc(var(--rpt-font-sm) + 0.5pt);
@@ -5408,7 +5407,7 @@ function radarMmToSvgUnits(mm, svgEl, vbHeight) {
     let renderMm = 99.36;
     if (chartBox) {
         const layout = chartBox.closest('.report-radar-layout');
-        const raw = getComputedStyle(layout || chartBox).getPropertyValue('--radar-svg-h').trim();
+        const raw = getComputedStyle(layout || chartBox).getPropertyValue('--radar-graph-h').trim();
         if (raw.endsWith('mm')) renderMm = parseFloat(raw) || renderMm;
     }
     return vbHeight * (mm / renderMm);
