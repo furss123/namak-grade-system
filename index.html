@@ -1994,10 +1994,20 @@
             border-top: 1px solid #e8edf4;
             border-radius: 0 0 5px 5px;
         }
+        .page-1 .report-grade-goal-panel .report-grade-goal-manual-note .score-grade-manual-row-score .score-grade-manual-desc,
         .page-1 .report-grade-goal-panel .report-grade-goal-manual-note .score-grade-manual-row-goal .score-grade-manual-desc {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.5mm;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: center;
+            gap: 0;
+        }
+        .page-1 .report-grade-goal-panel .report-grade-goal-manual-note .score-grade-manual-row-score .score-grade-manual-item,
+        .page-1 .report-grade-goal-panel .report-grade-goal-manual-note .score-grade-manual-row-goal .score-grade-manual-item {
+            width: auto;
+            flex: 0 0 auto;
+            white-space: nowrap;
+            word-break: keep-all;
+            overflow-wrap: normal;
         }
         .page-1 .report-grade-goal-table .goal-cell {
             background: #fffbeb;
@@ -2852,11 +2862,16 @@
                                     <span class="score-grade-manual-item"><strong>괄호 ( )</strong> · 9등급제</span>
                                 </div>
                             </div>
+                            <div class="score-grade-manual-row score-grade-manual-row-score">
+                                <span class="score-grade-manual-label">원점수</span>
+                                <div class="score-grade-manual-desc">
+                                    <span class="score-grade-manual-item">해당 과목 <strong>원점수</strong></span>
+                                </div>
+                            </div>
                             <div class="score-grade-manual-row score-grade-manual-row-goal">
                                 <span class="score-grade-manual-label">목표 점수</span>
                                 <div class="score-grade-manual-desc">
-                                    <span class="score-grade-manual-item">한 등급 올리기 · <strong>원점수 + 윗등급 차×2</strong></span>
-                                    <span class="score-grade-manual-item">1등급이면 <strong>—</strong> (유지)</span>
+                                    <span class="score-grade-manual-item">한 등급 올리기 · <strong>원점수 + 윗등급 차×2</strong> · 1등급 <strong>—</strong> (유지)</span>
                                 </div>
                             </div>
                         </div>
