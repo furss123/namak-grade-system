@@ -2823,7 +2823,7 @@
             <h3>한눈에 보기</h3>
             <div class="report-radar-layout">
                 <div class="report-radar-chart">
-                    <svg id="gradeRadarChart" viewBox="-38 -38 316 348" role="img" aria-label="과목별 9등급·5등급 비교 레이더 차트"></svg>
+                    <svg id="gradeRadarChart" viewBox="4 0 232 228" role="img" aria-label="과목별 9등급·5등급 비교 레이더 차트"></svg>
                 </div>
                 <div class="report-radar-side">
                     <div class="report-grade-goal-panel">
@@ -5354,9 +5354,10 @@ const GRADE9_SCALE = 9;
 const GRADE5_SCALE = 5;
 const GRADE9_RING_LABELS = [1, 3, 5, 7, 9];
 const RADAR_SERIES = {
-    g9: { stroke: '#1e3a5f', fill: 'rgba(30, 58, 95, 0.2)', dot: '#1e3a5f', dash: null, label: '9등급제' },
-    g5: { stroke: '#c2410c', fill: 'rgba(194, 65, 12, 0.1)', dot: '#c2410c', dash: '6 4', label: '5등급제' }
+    g9: { stroke: '#1e3a5f', fill: 'rgba(30, 58, 95, 0.16)', dot: '#1e3a5f', dash: null, label: '9등급제', dotR: 3.2 },
+    g5: { stroke: '#c2410c', fill: 'none', dot: '#c2410c', dash: '5 3.5', label: '5등급제', dotR: 2.6 }
 };
+const RADAR_SUBJECT_FONT = 13;
 
 function gradeToRadarRadius(grade, scale, maxR) {
     const g = Math.min(scale, Math.max(1, Number(grade) || scale));
@@ -5367,8 +5368,8 @@ function appendRadarLegend(svgEl, NS, cx, baseY) {
     const g = document.createElementNS(NS, 'g');
     g.setAttribute('class', 'radar-legend');
     const items = [
-        { key: 'g9', x: cx - 52 },
-        { key: 'g5', x: cx + 8 }
+        { key: 'g9', x: cx - 48 },
+        { key: 'g5', x: cx + 6 }
     ];
     items.forEach(function(item) {
         const s = RADAR_SERIES[item.key];
@@ -5377,17 +5378,17 @@ function appendRadarLegend(svgEl, NS, cx, baseY) {
         const sample = document.createElementNS(NS, 'line');
         sample.setAttribute('x1', '0');
         sample.setAttribute('y1', '0');
-        sample.setAttribute('x2', '22');
+        sample.setAttribute('x2', '20');
         sample.setAttribute('y2', '0');
         sample.setAttribute('stroke', s.stroke);
-        sample.setAttribute('stroke-width', '2.5');
+        sample.setAttribute('stroke-width', '2.2');
         if (s.dash) sample.setAttribute('stroke-dasharray', s.dash);
         row.appendChild(sample);
         const label = document.createElementNS(NS, 'text');
-        label.setAttribute('x', '28');
-        label.setAttribute('y', '4');
-        label.setAttribute('fill', '#334155');
-        label.setAttribute('font-size', '10.5');
+        label.setAttribute('x', '25');
+        label.setAttribute('y', '3.5');
+        label.setAttribute('fill', '#475569');
+        label.setAttribute('font-size', '9.5');
         label.setAttribute('font-weight', '700');
         label.setAttribute('font-family', 'Pretendard, Malgun Gothic, sans-serif');
         label.textContent = s.label;
@@ -5403,7 +5404,7 @@ function appendRadarDataSeries(svgEl, NS, pts, seriesKey) {
     poly.setAttribute('points', pts.map((p) => p.x + ',' + p.y).join(' '));
     poly.setAttribute('fill', s.fill);
     poly.setAttribute('stroke', s.stroke);
-    poly.setAttribute('stroke-width', seriesKey === 'g9' ? '2.2' : '2');
+    poly.setAttribute('stroke-width', seriesKey === 'g9' ? '2.4' : '1.9');
     poly.setAttribute('stroke-linejoin', 'round');
     if (s.dash) poly.setAttribute('stroke-dasharray', s.dash);
     svgEl.appendChild(poly);
@@ -5411,10 +5412,10 @@ function appendRadarDataSeries(svgEl, NS, pts, seriesKey) {
         const dot = document.createElementNS(NS, 'circle');
         dot.setAttribute('cx', String(pt.x));
         dot.setAttribute('cy', String(pt.y));
-        dot.setAttribute('r', seriesKey === 'g9' ? '3.5' : '3');
+        dot.setAttribute('r', String(s.dotR));
         dot.setAttribute('fill', s.dot);
         dot.setAttribute('stroke', '#fff');
-        dot.setAttribute('stroke-width', '1.1');
+        dot.setAttribute('stroke-width', '1');
         svgEl.appendChild(dot);
     });
 }
@@ -5426,12 +5427,18 @@ function renderStudentGradeRadar(subjectRows) {
 
     const NS = 'http://www.w3.org/2000/svg';
     const cx = 120;
-    const cy = 118;
-    const maxR = 74;
-    const labelR = maxR + 18;
+    const cy = 106;
+    const maxR = 90;
+    const labelR = maxR + 10;
+    const legendY = cy + maxR + 16;
     const n = subjectRows.length;
 
-    svgEl.setAttribute('viewBox', '-38 -38 316 348');
+    const vbPad = 6;
+    const vbX = cx - labelR - vbPad;
+    const vbY = cy - labelR - vbPad;
+    const vbW = (labelR + vbPad) * 2;
+    const vbH = legendY + 14 - vbY;
+    svgEl.setAttribute('viewBox', vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH);
     const angles = subjectRows.map((_, i) => -Math.PI / 2 + (2 * Math.PI * i) / n);
 
     function polar(r, idx) {
@@ -5449,22 +5456,24 @@ function renderStudentGradeRadar(subjectRows) {
         const poly = document.createElementNS(NS, 'polygon');
         poly.setAttribute('points', pts.map((p) => p.x + ',' + p.y).join(' '));
         const isKeyRing = GRADE9_RING_LABELS.indexOf(g) !== -1;
+        if (!isKeyRing) continue;
         poly.setAttribute('fill', 'none');
-        poly.setAttribute('stroke', isKeyRing ? '#c5d0dc' : '#e8edf4');
-        poly.setAttribute('stroke-width', g === 1 ? '1' : (isKeyRing ? '0.75' : '0.4'));
+        poly.setAttribute('stroke', g === 1 ? '#b8c5d6' : '#d8e0ea');
+        poly.setAttribute('stroke-width', g === 1 ? '0.9' : '0.65');
         svgEl.appendChild(poly);
     }
 
     GRADE9_RING_LABELS.forEach(function(g) {
+        if (g === 3 || g === 7) return;
         const r = gradeToRadarRadius(g, GRADE9_SCALE, maxR);
         const tick = document.createElementNS(NS, 'text');
-        tick.setAttribute('x', String(cx + 10));
-        tick.setAttribute('y', String(cy - r + 3.5));
+        tick.setAttribute('x', String(cx + 7));
+        tick.setAttribute('y', String(cy - r + 3));
         tick.setAttribute('text-anchor', 'start');
         tick.setAttribute('dominant-baseline', 'middle');
-        tick.setAttribute('fill', '#94a3b8');
-        tick.setAttribute('font-size', '8.5');
-        tick.setAttribute('font-weight', '700');
+        tick.setAttribute('fill', '#a8b4c4');
+        tick.setAttribute('font-size', '7.5');
+        tick.setAttribute('font-weight', '600');
         tick.setAttribute('font-family', 'Pretendard, Malgun Gothic, sans-serif');
         tick.textContent = String(g);
         svgEl.appendChild(tick);
@@ -5502,7 +5511,7 @@ function renderStudentGradeRadar(subjectRows) {
         text.setAttribute('text-anchor', 'middle');
         text.setAttribute('dominant-baseline', 'middle');
         text.setAttribute('fill', '#1e3a5f');
-        text.setAttribute('font-size', '13.5');
+        text.setAttribute('font-size', String(RADAR_SUBJECT_FONT));
         text.setAttribute('font-weight', '700');
         text.setAttribute('font-family', 'Pretendard, Malgun Gothic, sans-serif');
         text.setAttribute('stroke', '#fff');
@@ -5512,7 +5521,7 @@ function renderStudentGradeRadar(subjectRows) {
         svgEl.appendChild(text);
     });
 
-    appendRadarLegend(svgEl, NS, cx, cy + maxR + 28);
+    appendRadarLegend(svgEl, NS, cx, legendY);
 
     const title = document.createElementNS(NS, 'title');
     title.textContent = subjectRows.map((row) =>
