@@ -1819,12 +1819,13 @@
         .page-2 .dist-student-name.dist-name-size-sm { font-size: calc(8.5px + 1.5pt); }
         .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 1.5pt); }
         .page-1 .report-radar-layout {
-            --radar-chart-pad-top: 0.5mm;
-            --radar-chart-pad-bottom: 4.5mm;
+            --radar-chart-pad-top: 0;
+            --radar-chart-pad-bottom: 0;
             --radar-box-trim: 3mm;
+            --radar-box-trim-y: 5mm;
             --radar-graph-h: calc(69mm * 1.44);
             --radar-svg-h: calc(var(--radar-graph-h) + 9.6mm);
-            --radar-panel-h: calc(var(--radar-svg-h) + var(--radar-chart-pad-top) + var(--radar-chart-pad-bottom));
+            --radar-panel-h: calc(var(--radar-svg-h) - 5mm);
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
@@ -1852,7 +1853,7 @@
         .page-1 .report-radar-chart svg {
             width: calc(100% + var(--radar-box-trim));
             max-width: calc(100% + var(--radar-box-trim));
-            margin-left: calc(var(--radar-box-trim) / -2);
+            margin: calc(-1 * var(--radar-box-trim-y)) calc(var(--radar-box-trim) / -2);
             height: var(--radar-svg-h);
             max-height: var(--radar-svg-h);
             overflow: visible;
