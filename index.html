@@ -1329,6 +1329,38 @@
             box-shadow: var(--shadow-lg);
             border-color: var(--school-border);
         }
+        /* 화면 미리보기: A4 고정 그리드(minmax(0,1fr)) 대신 flex로 본문 전체 표시 */
+        #printContainer .page.page-1,
+        #printContainer .page.page-2 {
+            display: flex;
+            flex-direction: column;
+            height: auto;
+            min-height: 297mm;
+            max-height: none;
+            overflow: visible;
+            grid-template-rows: unset;
+            grid-template-columns: unset;
+        }
+        #printContainer .page .page-top-accent {
+            flex: 0 0 3mm;
+            grid-row: unset;
+        }
+        #printContainer .page .page-body {
+            flex: 0 0 auto;
+            grid-row: unset;
+            overflow: visible !important;
+            min-height: auto !important;
+            max-height: none !important;
+        }
+        #printContainer .page .page-footer {
+            flex: 0 0 var(--report-footer-h);
+            grid-row: unset;
+        }
+        #printContainer .page-body.page-body-fit {
+            overflow: visible !important;
+            transform: none !important;
+            zoom: 1 !important;
+        }
         /* ===== 인쇄 보고서 ===== */
         .report-wrapper { display: none; margin-top: 24px; page-break-after: always; }
         .report-wrapper:last-child { page-break-after: auto; }
@@ -1839,34 +1871,27 @@
             min-height: auto;
         }
         .page-1 .report-radar-chart {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: block;
             background: #fafbfd;
             border: 1px solid #d4dde8;
             border-radius: 5px;
             padding: var(--radar-chart-pad-top) 2mm var(--radar-chart-pad-bottom);
             box-sizing: border-box;
-            width: calc(100% - var(--radar-box-trim));
-            max-width: calc(100% - var(--radar-box-trim));
+            width: 100%;
             margin-inline: auto;
-            height: fit-content;
-            min-height: var(--radar-graph-h);
+            height: auto;
+            min-height: 0;
             align-self: start;
             overflow: visible;
-            flex-shrink: 0;
         }
         .page-1 .report-radar-chart svg {
-            width: calc(100% + var(--radar-box-trim));
-            max-width: calc(100% + var(--radar-box-trim));
-            margin: 0 calc(var(--radar-box-trim) / -2);
+            display: block;
+            width: 100%;
             height: auto;
             max-height: none;
+            margin: 0;
             aspect-ratio: var(--radar-aspect);
             overflow: visible;
-            flex-shrink: 0;
-            display: block;
-            vertical-align: top;
         }
         .page-1 .report-zone-radar,
         .page-1 .report-block-radar,
@@ -1875,8 +1900,8 @@
         }
         .page-1 .page-body.report-page-one.page-body-fit,
         .page-2 .page-body.report-page-two.page-body-fit {
-            transform: scale(var(--page-fit-scale, 1));
-            transform-origin: top center;
+            transform: none;
+            zoom: var(--page-fit-scale, 1);
             width: 100%;
             max-width: 100%;
             margin-left: auto;
@@ -2538,7 +2563,8 @@
                 max-width: 100% !important;
                 margin-left: auto !important;
                 margin-right: auto !important;
-                transform-origin: top center !important;
+                transform: none !important;
+                zoom: var(--page-fit-scale, 1) !important;
             }
             #printContainer .page-doc-header,
             #printContainer .page-logo {
@@ -5668,7 +5694,11 @@ function applyReportPageFitScale(pageEl) {
     body.classList.remove('page-body-fit');
     pageEl.style.setProperty('--page-fit-scale', '1');
     body.style.transform = '';
+    body.style.zoom = '';
     body.style.width = '';
+
+    /* 화면 미리보기(#printContainer): 페이지 높이를 내용에 맞추므로 축소·클리핑 없음 */
+    if (pageEl.closest('#printContainer')) return;
 
     const accent = pageEl.querySelector('.page-top-accent');
     const footer = pageEl.querySelector('.page-footer');
