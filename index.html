@@ -1865,16 +1865,14 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
-            align-items: stretch;
+            align-items: start;
             width: 100%;
             flex: 0 0 auto;
             min-height: auto;
         }
         .page-1 .report-radar-chart {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+            display: grid;
+            grid-template: 1fr / 1fr;
             background: #fafbfd;
             border: 1px solid #d4dde8;
             border-radius: 5px;
@@ -1885,18 +1883,17 @@
             height: var(--radar-graph-h);
             min-height: var(--radar-graph-h);
             max-height: var(--radar-graph-h);
-            align-self: stretch;
+            align-self: start;
             overflow: hidden;
         }
         .page-1 .report-radar-chart svg {
             display: block;
-            width: auto;
-            max-width: 100%;
-            height: auto;
-            max-height: calc(var(--radar-graph-h) - var(--radar-chart-pad-top) - var(--radar-chart-pad-bottom));
-            margin: auto;
-            aspect-ratio: var(--radar-aspect);
-            flex: 0 0 auto;
+            grid-area: 1 / 1;
+            width: 100%;
+            height: 100%;
+            min-width: 0;
+            min-height: 0;
+            margin: 0;
             overflow: visible;
         }
         .page-1 .report-zone-radar,
@@ -1919,9 +1916,11 @@
             flex-direction: column;
             min-width: 0;
             width: 100%;
-            height: auto;
+            height: var(--radar-graph-h);
             min-height: var(--radar-graph-h);
+            max-height: var(--radar-graph-h);
             align-self: stretch;
+            box-sizing: border-box;
         }
         .page-1 .report-grade-goal-panel {
             --goal-font-caption: calc(var(--rpt-font-sm) + 0.5pt);
@@ -1929,8 +1928,9 @@
             --goal-cell-pad-y: var(--rpt-cell-pad-y);
             display: flex;
             flex-direction: column;
-            height: auto;
-            flex: 0 0 auto;
+            height: 100%;
+            min-height: 0;
+            flex: 1 1 auto;
             border: 1px solid #d4dde8;
             border-radius: 5px;
             overflow: hidden;
@@ -1938,9 +1938,12 @@
             box-sizing: border-box;
         }
         .page-1 #gradeRadarSummary {
-            flex: 0 0 auto;
-            overflow: visible;
+            flex: 1 1 0;
+            min-height: 0;
+            height: auto;
+            overflow: hidden;
             display: block;
+            box-sizing: border-box;
         }
         .page-1 .report-grade-goal-panel .panel-caption-bottom {
             flex-shrink: 0;
@@ -1960,7 +1963,7 @@
         }
         .page-1 .report-grade-goal-table {
             width: 100%;
-            height: auto;
+            height: 100%;
             border-collapse: collapse;
             table-layout: fixed;
         }
@@ -1968,7 +1971,7 @@
             height: auto;
         }
         .page-1 .report-grade-goal-table tbody tr {
-            height: auto;
+            height: 1%;
         }
         .page-1 .report-grade-goal-table .col-subject { width: 26%; }
         .page-1 .report-grade-goal-table .col-grade { width: 18%; }
@@ -3602,6 +3605,13 @@ function restoreAppViewFromSession(ui) {
 }
 
 function initSessionPersistenceListeners() {
+    let radarSideResizeTimer = null;
+    window.addEventListener('resize', function() {
+        if (radarSideResizeTimer) clearTimeout(radarSideResizeTimer);
+        radarSideResizeTimer = setTimeout(function() {
+            syncRadarSideLayout();
+        }, 80);
+    });
     window.addEventListener('beforeunload', function() {
         if (!isFileUploaded) return;
         persistUiSnapshot(collectUiState());
@@ -5573,7 +5583,7 @@ function renderStudentGradeRadar(subjectRows) {
         const labelY = getRadarSubjectLabelY(labPt, sinA);
         const top = labelY - RADAR_SUBJECT_FONT * (sinA > 0.55 ? 0.85 : sinA > 0.2 ? 0.45 : 0.55);
         const bottom = labelY + RADAR_SUBJECT_FONT * (sinA > 0.55 ? 0.72 : 0.52);
-        const halfW = row.subject.length * RADAR_SUBJECT_FONT * 0.52;
+        const halfW = row.subject.length * RADAR_SUBJECT_FONT * 0.62;
         if (labPt.x - halfW < contentMinX) contentMinX = labPt.x - halfW;
         if (labPt.x + halfW > contentMaxX) contentMaxX = labPt.x + halfW;
         if (top < contentMinY) contentMinY = top;
@@ -5585,11 +5595,16 @@ function renderStudentGradeRadar(subjectRows) {
     const legendGapSvg = radarMmToSvgUnits(RADAR_LABEL_LEGEND_GAP_MM, svgEl, estVbH);
     const legendY = lowestLabelBottom + legendGapSvg;
     contentMaxY = legendY + RADAR_LEGEND_HEIGHT;
+    const legendHalfW = 52;
+    if (cx - legendHalfW < contentMinX) contentMinX = cx - legendHalfW;
+    if (cx + legendHalfW > contentMaxX) contentMaxX = cx + legendHalfW;
     if (cx + 20 > contentMaxX) contentMaxX = cx + 20;
-    const vbX = contentMinX - vbPad;
-    const vbY = contentMinY - vbPad;
-    const vbW = contentMaxX - contentMinX + vbPad * 2;
-    const vbH = contentMaxY - contentMinY + vbPad * 2;
+    const halfSpanX = Math.max(cx - contentMinX, contentMaxX - cx);
+    const halfSpanY = Math.max(cy - contentMinY, contentMaxY - cy);
+    const vbX = cx - halfSpanX - vbPad;
+    const vbY = cy - halfSpanY - vbPad;
+    const vbW = (halfSpanX + vbPad) * 2;
+    const vbH = (halfSpanY + vbPad) * 2;
 
     svgEl.setAttribute('viewBox', vbX + ' ' + vbY + ' ' + vbW + ' ' + vbH);
     svgEl.setAttribute('preserveAspectRatio', 'xMidYMid meet');
@@ -5701,7 +5716,47 @@ function renderStudentGradeRadar(subjectRows) {
         table.appendChild(tbody);
         summaryEl.innerHTML = '';
         summaryEl.appendChild(table);
+        requestAnimationFrame(function() {
+            requestAnimationFrame(function() {
+                syncRadarSideLayout();
+            });
+        });
     }
+}
+
+function syncRadarSideLayout(root) {
+    const scope = root && root.querySelector ? root : document;
+    scope.querySelectorAll('.report-radar-layout').forEach(function(layout) {
+        const chart = layout.querySelector('.report-radar-chart');
+        const side = layout.querySelector('.report-radar-side');
+        const summaryEl = layout.querySelector('#gradeRadarSummary');
+        const table = summaryEl && summaryEl.querySelector('.report-grade-goal-table');
+        if (!chart || !side) return;
+
+        const chartH = chart.offsetHeight;
+        if (chartH > 0) {
+            side.style.height = chartH + 'px';
+            side.style.minHeight = chartH + 'px';
+            side.style.maxHeight = chartH + 'px';
+        } else {
+            side.style.height = '';
+            side.style.minHeight = '';
+            side.style.maxHeight = '';
+            return;
+        }
+
+        if (!summaryEl || !table) return;
+
+        const tbody = table.tBodies[0];
+        if (!tbody || !tbody.rows.length) return;
+
+        const headH = table.tHead ? table.tHead.offsetHeight : 0;
+        const bodyH = Math.max(0, summaryEl.clientHeight - headH);
+        const rowH = bodyH / tbody.rows.length;
+        Array.prototype.forEach.call(tbody.rows, function(tr) {
+            tr.style.height = rowH > 0 ? rowH + 'px' : '';
+        });
+    });
 }
 
 function applyReportPageFitScale(pageEl) {
@@ -5747,8 +5802,12 @@ function applyReportPageFitScale(pageEl) {
 function fitReportPagesInRoot(root) {
     if (!root) return;
     root.querySelectorAll('.report-zone-dist .page-doc-header h1').forEach(fitDistPageTitle);
+    syncRadarSideLayout(root);
     root.querySelectorAll('.page-1, .page-2').forEach(function(pageEl) {
         applyReportPageFitScale(pageEl);
+    });
+    requestAnimationFrame(function() {
+        syncRadarSideLayout(root);
     });
 }
 
