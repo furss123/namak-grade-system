@@ -1821,7 +1821,7 @@
         .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 1.5pt); }
         .page-1 .report-radar-layout {
             --radar-chart-pad-top: 2mm;
-            --radar-chart-pad-bottom: 5mm;
+            --radar-chart-pad-bottom: 7mm;
             --radar-box-trim: 3mm;
             --radar-graph-h: 96mm;
             --radar-aspect: 212 / 226;
@@ -5509,12 +5509,12 @@ function renderStudentGradeRadar(subjectRows) {
 
     const NS = 'http://www.w3.org/2000/svg';
     const cx = 120;
-    const cy = 106;
+    const cy = 100;
     const maxR = 90;
     const labelR = maxR + 10;
     const n = subjectRows.length;
     const vbPad = 6;
-    const vbBottomPad = 20;
+    const vbBottomPad = 24;
     const vbX = cx - labelR - vbPad;
     const vbY = cy - labelR - vbPad;
     const vbW = (labelR + vbPad) * 2;
