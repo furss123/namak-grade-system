@@ -618,6 +618,9 @@
             border-color: var(--school-navy-light);
             background: var(--theme-print-opt-checked);
         }
+        html[data-theme="dark"] .exam-chip-toggle {
+            color: var(--theme-text);
+        }
         .exam-chip-toggle input {
             width: 14px;
             height: 14px;
@@ -1534,9 +1537,11 @@
             box-shadow: var(--focus-ring), var(--shadow-xs);
         }
         .search-btn-range {
-            background: linear-gradient(180deg, #14b8a6 0%, var(--school-success) 100%);
+            background: linear-gradient(180deg, #4a7ab0 0%, var(--school-navy) 100%);
         }
-        .search-btn-range:hover { box-shadow: 0 6px 16px rgba(15, 118, 110, 0.28); }
+        .search-btn-range:hover {
+            box-shadow: 0 4px 14px rgba(30, 58, 95, 0.2);
+        }
 
         .stats-dashboard { display: none; }
         .stats-dashboard .stats-table-wrap {
@@ -1571,6 +1576,8 @@
         .stats-table td {
             font-size: 1em;
             border: 1px solid var(--theme-border-light);
+            border-left: none;
+            border-right: none;
             vertical-align: middle;
             text-align: center;
         }
@@ -1581,6 +1588,8 @@
                 clamp(6px, 0.35rem + 0.4vw, 12px);
             text-align: center;
             border-color: #1a3352;
+            border-left: none;
+            border-right: none;
             letter-spacing: -0.01em;
             line-height: 1.15;
         }
@@ -1597,6 +1606,7 @@
             text-align: center;
             padding: clamp(6px, 0.4rem + 0.3vw, 10px)
                 clamp(5px, 0.3rem + 0.35vw, 10px);
+            border-left: none;
             border-right: 1px solid #dce4ee;
             white-space: nowrap;
             line-height: 1.15;
@@ -2364,12 +2374,6 @@
             --rpt-cell-pad: var(--rpt-cell-pad-y) var(--rpt-cell-pad-x);
             --p1-stack-gap: var(--report-zone-gap);
         }
-        .page-1.p1-opt-count-1 .report-goal-layout {
-            --goal-panel-h: 48mm;
-        }
-        .page-1.p1-opt-count-2 .report-goal-layout {
-            --goal-panel-h: 40mm;
-        }
         .page-1.p1-opt-count-1 .report-block-main,
         .page-1.p1-opt-count-1 .report-block-goal,
         .page-1.p1-opt-count-2 .report-block-main,
@@ -2423,7 +2427,7 @@
         }
         .page-1 .student-info .avg-grade-pill .info-avg-grade {
             color: var(--school-navy-dark);
-            font-size: 1.22em;
+            font-size: 1.4em;
             font-weight: 800;
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum" 1;
@@ -2435,7 +2439,7 @@
             color: #64748b;
         }
         .page-1 .student-info .info-student-name {
-            font-size: 1.12em;
+            font-size: 1.3em;
             font-weight: 800;
             letter-spacing: -0.01em;
         }
@@ -2509,7 +2513,6 @@
             border-radius: 5px;
             overflow: hidden;
             background: #fff;
-            box-shadow: 0 1px 0 rgba(15, 36, 64, 0.04);
         }
         .page-1 .report-block table {
             margin: 0;
@@ -2526,9 +2529,17 @@
             text-align: center;
             letter-spacing: 0;
         }
-        .page-1 .report-block td {
+        .page-1 .report-block tbody td {
+            border-left: none;
+            border-right: none;
+            border-top: none;
+            border-bottom: 1px solid #e3e9f1;
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum" 1;
+        }
+        .page-1 .report-block tbody tr:last-child td,
+        .page-1 .report-block tbody tr:last-child th.row-label {
+            border-bottom: none;
         }
         .page-1 .report-block-maxcut .report-panel th,
         .page-1 .report-block-maxcut .report-panel td,
@@ -2542,6 +2553,8 @@
             font-weight: 600;
             font-size: calc(var(--rpt-font-base) + 0.5pt);
             border-color: #1a3352;
+            border-left: none;
+            border-right: none;
             padding-top: calc(3px + 1mm);
             padding-bottom: calc(3px + 1mm);
             vertical-align: middle;
@@ -2577,6 +2590,10 @@
             padding-right: var(--rpt-cell-pad-x);
             letter-spacing: 0;
             white-space: nowrap;
+            border-left: none;
+            border-top: none;
+            border-right: 1px solid #d4dde8;
+            border-bottom: 1px solid #e3e9f1;
         }
         .page-1 .report-block .cell-main {
             font-variant-numeric: tabular-nums;
@@ -2825,6 +2842,13 @@
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum" 1;
         }
+        .page-2 .dist-table tbody tr:not(.my-score-row) > td:not(.dist-band-label):not(.row-label) {
+            border: 2px solid #fff;
+        }
+        .page-2 .dist-table tbody tr.dist-row-up > td:not(.dist-band-label):not(.dist-near-1-up):not(.dist-near-3-up),
+        .page-2 .dist-table tbody tr.dist-row-down > td:not(.dist-band-label):not(.dist-near-1-down):not(.dist-near-3-down) {
+            border-bottom: 1px solid #eef2f6;
+        }
         .page-2 .dist-table thead th,
         #printContainer .page-2 .dist-table thead th {
             background: var(--school-navy-dark) !important;
@@ -2852,6 +2876,8 @@
             text-orientation: mixed;
             white-space: nowrap;
             vertical-align: middle !important;
+            border: none;
+            border-right: 1px solid #d4dde8;
         }
         .page-2 .dist-table tr.dist-row-up td,
         .page-2 .dist-table tr.dist-row-down td {
@@ -2865,16 +2891,16 @@
             color: var(--school-navy-dark);
         }
         .page-2 .dist-table td.dist-near-1-up {
-            background: #fbd5d5 !important;
+            background: #f9c9c9 !important;
         }
         .page-2 .dist-table td.dist-near-3-up {
-            background: #fdecec !important;
+            background: #fde3e3 !important;
         }
         .page-2 .dist-table td.dist-near-1-down {
-            background: #cfe2fb !important;
+            background: #c3dbf9 !important;
         }
         .page-2 .dist-table td.dist-near-3-down {
-            background: #e8f1fd !important;
+            background: #e3edfc !important;
         }
         .page-2 .dist-table .dist-empty {
             color: #94a3b8;
@@ -2938,10 +2964,10 @@
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
-        .page-2 .dist-legend-swatch.near-1-up { background: #fbd5d5; }
-        .page-2 .dist-legend-swatch.near-3-up { background: #fdecec; }
-        .page-2 .dist-legend-swatch.near-1-down { background: #cfe2fb; }
-        .page-2 .dist-legend-swatch.near-3-down { background: #e8f1fd; }
+        .page-2 .dist-legend-swatch.near-1-up { background: #f9c9c9; }
+        .page-2 .dist-legend-swatch.near-3-up { background: #fde3e3; }
+        .page-2 .dist-legend-swatch.near-1-down { background: #c3dbf9; }
+        .page-2 .dist-legend-swatch.near-3-down { background: #e3edfc; }
         .page-2 .dist-guide-box {
             margin: 0;
             padding: 2.2mm 2.8mm;
@@ -2992,19 +3018,17 @@
         .page-2 .dist-student-name.dist-name-size-sm { font-size: calc(8.5px + 1.5pt); }
         .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 1.5pt); }
         .page-1 .report-goal-layout {
-            --goal-panel-h: 44mm;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2.6mm;
-            align-items: stretch;
+            display: block;
             width: 100%;
             flex: 0 0 auto;
-            min-height: auto;
+            min-height: 0;
             overflow: visible;
         }
         .page-1 .report-zone-goal,
         .page-1 .report-block-goal {
             overflow: visible;
+            flex: 0 0 auto;
+            min-height: 0;
         }
         .page-1 .page-body.report-page-one.page-body-fit,
         .page-2 .page-body.report-page-two.page-body-fit {
@@ -3016,24 +3040,14 @@
             margin-right: auto;
             box-sizing: border-box;
         }
-        .page-1 .report-goal-side {
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-            width: 100%;
-            min-height: var(--goal-panel-h);
-            align-self: stretch;
-            box-sizing: border-box;
-        }
         .page-1 .report-grade-goal-panel {
             --goal-font-caption: calc(var(--rpt-font-sm) + 0.5pt);
             --goal-font-cell: calc(var(--rpt-font-base) + 1pt);
             --goal-cell-pad-y: var(--rpt-cell-pad-y);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            min-height: var(--goal-panel-h);
-            flex: 1 1 auto;
+            display: block;
+            width: 100%;
+            height: auto;
+            min-height: 0;
             border: 1px solid #d4dde8;
             border-radius: 5px;
             overflow: hidden;
@@ -3041,11 +3055,11 @@
             box-sizing: border-box;
         }
         .page-1 .grade-goal-summary {
-            flex: 1 1 auto;
+            display: block;
+            width: 100%;
+            height: auto;
             min-height: 0;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
+            overflow: visible;
             box-sizing: border-box;
         }
         .page-1 .report-grade-goal-panel .panel-caption-bottom {
@@ -3066,27 +3080,35 @@
         }
         .page-1 .report-grade-goal-table {
             width: 100%;
-            height: 100%;
+            height: auto;
             border-collapse: collapse;
             table-layout: fixed;
         }
-        .page-1 .report-grade-goal-table thead tr {
-            height: auto;
-        }
+        .page-1 .report-grade-goal-table thead tr,
         .page-1 .report-grade-goal-table tbody tr {
             height: auto;
         }
         .page-1 .report-grade-goal-table th,
         .page-1 .report-grade-goal-table td {
-            padding: 0.6mm 2px;
-            font-size: calc(var(--goal-font-cell) - 0.5pt);
-            line-height: 1.2;
+            padding: 1.4mm 4px;
+            font-size: calc(var(--goal-font-cell) + 0.5pt);
+            line-height: 1.25;
             text-align: center;
             vertical-align: middle;
             border: 1px solid #e8edf4;
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum" 1;
             letter-spacing: 0;
+        }
+        .page-1 .report-grade-goal-table tbody td {
+            border-left: none;
+            border-right: none;
+            border-top: none;
+            border-bottom: 1px solid #e3e9f1;
+        }
+        .page-1 .report-grade-goal-table tbody tr:last-child td,
+        .page-1 .report-grade-goal-table tbody tr:last-child th.subject-name {
+            border-bottom: none;
         }
         .page-1 .report-grade-goal-table .grade-badge {
             min-width: 1.35em;
@@ -3100,6 +3122,8 @@
             font-weight: 600;
             font-size: calc(var(--goal-font-cell) - 0.2pt);
             border-color: #1a3352;
+            border-left: none;
+            border-right: none;
             vertical-align: middle;
             letter-spacing: 0;
             text-align: center;
@@ -3115,52 +3139,14 @@
             padding-right: 2px;
             letter-spacing: 0;
             white-space: nowrap;
+            border-left: none;
+            border-top: none;
+            border-right: 1px solid #d4dde8;
+            border-bottom: 1px solid #e3e9f1;
         }
-        .page-1 .report-grade-goal-table .col-subject { width: 34%; }
-        .page-1 .report-grade-goal-table .col-grade { width: 22%; }
+        .page-1 .report-grade-goal-table .col-subject { width: 28%; }
+        .page-1 .report-grade-goal-table .col-grade { width: 28%; }
         .page-1 .report-grade-goal-table .col-goal { width: 44%; }
-        .page-1 .report-homeroom-comment {
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-            width: 100%;
-            height: 100%;
-            min-height: 42mm;
-            border: 1px solid #d4dde8;
-            border-radius: 5px;
-            background: #fff;
-            box-sizing: border-box;
-            overflow: hidden;
-        }
-        .page-1 .report-homeroom-comment-title {
-            margin: 0;
-            padding: 1.6mm 2.8mm;
-            font-size: calc(var(--rpt-font-base) + 0.5pt);
-            font-weight: 700;
-            color: var(--school-navy-dark);
-            background: #f4f7fa;
-            border-bottom: 1px solid #e8edf4;
-            letter-spacing: 0;
-        }
-        .page-1 .report-homeroom-comment-lines {
-            --homeroom-line-gap: 5.5mm;
-            flex: 1 1 auto;
-            margin: 0;
-            padding: 2.2mm 3mm 2.8mm;
-            min-height: 31mm;
-            background-image: repeating-linear-gradient(
-                to bottom,
-                transparent 0,
-                transparent calc(var(--homeroom-line-gap) - 1px),
-                #dbe3ee calc(var(--homeroom-line-gap) - 1px),
-                #dbe3ee var(--homeroom-line-gap)
-            );
-            background-size: 100% var(--homeroom-line-gap);
-            background-repeat: repeat-y;
-            background-position: 0 0;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
         .page-1 .report-grade-goal-panel .report-grade-goal-manual-note {
             flex-shrink: 0;
             margin: 0;
@@ -3190,7 +3176,7 @@
             overflow-wrap: normal;
         }
         .page-1 .report-grade-goal-table .goal-cell {
-            background: #fffbeb;
+            background: transparent;
             color: #9a3412;
             font-weight: 700;
         }
@@ -3878,7 +3864,6 @@
             }
             #printContainer .report-panel,
             #printContainer .student-info,
-            #printContainer .report-homeroom-comment,
             #printContainer .report-goal-layout {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
@@ -3947,7 +3932,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
-                <span><strong>학교·시험 정보(이름·마크·학기·고사)만</strong> 이 브라우저에 저장됩니다. <strong>성적 엑셀 파일은 저장되지 않습니다.</strong></span>
+                <span><strong>학교·시험 정보(이름·마크·학기·고사)만</strong> 이 브라우저에 저장됩니다. <strong>업로드한 성적 엑셀은 서버나 브라우저 어디에도 저장되지 않습니다.</strong></span>
             </p>
             <input type="file" id="schoolLogoFile" accept="image/*,.png,.jpg,.jpeg,.webp,.gif,.svg,.bmp,.ico" style="display:none;" onchange="onSchoolLogoPicked(this)">
             <div class="school-info-card">
@@ -4102,10 +4087,6 @@
                 </summary>
                 <ul class="upload-warnings-list" id="uploadWarningsList"></ul>
             </details>
-            <p class="grade-privacy-note" role="note">
-                <strong>성적 파일은 저장되지 않습니다.</strong>
-                업로드한 엑셀 원본은 서버·브라우저에 보관하지 않습니다. 저장되는 항목은 위 「시험 정보」뿐입니다.
-            </p>
             <p class="upload-example-notice" id="uploadExampleNotice" role="note" hidden>지금은 예시 파일이 업로드 된 상태에서는 지금은 가상의 1학년 성적이 입력된 상태입니다.</p>
         </section>
 
@@ -4157,7 +4138,7 @@
                             </label>
                             <label class="print-opt-label" for="printOptRadar">
                                 <input type="checkbox" id="printOptRadar" checked>
-                                <span>목표 점수·담임 코멘트</span>
+                                <span>목표 점수</span>
                             </label>
                         </div>
                     </div>
@@ -4298,18 +4279,10 @@
 
             <section class="report-zone report-zone-goal">
             <div class="report-block report-block-goal">
-            <h3>목표 점수와 담임 코멘트</h3>
+            <h3>목표 점수</h3>
             <div class="report-goal-layout">
-                <div class="report-goal-side">
-                    <div class="report-grade-goal-panel">
-                        <div id="gradeGoalSummary" class="grade-goal-summary"></div>
-                    </div>
-                </div>
-                <div class="report-goal-side">
-                    <div class="report-homeroom-comment" aria-label="담임 코멘트">
-                        <p class="report-homeroom-comment-title">담임 코멘트</p>
-                        <div class="report-homeroom-comment-lines" aria-hidden="true"></div>
-                    </div>
+                <div class="report-grade-goal-panel">
+                    <div id="gradeGoalSummary" class="grade-goal-summary"></div>
                 </div>
             </div>
             <p class="report-table-footnote">목표 점수 · 한 등급 위 컷 점수 이상 | 1등급 — (유지)</p>
@@ -4430,7 +4403,7 @@
     </footer>
 
 <script>
-const APP_VERSION = '1.5.1';
+const APP_VERSION = '1.5.2';
 const APP_RELEASE_DATE = '2026-10-29';
 const THEME_KEY = 'namak-theme';
 
@@ -7754,42 +7727,8 @@ function renderSubjectGoalTable(subjectRows) {
     });
 }
 
-function syncGoalSideLayout(root) {
-    const scope = root && root.querySelector ? root : document;
-    scope.querySelectorAll('.report-goal-layout').forEach(function(layout) {
-        const panel = layout.querySelector('.report-grade-goal-panel');
-        const summaryEl = layout.querySelector('.grade-goal-summary');
-        const table = summaryEl && summaryEl.querySelector('.report-grade-goal-table');
-        const comment = layout.querySelector('.report-homeroom-comment');
-        if (!panel || !summaryEl || !table) return;
-
-        const tbody = table.tBodies[0];
-        if (!tbody || !tbody.rows.length) return;
-
-        const layoutH = Math.max(panel.clientHeight, comment ? comment.clientHeight : 0, 1);
-        if (comment) {
-            comment.style.minHeight = layoutH + 'px';
-            comment.style.height = layoutH + 'px';
-        }
-        panel.style.minHeight = layoutH + 'px';
-        panel.style.height = layoutH + 'px';
-
-        const headH = table.tHead ? table.tHead.offsetHeight : 0;
-        const bodyH = Math.max(0, layoutH - headH);
-        const rowH = bodyH / tbody.rows.length;
-
-        summaryEl.style.height = bodyH + 'px';
-        summaryEl.style.minHeight = bodyH + 'px';
-        summaryEl.style.maxHeight = bodyH + 'px';
-        table.style.height = (bodyH + headH) + 'px';
-
-        Array.prototype.forEach.call(tbody.rows, function(tr) {
-            tr.style.height = rowH > 0 ? rowH + 'px' : '';
-        });
-        Array.prototype.forEach.call(table.querySelectorAll('tbody th, tbody td'), function(cell) {
-            cell.style.height = rowH > 0 ? rowH + 'px' : '';
-        });
-    });
+function syncGoalSideLayout() {
+    /* 목표 점수 표만 내용 높이로 표시 (강제 스트레치·여백 없음) */
 }
 
 function applyReportPageFitScale(pageEl, options) {
