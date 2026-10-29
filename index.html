@@ -99,16 +99,7 @@
 
         html[data-theme="dark"] {
             color-scheme: dark;
-            --grade-1-bg: #1e3a5f;
-            --grade-1-fg: #93c5fd;
-            --grade-2-bg: #14532d;
-            --grade-2-fg: #86efac;
-            --grade-3-bg: #334155;
-            --grade-3-fg: #cbd5e1;
-            --grade-4-bg: #7c2d12;
-            --grade-4-fg: #fdba74;
-            --grade-5-bg: #7f1d1d;
-            --grade-5-fg: #fca5a5;
+            /* 등급색은 라이트와 동일 변수값 유지 (C4) */
             --theme-bg-page: #0f172a;
             --theme-bg-panel: #1e293b;
             --theme-bg-muted: #334155;
@@ -2349,9 +2340,9 @@
         }
         .page-1.p1-opt-count-2 {
             --rpt-font-base: calc(9.5px + 1.5pt);
-            --rpt-font-sm: calc(8.5px + 1.5pt);
+            --rpt-font-sm: calc(9px + 0.5pt);
             --rpt-font-h: calc(10px + 2pt);
-            --rpt-font-caption: calc(8px + 1.5pt);
+            --rpt-font-caption: calc(9px + 0pt);
             --rpt-cell-pad-x: 3px;
             --rpt-cell-pad-y: calc(2px + 1mm);
             --rpt-cell-pad: var(--rpt-cell-pad-y) var(--rpt-cell-pad-x);
@@ -4138,7 +4129,7 @@
                 </tbody>
             </table>
             </div>
-            <p class="report-table-footnote">석차: 앞 숫자·동석차는 괄호 · 등급: 큰 숫자=5등급제, 아래 회색=9등급제 · 윗등급 차: 상위 등급 컷과의 차이</p>
+            <p class="report-table-footnote">석차 괄호 · 동석차 인원 | 작은 글씨 · 9등급(참고) | 윗등급 차 · 위 등급 컷까지 남은 점수</p>
             </div>
             </section>
 
@@ -4180,7 +4171,7 @@
                     </div>
                 </div>
             </div>
-            <p class="report-table-footnote">목표 점수: 한 등급 위 컷 이상 · 1등급은 — (유지)</p>
+            <p class="report-table-footnote">목표 점수 · 한 등급 위 컷 점수 이상 | 1등급 — (유지)</p>
             </div>
             </section>
             </div>
@@ -4287,7 +4278,7 @@
     </footer>
 
 <script>
-const APP_VERSION = '1.4.1';
+const APP_VERSION = '1.5.0';
 const APP_RELEASE_DATE = '2026-10-29';
 const THEME_KEY = 'namak-theme';
 
