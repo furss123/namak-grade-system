@@ -2110,37 +2110,30 @@
             box-shadow: var(--shadow-lg);
             border-color: var(--school-border);
         }
-        /* 화면 미리보기: A4 고정 그리드(minmax(0,1fr)) 대신 flex로 본문 전체 표시 */
-        #printContainer .page.page-1,
-        #printContainer .page.page-2 {
-            display: flex;
-            flex-direction: column;
-            height: auto;
-            min-height: 297mm;
-            max-height: none;
-            overflow: visible;
-            grid-template-rows: unset;
-            grid-template-columns: unset;
+        /* 화면 미리보기: 인쇄와 같은 A4 고정 그리드 + 맞춤 축소 */
+        #printContainer:not(.pdf-export-capture) .page.page-1,
+        #printContainer:not(.pdf-export-capture) .page.page-2 {
+            display: grid !important;
+            width: 210mm !important;
+            height: 297mm !important;
+            min-height: 297mm !important;
+            max-height: 297mm !important;
+            grid-template-rows: 3mm minmax(0, 1fr) var(--report-footer-h) !important;
+            overflow: hidden !important;
+            box-sizing: border-box !important;
         }
-        #printContainer .page .page-top-accent {
-            flex: 0 0 3mm;
-            grid-row: unset;
+        #printContainer:not(.pdf-export-capture) .page .page-top-accent { grid-row: 1 !important; }
+        #printContainer:not(.pdf-export-capture) .page .page-body {
+            grid-row: 2 !important; min-height: 0 !important; overflow: hidden !important;
         }
-        #printContainer .page .page-body {
-            flex: 0 0 auto;
-            grid-row: unset;
-            overflow: visible !important;
-            min-height: auto !important;
-            max-height: none !important;
+        #printContainer:not(.pdf-export-capture) .page .page-footer {
+            grid-row: 3 !important;
+            display: flex !important; align-items: center !important; justify-content: center !important;
         }
-        #printContainer .page .page-footer {
-            flex: 0 0 var(--report-footer-h);
-            grid-row: unset;
-        }
-        #printContainer .page-body.page-body-fit {
-            overflow: visible !important;
+        #printContainer:not(.pdf-export-capture) .page .page-body.page-body-fit {
+            width: 100% !important; max-width: 100% !important;
             transform: none !important;
-            zoom: 1 !important;
+            zoom: var(--page-fit-scale, 1) !important;
         }
         /* ===== 인쇄 보고서 ===== */
         .report-wrapper { display: none; margin-top: 24px; page-break-after: always; }
@@ -7742,15 +7735,6 @@ function applyReportPageFitScale(pageEl, options) {
     body.style.zoom = '';
     body.style.width = '';
 
-    /* 화면 미리보기(#printContainer, height:auto): 축소 생략.
-       인쇄·PDF 캡처(고정 A4)는 적용 */
-    const printRoot = pageEl.closest('#printContainer');
-    if (printRoot && !opts.force) {
-        const fixedCapture = document.body.classList.contains('pdf-exporting')
-            || printRoot.classList.contains('pdf-export-capture');
-        if (!fixedCapture) return;
-    }
-
     const accent = pageEl.querySelector('.page-top-accent');
     const footer = pageEl.querySelector('.page-footer');
     const bodyStyle = getComputedStyle(body);
@@ -7878,8 +7862,11 @@ function appendReportsToPrintContainer(studentIds, printOpts) {
             fitReportPagesInRoot(printContainer);
             syncWrittenOnlyNotes(printContainer);
             syncGoalSideLayout(printContainer);
-            requestAnimationFrame(function() {
-                requestAnimationFrame(resolve);
+            waitForImagesInRoot(printContainer).then(function() {
+                fitReportPagesInRoot(printContainer);
+                requestAnimationFrame(function() {
+                    requestAnimationFrame(resolve);
+                });
             });
         });
     });
@@ -8645,17 +8632,7 @@ window.addEventListener('beforeprint', function() {
 window.addEventListener('afterprint', function() {
     const printContainer = document.getElementById('printContainer');
     if (!printContainer) return;
-    printContainer.querySelectorAll('.page-1, .page-2').forEach(function(pageEl) {
-        const body = pageEl.querySelector('.page-body');
-        if (body) {
-            body.classList.remove('page-body-fit');
-            body.style.transform = '';
-            body.style.zoom = '';
-            body.style.width = '';
-        }
-        pageEl.style.setProperty('--page-fit-scale', '1');
-    });
-    syncGoalSideLayout(printContainer);
+    fitReportPagesInRoot(printContainer);
 });
 
 (async function initAppOnLoad() {
