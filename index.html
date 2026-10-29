@@ -2536,8 +2536,8 @@
         .page-1 .report-block thead th.row-label,
         #printContainer .page-1 .report-block thead th.row-label,
         #printContainer thead th.row-label,
-        .page-2 #distributionTable thead th.row-label,
-        #printContainer .page-2 #distributionTable thead th.row-label {
+        .page-2 .dist-table thead th.row-label,
+        #printContainer .page-2 .dist-table thead th.row-label {
             background: var(--school-navy-dark) !important;
             background-color: var(--school-navy-dark) !important;
             color: #fff !important;
@@ -2641,22 +2641,22 @@
             line-height: 1.4;
             letter-spacing: 0;
         }
-        .page-1 #rowDiffUp td,
-        .page-1 #rowDiffDown td {
+        .page-1 .row-diff-up td,
+        .page-1 .row-diff-down td {
             font-size: calc(var(--rpt-font-base) - 0.2pt);
             color: #475569;
         }
-        .page-1 #rowUnit td {
+        .page-1 .row-unit td {
             color: #64748b;
             font-weight: 600;
         }
-        .page-1 #rowMax th.row-label,
-        .page-1 #rowMax td {
+        .page-1 .row-max th.row-label,
+        .page-1 .row-max td {
             background: #f1f5f9 !important;
             font-weight: 700;
         }
-        .page-1 #rowCut1 th.row-label,
-        .page-1 #rowCut1 td {
+        .page-1 .row-cut1 th.row-label,
+        .page-1 .row-cut1 td {
             border-top: 1.5px solid #c5d0de;
         }
         .page-2 {
@@ -2688,8 +2688,8 @@
             --p2-font-base: calc(10px + 1.5pt);
             --p2-stack-gap: 3mm;
         }
-        .page-2.p2-opt-count-1 #distributionTable th,
-        .page-2.p2-opt-count-1 #distributionTable td {
+        .page-2.p2-opt-count-1 .dist-table th,
+        .page-2.p2-opt-count-1 .dist-table td {
             font-size: calc(10px + 7pt);
         }
         .page-2.p2-opt-count-1 .univ-ref-table th,
@@ -2712,21 +2712,21 @@
         .page-2.layout-p2-dist-only .report-zone-dist {
             flex: 1 1 auto;
         }
-        .page-2.layout-p2-dist-only #distributionTable {
+        .page-2.layout-p2-dist-only .dist-table {
             height: 100%;
         }
-        .page-2.layout-p2-dist-only #distributionTable tbody {
+        .page-2.layout-p2-dist-only .dist-table tbody {
             height: 100%;
         }
-        .page-2.layout-p2-dist-only #distributionTable tbody tr {
+        .page-2.layout-p2-dist-only .dist-table tbody tr {
             height: calc(100% / 21);
         }
         .page-2.p2-opt-count-2 {
             --p2-font-base: calc(8.5px + 1.5pt);
             --p2-stack-gap: 2.2mm;
         }
-        .page-2.p2-opt-count-2 #distributionTable th,
-        .page-2.p2-opt-count-2 #distributionTable td {
+        .page-2.p2-opt-count-2 .dist-table th,
+        .page-2.p2-opt-count-2 .dist-table td {
             font-size: calc(8.5px + 7pt);
         }
         .page-2.p2-opt-count-2 .univ-ref-table th,
@@ -2746,7 +2746,7 @@
             padding: 1.5mm 2mm;
         }
         .page-2 .page-doc-header h1,
-        .page-2 #distPageTitle {
+        .page-2 .dist-page-title {
             min-width: 0;
             max-width: 100%;
             white-space: nowrap;
@@ -2768,12 +2768,12 @@
             overflow: hidden;
             background: #fff;
         }
-        .page-2 #distributionTable {
+        .page-2 .dist-table {
             margin: 0;
             border: none;
         }
-        .page-2 #distributionTable th,
-        .page-2 #distributionTable td {
+        .page-2 .dist-table th,
+        .page-2 .dist-table td {
             padding: 4px 3px;
             font-size: calc(10px + 7pt);
             line-height: 1.35;
@@ -2784,7 +2784,7 @@
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum" 1;
         }
-        .page-2 #distributionTable thead th {
+        .page-2 .dist-table thead th {
             background: var(--school-navy-dark);
             color: #fff;
             font-weight: 600;
@@ -2792,13 +2792,13 @@
             text-align: center;
             white-space: nowrap;
         }
-        .page-2 #distributionTable th.row-label,
-        .page-2 #distributionTable td.row-label {
+        .page-2 .dist-table th.row-label,
+        .page-2 .dist-table td.row-label {
             text-align: center;
             letter-spacing: 0;
             white-space: nowrap;
         }
-        .page-2 #distributionTable .dist-band-label {
+        .page-2 .dist-table .dist-band-label {
             width: 11mm;
             max-width: 12mm;
             padding: 2px 1px !important;
@@ -2810,30 +2810,30 @@
             white-space: nowrap;
             vertical-align: middle !important;
         }
-        .page-2 #distributionTable tr.dist-row-up td {
+        .page-2 .dist-table tr.dist-row-up td {
             background: #fff5f5;
         }
-        .page-2 #distributionTable tr.dist-row-up .dist-band-label {
+        .page-2 .dist-table tr.dist-row-up .dist-band-label {
             background: #fde8e8;
             color: #b91c1c;
         }
-        .page-2 #distributionTable tr.dist-row-down td {
+        .page-2 .dist-table tr.dist-row-down td {
             background: #f0f7ff;
         }
-        .page-2 #distributionTable tr.dist-row-down .dist-band-label {
+        .page-2 .dist-table tr.dist-row-down .dist-band-label {
             background: #e0ecff;
             color: #1d4ed8;
         }
-        .page-2 #distributionTable .dist-empty {
+        .page-2 .dist-table .dist-empty {
             color: #94a3b8;
             font-weight: 600;
         }
-        .page-2 #distributionTable .dist-score-main {
+        .page-2 .dist-table .dist-score-main {
             display: block;
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum" 1;
         }
-        .page-2 #distributionTable .dist-score-delta {
+        .page-2 .dist-table .dist-score-delta {
             display: block;
             margin-top: 0.12em;
             font-size: 0.72em;
@@ -2842,7 +2842,7 @@
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum" 1;
         }
-        .page-2 #distributionTable .my-score-row td.row-label {
+        .page-2 .dist-table .my-score-row td.row-label {
             vertical-align: middle;
             padding: 3px 4px;
             line-height: 1.15;
@@ -3374,8 +3374,8 @@
         .page-1 .score-grade-manual-block-oneline .score-grade-manual-row-grade .score-grade-manual-item {
             width: auto;
         }
-        .page-1 #rowGrade td,
-        .page-1 #rowGrade th.row-label {
+        .page-1 .row-grade td,
+        .page-1 .row-grade th.row-label {
             font-weight: 800;
             background: #eef4fc !important;
             color: var(--school-navy-dark);
@@ -3767,8 +3767,8 @@
             #printContainer .ref-cell-official .univ-ref-grade,
             #printContainer .ref-cell-estimate .univ-ref-grade,
             #printContainer .page-1 .student-info,
-            #printContainer .page-2 #distributionTable tr.dist-row-up td,
-            #printContainer .page-2 #distributionTable tr.dist-row-down td {
+            #printContainer .page-2 .dist-table tr.dist-row-up td,
+            #printContainer .page-2 .dist-table tr.dist-row-down td {
                 -webkit-print-color-adjust: exact !important;
                 print-color-adjust: exact !important;
             }
@@ -4114,18 +4114,18 @@
             <div class="report-block report-block-main">
             <h3 class="report-section-title">과목별 성적</h3>
             <div class="report-panel">
-            <table id="mainScoreTable">
+            <table id="mainScoreTable" class="main-score-table">
                 <thead>
                     <tr id="mainTableHead"><th class="row-label">과목</th></tr>
                 </thead>
                 <tbody>
-                    <tr id="rowUnit"><th class="row-label">학점</th></tr>
-                    <tr id="rowScore"><th class="row-label">원점수</th></tr>
-                    <tr id="rowRank"><th class="row-label">석차</th></tr>
-                    <tr id="rowPercent"><th class="row-label">상위%</th></tr>
-                    <tr id="rowGrade" style="font-weight: bold;"><th class="row-label">등급</th></tr>
-                    <tr id="rowDiffUp"><th class="row-label">윗등급 차</th></tr>
-                    <tr id="rowDiffDown"><th class="row-label">아랫등급 차</th></tr>
+                    <tr id="rowUnit" class="row-unit"><th class="row-label">학점</th></tr>
+                    <tr id="rowScore" class="row-score"><th class="row-label">원점수</th></tr>
+                    <tr id="rowRank" class="row-rank"><th class="row-label">석차</th></tr>
+                    <tr id="rowPercent" class="row-percent"><th class="row-label">상위%</th></tr>
+                    <tr id="rowGrade" class="row-grade" style="font-weight: bold;"><th class="row-label">등급</th></tr>
+                    <tr id="rowDiffUp" class="row-diff-up"><th class="row-label">윗등급 차</th></tr>
+                    <tr id="rowDiffDown" class="row-diff-down"><th class="row-label">아랫등급 차</th></tr>
                 </tbody>
             </table>
             </div>
@@ -4137,18 +4137,18 @@
             <div class="report-block report-block-maxcut">
             <h3><span class="report-h3-label">최고 점수 및 등급 컷 (5등급제, <span class="total-count">-</span>명)</span></h3>
             <div class="report-panel">
-            <table id="maxCutTable">
+            <table id="maxCutTable" class="max-cut-table">
                 <thead>
                     <tr id="maxCutTableHead"><th class="row-label">구분</th></tr>
                 </thead>
                 <tbody>
-                    <tr id="rowAvg"><th class="row-label">평균</th></tr>
-                    <tr id="rowStd"><th class="row-label">표준편차</th></tr>
-                    <tr id="rowMax"><th class="row-label">최고 점수</th></tr>
-                    <tr id="rowCut1"><th class="row-label">1등급 컷</th></tr>
-                    <tr id="rowCut2"><th class="row-label">2등급 컷</th></tr>
-                    <tr id="rowCut3"><th class="row-label">3등급 컷</th></tr>
-                    <tr id="rowCut4"><th class="row-label">4등급 컷</th></tr>
+                    <tr id="rowAvg" class="row-avg"><th class="row-label">평균</th></tr>
+                    <tr id="rowStd" class="row-std"><th class="row-label">표준편차</th></tr>
+                    <tr id="rowMax" class="row-max"><th class="row-label">최고 점수</th></tr>
+                    <tr id="rowCut1" class="row-cut1"><th class="row-label">1등급 컷</th></tr>
+                    <tr id="rowCut2" class="row-cut2"><th class="row-label">2등급 컷</th></tr>
+                    <tr id="rowCut3" class="row-cut3"><th class="row-label">3등급 컷</th></tr>
+                    <tr id="rowCut4" class="row-cut4"><th class="row-label">4등급 컷</th></tr>
                 </tbody>
             </table>
             </div>
@@ -4195,12 +4195,12 @@
                     <p class="page-doc-meta">
                         <span class="page-doc-school js-school-name">남악고등학교</span>
                     </p>
-                    <h1 id="distPageTitle">학생의 바로 위·아래 점수 분포 (10구간)</h1>
+                    <h1 id="distPageTitle" class="dist-page-title">학생의 바로 위·아래 점수 분포 (10구간)</h1>
                 </div>
             </div>
             <p id="distTableNote" class="dist-table-note">(※ 동일 점수는 괄호 안 인원으로 표시 · 아래 작은 숫자는 내 점수와의 차이)</p>
             <div class="report-panel">
-            <table id="distributionTable">
+            <table id="distributionTable" class="dist-table">
                 <thead>
                     <tr id="distTableHead"><th class="row-label" style="width: 12%;">구분</th></tr>
                 </thead>
