@@ -424,7 +424,7 @@
             --upload-panel-border: var(--school-border);
             --upload-panel-accent: var(--school-navy);
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             align-items: stretch;
             gap: var(--space-3);
             width: 100%;
@@ -729,16 +729,6 @@
             text-decoration: underline;
             text-decoration-color: rgba(30, 58, 95, 0.28);
             text-underline-offset: 2px;
-        }
-        @media (max-width: 720px) {
-            .upload-row {
-                grid-template-columns: 1fr;
-            }
-            .upload-box,
-            .upload-guide-box {
-                width: 100%;
-                max-width: none;
-            }
         }
         .upload-example-notice {
             width: 100%;
