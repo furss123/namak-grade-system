@@ -2006,6 +2006,25 @@
         .report-wrapper { display: none; margin-top: 24px; page-break-after: always; }
         .report-wrapper:last-child { page-break-after: auto; }
 
+        /* 보고서 페이지: 화면 테마와 무관하게 항상 라이트(인쇄·PDF용 종이색) */
+        .page,
+        #reportTemplate,
+        #printContainer {
+            color-scheme: light;
+            --theme-bg-page: #eef2f7;
+            --theme-bg-panel: #ffffff;
+            --theme-bg-muted: #f8fafc;
+            --theme-text: #1a2332;
+            --theme-text-muted: #64748b;
+            --theme-border: #d4dce8;
+            --theme-border-light: #e8edf4;
+            --theme-input-bg: #ffffff;
+            --theme-input-disabled: #f1f5f9;
+            --theme-accent-soft: #faf6eb;
+            --theme-query-card-bg: #fafbfc;
+            --theme-query-card-hover: #fff;
+            --theme-print-opt-checked: #f0f6fc;
+        }
         .page {
             width: 210mm; height: 297mm; min-height: 297mm; max-height: 297mm;
             margin: 0 auto; box-sizing: border-box;
@@ -2015,6 +2034,8 @@
             grid-template-rows: 3mm minmax(0, 1fr) var(--report-footer-h);
             grid-template-columns: 1fr;
             padding: 0;
+            color: #1a2332;
+            color-scheme: light;
         }
         .page-body {
             grid-row: 2;
@@ -2121,6 +2142,9 @@
         #printContainer .page { counter-increment: report-page; }
         #printContainer .page-footer-num::before {
             content: "- " counter(report-page) " -";
+        }
+        #printContainer .page-footer-num.is-stamped::before {
+            content: none !important;
         }
         .page-top-accent {
             grid-row: 1;
@@ -2382,8 +2406,20 @@
             text-align: center;
             white-space: nowrap;
         }
-        .page-1 .report-block thead th.row-label {
+        .page-1 .report-block thead th.row-label,
+        #printContainer .page-1 .report-block thead th.row-label,
+        #printContainer thead th.row-label,
+        .page-2 #distributionTable thead th.row-label,
+        #printContainer .page-2 #distributionTable thead th.row-label {
+            background: var(--school-navy-dark) !important;
+            background-color: var(--school-navy-dark) !important;
+            color: #fff !important;
             text-align: center;
+            border-color: #1a3352 !important;
+        }
+        .stats-table thead th.stats-head-corner {
+            background: var(--school-navy-dark);
+            color: #fff;
         }
         .page-1 .report-block tbody th.row-label {
             background: #f4f7fa;
@@ -3145,9 +3181,20 @@
         #printContainer th.row-label,
         #printContainer td.row-label {
             background-color: #f1f5f9;
+            color: #1a2332;
             width: 90px;
             font-weight: bold;
             text-align: center;
+        }
+        /* 머리칸(구분/과목): 남색 헤더와 동일 — 일반 .row-label 회색 규칙을 덮음 */
+        thead th.row-label,
+        .page thead th.row-label,
+        #printContainer thead th.row-label,
+        #reportTemplate thead th.row-label {
+            background: var(--school-navy-dark) !important;
+            background-color: var(--school-navy-dark) !important;
+            color: #fff !important;
+            border-color: #1a3352 !important;
         }
         .symbol-up { color: var(--school-danger); font-weight: bold; font-size: var(--text-md); width: 60px; }
         .symbol-down { color: var(--school-info); font-weight: bold; font-size: var(--text-md); width: 60px; }
@@ -7695,19 +7742,40 @@ function getJsPdfConstructorForWindow(win) {
     return lib && lib.jsPDF;
 }
 
-/** html2canvas clone: scale/transform이 빈 캔버스를 만드는 경우 방지 */
-function pdfHtml2canvasOnclone(doc, clonedNode) {
+/** 캡처용 노드의 transform/배경만 정리 (라이브 documentElement는 건드리지 않음) */
+function pdfNormalizeCaptureNode(clonedNode) {
     if (!clonedNode || !clonedNode.querySelectorAll) return;
     clonedNode.querySelectorAll('.page-body').forEach(function(body) {
         body.classList.remove('page-body-fit');
         body.style.transform = 'none';
         body.style.width = '100%';
         body.style.maxWidth = '100%';
+        body.style.background = '#fff';
+        body.style.color = '#1a2332';
     });
     clonedNode.querySelectorAll('.page').forEach(function(page) {
         page.style.transform = 'none';
         page.style.overflow = 'visible';
+        page.style.background = '#fff';
+        page.style.color = '#1a2332';
+        page.style.colorScheme = 'light';
     });
+}
+
+/** html2canvas onclone: 복제 문서에 data-theme=light 강제 (다크 변수 유입 차단) */
+function pdfHtml2canvasOnclone(doc, clonedNode) {
+    if (doc && doc.documentElement && doc !== document) {
+        doc.documentElement.setAttribute('data-theme', 'light');
+        doc.documentElement.style.colorScheme = 'light';
+        doc.documentElement.style.background = '#fff';
+        doc.documentElement.style.color = '#1a2332';
+        if (doc.body) {
+            doc.body.style.background = '#fff';
+            doc.body.style.color = '#1a2332';
+            doc.body.style.colorScheme = 'light';
+        }
+    }
+    pdfNormalizeCaptureNode(clonedNode || (doc && doc.body));
 }
 
 function getPdfPageCaptureSize(pageEl) {
@@ -7767,19 +7835,23 @@ function getPdfCaptureSandbox(targetDoc) {
     return sandbox;
 }
 
+function stampPdfPageNumberOnClone(clone, pageIndex) {
+    if (!clone || !clone.querySelectorAll) return;
+    const label = '- ' + (Number(pageIndex) + 1) + ' -';
+    clone.querySelectorAll('.page-footer-num').forEach(function(el) {
+        el.textContent = label;
+        el.classList.add('is-stamped');
+    });
+}
+
 /** html2canvas용: 화면 밖 샌드박스에 클론 배치 (본문 UI는 그대로 유지) */
-function createPdfCaptureClone(pageEl, captureW, captureH, targetDoc) {
+function createPdfCaptureClone(pageEl, captureW, captureH, targetDoc, pageIndex) {
     const doc = targetDoc || pageEl.ownerDocument || document;
     const clone = pageEl.ownerDocument === doc
         ? pageEl.cloneNode(true)
         : doc.importNode(pageEl, true);
-    pdfHtml2canvasOnclone(doc, clone);
-    clone.querySelectorAll('.page-body').forEach(function(body) {
-        body.classList.remove('page-body-fit');
-        body.style.transform = 'none';
-        body.style.width = '100%';
-        body.style.maxWidth = '100%';
-    });
+    pdfNormalizeCaptureNode(clone);
+    if (pageIndex != null) stampPdfPageNumberOnClone(clone, pageIndex);
     clone.style.cssText = [
         'position:absolute',
         'left:0',
@@ -7797,7 +7869,9 @@ function createPdfCaptureClone(pageEl, captureW, captureH, targetDoc) {
         'border:none',
         'display:grid',
         'visibility:visible',
-        'opacity:1'
+        'opacity:1',
+        'color:#1a2332',
+        'color-scheme:light'
     ].join(';');
     getPdfCaptureSandbox(doc).appendChild(clone);
     if (clone.classList.contains('page')) {
@@ -7830,7 +7904,7 @@ async function capturePageToCanvas(pageEl, pageIndex, captureWin) {
     const captureDoc = (captureWin && !captureWin.closed && captureWin.document)
         ? captureWin.document
         : (pageEl.ownerDocument || document);
-    const clone = createPdfCaptureClone(pageEl, size.captureW, size.captureH, captureDoc);
+    const clone = createPdfCaptureClone(pageEl, size.captureW, size.captureH, captureDoc, pageIndex);
     const html2canvasFn = getHtml2canvasForWindow(captureWin);
     await yieldToPaint();
     await new Promise(function(resolve) { setTimeout(resolve, 40); });
