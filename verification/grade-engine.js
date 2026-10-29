@@ -147,14 +147,19 @@
                 gradeScores[processedGradesCache[s.id][subject].grade].push(s.score);
             });
 
+            const avgNum = allScoresOnly.reduce((a, b) => a + b, 0) / totalStudents;
+            const variancePop = allScoresOnly.reduce((sum, x) => sum + (x - avgNum) * (x - avgNum), 0) / totalStudents;
+            const stdPop = Math.sqrt(variancePop);
+
             subjectStatsCache[subject] = {
-                avg: (allScoresOnly.reduce((a, b) => a + b, 0) / totalStudents).toFixed(1),
-                max: Math.max(...allScoresOnly).toFixed(1),
-                min: Math.min(...allScoresOnly).toFixed(1),
-                cut1: gradeScores[1].length ? Math.min(...gradeScores[1]).toFixed(1) : '-',
-                cut2: gradeScores[2].length ? Math.min(...gradeScores[2]).toFixed(1) : '-',
-                cut3: gradeScores[3].length ? Math.min(...gradeScores[3]).toFixed(1) : '-',
-                cut4: gradeScores[4].length ? Math.min(...gradeScores[4]).toFixed(1) : '-',
+                avg: avgNum.toFixed(2),
+                std: stdPop.toFixed(2),
+                max: Math.max(...allScoresOnly).toFixed(2),
+                min: Math.min(...allScoresOnly).toFixed(2),
+                cut1: gradeScores[1].length ? Math.min(...gradeScores[1]).toFixed(2) : '-',
+                cut2: gradeScores[2].length ? Math.min(...gradeScores[2]).toFixed(2) : '-',
+                cut3: gradeScores[3].length ? Math.min(...gradeScores[3]).toFixed(2) : '-',
+                cut4: gradeScores[4].length ? Math.min(...gradeScores[4]).toFixed(2) : '-',
                 allScoresSorted: allScoresOnly,
             };
         });

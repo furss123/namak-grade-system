@@ -6939,24 +6939,24 @@ function populateTemplate(studentIdStr, options) {
         let diffUp = '-';
         let diffDown = '-';
         if (pData.grade === 1) {
-            diffDown = stats.cut1 !== '-' ? (pData.score - Number(stats.cut1)).toFixed(1) : '-';
+            diffDown = stats.cut1 !== '-' ? (pData.score - Number(stats.cut1)).toFixed(2) : '-';
         } else {
             let upperCut = 0;
             if (pData.grade === 2) {
                 upperCut = Number(stats.cut1);
-                diffDown = stats.cut2 !== '-' ? (pData.score - Number(stats.cut2)).toFixed(1) : '-';
+                diffDown = stats.cut2 !== '-' ? (pData.score - Number(stats.cut2)).toFixed(2) : '-';
             } else if (pData.grade === 3) {
                 upperCut = Number(stats.cut2);
-                diffDown = stats.cut3 !== '-' ? (pData.score - Number(stats.cut3)).toFixed(1) : '-';
+                diffDown = stats.cut3 !== '-' ? (pData.score - Number(stats.cut3)).toFixed(2) : '-';
             } else if (pData.grade === 4) {
                 upperCut = Number(stats.cut3);
-                diffDown = stats.cut4 !== '-' ? (pData.score - Number(stats.cut4)).toFixed(1) : '-';
+                diffDown = stats.cut4 !== '-' ? (pData.score - Number(stats.cut4)).toFixed(2) : '-';
             } else {
                 upperCut = Number(stats.cut4);
                 diffDown = '-';
             }
             if (upperCut > 0) {
-                diffUp = (upperCut - pData.score).toFixed(1);
+                diffUp = (upperCut - pData.score).toFixed(2);
             }
         }
 
@@ -8120,7 +8120,7 @@ function formatCutDisplay(value) {
     if (value == null || value === '' || value === '-') return '-';
     const n = Number(value);
     if (!Number.isFinite(n)) return String(value);
-    return n.toFixed(1);
+    return n.toFixed(2);
 }
 function formatParenCellHtml(text) {
     const raw = String(text == null ? '' : text);
