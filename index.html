@@ -3538,7 +3538,7 @@
                             <li>저장 시 <strong>보고서 형태 유지</strong> 체크 해제</li>
                             <li>반별 파일을 여러 개 선택해 한 번에 등록 가능</li>
                             <li>학번·이름·원점수 열이 있으면 자동 인식</li>
-                            <li><code>교과영역:과목명</code> 형식은 <strong>과목명</strong>만 표시 (예: 한국사2)</li>
+                            <li><code>교과영역:과목명</code> → <strong>:</strong> 이후 과목명을 그대로 사용 (예: 한국사2)</li>
                         </ul>
                         <div class="upload-template-card">
                             <div class="upload-template-card-icon" aria-hidden="true">
@@ -4349,12 +4349,14 @@ function loadDemoData() {
 
 function applyParsedStudentData(parsedData, fileName, options = {}) {
     if (!parsedData.length || !parsedData[0]['학번']) return false;
-    studentData = parsedData;
+    studentData = normalizeStudentsSubjectKeys(parsedData);
     isDemoData = !!options.isDemo;
     if (options.subjectUnitMap && Object.keys(options.subjectUnitMap).length) {
-        subjectUnitMap = options.subjectUnitMap;
+        subjectUnitMap = normalizeSubjectUnitMapKeys(options.subjectUnitMap);
     } else if (!Object.keys(subjectUnitMap).length) {
         subjectUnitMap = buildDefaultSubjectUnits(getSubjects(studentData[0]), true);
+    } else {
+        subjectUnitMap = normalizeSubjectUnitMapKeys(subjectUnitMap);
     }
     isFileUploaded = true;
     processAllGrades();
@@ -4525,21 +4527,57 @@ function buildDefaultSubjectUnits(subjects, useSchoolDefaults) {
     return map;
 }
 
-/** 나이스 "사회(역사/도덕포함):한국사2" → "한국사2" */
+/** 나이스 "사회(역사/도덕포함):한국사2" → "한국사2" (: 이후 문자열을 그대로 사용) */
 function stripSubjectAreaPrefix(name) {
     const s = trimCell(name);
     if (!s) return '';
-    const m = s.match(/^[^:：]+[:：]\s*(.+)$/);
-    return m ? trimCell(m[1]) : s;
+    const idx = Math.max(s.indexOf(':'), s.indexOf('：'));
+    if (idx < 0) return s;
+    return trimCell(s.slice(idx + 1));
 }
 
 /** 헤더 "국어(4)", "수학 [3]", "국어:공통국어2" → 과목명 + 단위수 */
 function splitHeaderSubjectUnit(header) {
     const h = normalizeHeaderKey(header);
     if (!h) return { subject: '', unit: null };
-    const m = h.match(/^(.+?)\s*[\[(（]\s*(\d+(?:\.\d+)?)\s*[\])）]\s*$/);
-    if (m) return { subject: stripSubjectAreaPrefix(m[1]), unit: Number(m[2]) };
-    return { subject: stripSubjectAreaPrefix(h), unit: null };
+    // 교과영역:과목명 → 과목명 먼저 확정한 뒤, 끝에 붙은 단위수만 분리
+    const base = stripSubjectAreaPrefix(h);
+    const m = base.match(/^(.+?)\s*[\[(（]\s*(\d+(?:\.\d+)?)\s*[\])）]\s*$/);
+    if (m) return { subject: trimCell(m[1]), unit: Number(m[2]) };
+    return { subject: base, unit: null };
+}
+
+/** 학생 객체 키에 남은 "교과:과목"을 : 이후 과목명 그대로 정규화 */
+function normalizeStudentSubjectKeys(student) {
+    if (!student || typeof student !== 'object') return student;
+    const out = {};
+    Object.keys(student).forEach(function(key) {
+        if (UPLOAD_META_KEYS.has(key)) {
+            out[key] = student[key];
+            return;
+        }
+        const subject = splitHeaderSubjectUnit(key).subject || key;
+        if (!subject || isExcludedSubjectKey(subject)) return;
+        if (!Object.prototype.hasOwnProperty.call(out, subject)
+            || hasCellValue(student[key]) || student[key] === 0) {
+            out[subject] = student[key];
+        }
+    });
+    return out;
+}
+
+function normalizeStudentsSubjectKeys(list) {
+    return (list || []).map(normalizeStudentSubjectKeys);
+}
+
+function normalizeSubjectUnitMapKeys(map) {
+    const out = {};
+    Object.keys(map || {}).forEach(function(key) {
+        const subject = splitHeaderSubjectUnit(key).subject || key;
+        if (!subject || isExcludedSubjectKey(subject)) return;
+        out[subject] = map[key];
+    });
+    return out;
 }
 
 function buildCanonicalHeaders(rawHeaders) {
