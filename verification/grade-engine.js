@@ -12,16 +12,22 @@
     const META_KEYS = ['학번', '이름', '학년', '반', '번호', '단위수', '합계', '총점', '총계'];
 
     const SUBJECT_ORDER = [
-        '국어', '공통국어 1',
-        '수학', '공통수학 1',
-        '영어', '공통영어 1',
-        '한국사', '한국사 1',
-        '통합사회', '통합사회 1',
-        '통합과학', '통합과학 1',
+        '국어', '공통국어 1', '공통국어2', '공통국어 2',
+        '수학', '공통수학 1', '공통수학2', '공통수학 2',
+        '영어', '공통영어 1', '공통영어2', '공통영어 2',
+        '한국사', '한국사 1', '한국사2', '한국사 2',
+        '통합사회', '통합사회 1', '통합사회2', '통합사회 2',
+        '통합과학', '통합과학 1', '통합과학2', '통합과학 2',
     ];
 
+    function isExcludedSubjectKey(key) {
+        if (!key || META_KEYS.includes(key)) return true;
+        const n = String(key).replace(/\s+/g, '');
+        return /합계|총점|총계/.test(n);
+    }
+
     function getSubjects(student) {
-        const subjects = Object.keys(student).filter((k) => !META_KEYS.includes(k));
+        const subjects = Object.keys(student).filter((k) => !isExcludedSubjectKey(k));
         return subjects.sort((a, b) => {
             let idxA = SUBJECT_ORDER.indexOf(a);
             let idxB = SUBJECT_ORDER.indexOf(b);
@@ -156,5 +162,5 @@
         return { processedGradesCache, subjectStatsCache, cutLimits };
     }
 
-    return { getSubjects, roundScore, grade9FromIntermediatePercent, processAllGrades, META_KEYS };
+    return { getSubjects, isExcludedSubjectKey, roundScore, grade9FromIntermediatePercent, processAllGrades, META_KEYS };
 });

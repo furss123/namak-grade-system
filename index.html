@@ -561,6 +561,46 @@
             font-weight: 800;
             color: var(--school-navy-dark);
         }
+        .upload-template-download {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            padding: 9px 14px;
+            border-radius: 8px;
+            border: 1px solid #c5d4e4;
+            background: #fff;
+            color: var(--school-navy-dark);
+            font-size: var(--upload-body-font);
+            font-weight: 700;
+            line-height: 1.25;
+            text-decoration: none;
+            box-shadow: 0 1px 0 rgba(15, 36, 64, 0.04);
+            transition: background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+        .upload-template-download:hover {
+            background: #f0f6fc;
+            border-color: var(--school-navy-light);
+            box-shadow: 0 0 0 3px rgba(61, 107, 158, 0.08);
+        }
+        .upload-template-download:focus-visible {
+            outline: 2px solid var(--school-navy-light);
+            outline-offset: 2px;
+        }
+        .upload-template-download svg {
+            width: 16px;
+            height: 16px;
+            flex-shrink: 0;
+        }
+        html[data-theme="dark"] .upload-template-download {
+            background: #1e293b;
+            border-color: #475569;
+            color: #e2e8f0;
+        }
+        html[data-theme="dark"] .upload-template-download:hover {
+            background: #334155;
+            border-color: #64748b;
+        }
         .upload-box:hover {
             border-color: var(--school-navy-light);
             background: linear-gradient(155deg, #f5f9fd 0%, #e8f0f8 100%);
@@ -2105,15 +2145,22 @@
         .page-1 .report-grade-goal-panel .report-grade-goal-manual-note {
             flex-shrink: 0;
             margin: 0;
+            padding: 1.6mm 2.8mm;
             border-top: 1px solid #e8edf4;
             border-radius: 0 0 5px 5px;
+        }
+        .page-1 .report-grade-goal-panel .report-grade-goal-manual-note .score-grade-manual-row {
+            column-gap: 3.5mm;
         }
         .page-1 .report-grade-goal-panel .report-grade-goal-manual-note .score-grade-manual-row-grade .score-grade-manual-desc,
         .page-1 .report-grade-goal-panel .report-grade-goal-manual-note .score-grade-manual-row-goal .score-grade-manual-desc {
             flex-direction: row;
             flex-wrap: nowrap;
             align-items: center;
-            gap: 1.2mm;
+            gap: 1.8mm;
+        }
+        .page-1 .report-grade-goal-panel .report-grade-goal-manual-note .score-grade-manual-label {
+            margin-right: 0.4mm;
         }
         .page-1 .report-grade-goal-panel .report-grade-goal-manual-note .score-grade-manual-row-grade .score-grade-manual-item,
         .page-1 .report-grade-goal-panel .report-grade-goal-manual-note .score-grade-manual-row-goal .score-grade-manual-item {
@@ -2316,12 +2363,12 @@
         }
         .page-1 .score-grade-manual-block {
             margin: 0;
-            padding: 1.2mm 2.5mm;
+            padding: 1.6mm 3mm;
             width: 100%;
             box-sizing: border-box;
             font-size: var(--rpt-font-caption);
             font-weight: 600;
-            line-height: 1.4;
+            line-height: 1.45;
             color: var(--school-navy-dark);
             background: #f8fafc;
             border: 1px solid #e8edf4;
@@ -2330,14 +2377,14 @@
         .page-1 .score-grade-manual-row {
             display: grid;
             grid-template-columns: max-content minmax(0, 1fr);
-            align-items: start;
-            column-gap: 3mm;
+            align-items: center;
+            column-gap: 3.5mm;
             row-gap: 1.2mm;
             min-height: min-content;
         }
         .page-1 .score-grade-manual-row + .score-grade-manual-row {
-            margin-top: 0.8mm;
-            padding-top: 0.8mm;
+            margin-top: 1.2mm;
+            padding-top: 1.2mm;
             border-top: 1px solid #e8edf4;
         }
         .page-1 .score-grade-manual-block-oneline .score-grade-manual-flow {
@@ -2345,17 +2392,17 @@
             flex-wrap: wrap;
             align-items: center;
             justify-content: center;
-            gap: 1.2mm 2.4mm;
+            gap: 2mm 3.5mm;
             min-width: 0;
         }
         .page-1 .score-grade-manual-block-oneline .score-grade-manual-seg {
             display: inline-flex;
             flex-wrap: nowrap;
             align-items: center;
-            gap: 1.6mm;
+            gap: 2.8mm;
             min-width: 0;
             grid-template-columns: none;
-            column-gap: 0;
+            column-gap: 2.8mm;
             row-gap: 0;
         }
         .page-1 .score-grade-manual-block-oneline .score-grade-manual-seg + .score-grade-manual-seg {
@@ -2366,14 +2413,15 @@
         .page-1 .score-grade-manual-block-oneline .score-grade-manual-sep {
             flex-shrink: 0;
             width: 1px;
-            height: 1.1em;
+            height: 1.15em;
+            margin: 0 0.6mm;
             background: #d4dde8;
         }
         .page-1 .score-grade-manual-label {
             grid-column: 1;
             flex-shrink: 0;
-            align-self: start;
-            padding: 0.5mm 2mm;
+            align-self: center;
+            padding: 0.7mm 2.4mm;
             border-radius: 3px;
             background: var(--school-navy-dark);
             color: #fff;
@@ -2386,20 +2434,23 @@
         .page-1 .score-grade-manual-block-oneline .score-grade-manual-label {
             grid-column: auto;
             align-self: center;
+            margin-right: 0.4mm;
         }
         .page-1 .score-grade-manual-desc {
             grid-column: 2;
             display: flex;
             flex-wrap: wrap;
-            align-items: flex-start;
+            align-items: center;
             gap: 1.2mm 3mm;
             min-width: 0;
         }
         .page-1 .score-grade-manual-block-oneline .score-grade-manual-desc {
             grid-column: auto;
-            display: inline;
+            display: inline-flex;
             flex-wrap: nowrap;
+            align-items: center;
             gap: 0;
+            margin-left: 0.2mm;
         }
         .page-1 .score-grade-manual-item {
             color: var(--school-muted);
@@ -2407,14 +2458,20 @@
             line-height: 1.45;
             word-break: keep-all;
             overflow-wrap: anywhere;
+            letter-spacing: 0.01em;
         }
         .page-1 .score-grade-manual-block-oneline .score-grade-manual-item {
             overflow-wrap: normal;
             white-space: nowrap;
+            padding-left: 0.3mm;
         }
         .page-1 .score-grade-manual-item strong {
             color: var(--school-navy);
             font-weight: 700;
+            margin: 0 0.15em;
+        }
+        .page-1 .score-grade-manual-item strong:first-child {
+            margin-left: 0;
         }
         .page-1 .score-grade-manual-row-grade .score-grade-manual-desc {
             flex-direction: column;
@@ -2825,6 +2882,16 @@
                             <li>학번·이름·원점수 열이 있으면 자동 인식</li>
                             <li><code>교과영역:과목명</code> 형식은 <strong>과목명</strong>만 표시 (예: 한국사2)</li>
                         </ul>
+                        <a class="upload-template-download"
+                           href="assets/grade-upload-template.xlsx"
+                           download="남악고_1학년_성적입력양식.xlsx"
+                           target="_blank"
+                           rel="noopener">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                            </svg>
+                            성적 입력 양식 다운로드
+                        </a>
                     </div>
                 </div>
             </div>
@@ -3560,7 +3627,7 @@ function buildCanonicalHeaders(rawHeaders) {
         }
         const split = splitHeaderSubjectUnit(key);
         const subject = split.subject || key;
-        if (NON_SUBJECT_HEADERS.has(subject)) {
+        if (isExcludedSubjectKey(subject) || NON_SUBJECT_HEADERS.has(subject)) {
             headers.push('');
             return;
         }
@@ -3620,15 +3687,31 @@ function downloadGradeTemplate(event) {
 
 function getSubjects(student) {
     return GradeEngine.getSubjects(student).filter(function(subject) {
-        return subject && !NON_SUBJECT_HEADERS.has(subject) && !/^합계$|^총점$|^총계$/i.test(subject);
+        return subject && !isExcludedSubjectKey(subject);
     });
 }
 
 /** 등급 산출 — verification/grade-engine.js (검증 세트와 동일) */
 function processAllGrades() {
+    stripExcludedSubjectKeysFromStudents(studentData);
+    if (subjectUnitMap && typeof subjectUnitMap === 'object') {
+        Object.keys(subjectUnitMap).forEach(function(key) {
+            if (isExcludedSubjectKey(key)) delete subjectUnitMap[key];
+        });
+    }
     const result = GradeEngine.processAllGrades(studentData);
     processedGradesCache = result.processedGradesCache;
     subjectStatsCache = result.subjectStatsCache;
+    Object.keys(subjectStatsCache || {}).forEach(function(key) {
+        if (isExcludedSubjectKey(key)) delete subjectStatsCache[key];
+    });
+    Object.keys(processedGradesCache || {}).forEach(function(sid) {
+        const grades = processedGradesCache[sid];
+        if (!grades) return;
+        Object.keys(grades).forEach(function(key) {
+            if (isExcludedSubjectKey(key)) delete grades[key];
+        });
+    });
     refreshClassSelect();
 }
 
@@ -4022,6 +4105,25 @@ const META_HEADER_ALIASES = {
     '성명': '이름', '학생명': '이름', '성명(한글)': '이름', '성명(한자)': '이름'
 };
 
+/** 합계·총점 등 — 등급컷/과목별 성적/한눈에 보기 과목으로 쓰지 않음 */
+function isExcludedSubjectKey(key) {
+    if (!key) return true;
+    if (UPLOAD_META_KEYS.has(key) || NON_SUBJECT_HEADERS.has(key)) return true;
+    if (typeof GradeEngine !== 'undefined' && GradeEngine.isExcludedSubjectKey) {
+        return GradeEngine.isExcludedSubjectKey(key);
+    }
+    const n = String(key).replace(/\s+/g, '');
+    return /합계|총점|총계/.test(n);
+}
+
+function stripExcludedSubjectKeysFromStudents(list) {
+    (list || []).forEach(function(student) {
+        Object.keys(student || {}).forEach(function(key) {
+            if (isExcludedSubjectKey(key) && !UPLOAD_META_KEYS.has(key)) delete student[key];
+        });
+    });
+}
+
 function trimCell(value) {
     if (value === null || value === undefined) return '';
     return String(value).trim();
@@ -4071,7 +4173,7 @@ function neisNormalizeRowCells(cells, sheetName, sheetContext) {
         if (!hasCellValue(out['학년']) && sheetContext.grade != null) out['학년'] = sheetContext.grade;
     }
     const subject = inferSubjectFromSheetName(sheetName);
-    if (subject && hasCellValue(out['원점수']) && !hasCellValue(out[subject])) {
+    if (subject && !isExcludedSubjectKey(subject) && hasCellValue(out['원점수']) && !hasCellValue(out[subject])) {
         out[subject] = out['원점수'];
     }
     if (subject && Object.prototype.hasOwnProperty.call(out, '원점수')) {
@@ -4134,7 +4236,7 @@ function buildStudentFromCells(cells, defaultGrade) {
     };
 
     Object.keys(cells).forEach((key) => {
-        if (!key || UPLOAD_META_KEYS.has(key) || NON_SUBJECT_HEADERS.has(key)) return;
+        if (!key || UPLOAD_META_KEYS.has(key) || isExcludedSubjectKey(key)) return;
         if (hasCellValue(cells[key]) || cells[key] === 0) student[key] = cells[key];
     });
 
@@ -4234,7 +4336,7 @@ function parseUnitDefinitionSheet(worksheet) {
         const c1 = trimCell(row[1]);
         if (!c0 || /^(교과|과목|subject|단위)/i.test(c0)) continue;
         const subject = stripSubjectAreaPrefix(c0);
-        if (!subject) continue;
+        if (!subject || isExcludedSubjectKey(subject)) continue;
         const n = Number(c1);
         if (!Number.isNaN(n) && n > 0 && n <= 20) units[subject] = n;
     }
@@ -4263,7 +4365,7 @@ function parseHeaderRow(rawHeaderRow) {
     const rawHeaders = (rawHeaderRow || []).map((c) => normalizeHeaderKey(c));
     const { headers, headerUnits } = buildCanonicalHeaders(rawHeaders);
     const metaHeaders = headers.filter((h) => UPLOAD_META_KEYS.has(h));
-    const subjectHeaders = headers.filter((h) => h && !UPLOAD_META_KEYS.has(h));
+    const subjectHeaders = headers.filter((h) => h && !UPLOAD_META_KEYS.has(h) && !isExcludedSubjectKey(h));
     return { rawHeaders, headers, metaHeaders, subjectHeaders, headerUnits };
 }
 
@@ -5540,12 +5642,14 @@ function populateTemplate(studentIdStr, options) {
     const subjectRows = [];
 
     subjects.forEach(subject => {
+        if (isExcludedSubjectKey(subject)) return;
         appendTh('mainTableHead', subject);
         appendTh('maxCutTableHead', subject);
         appendTh('distTableHead', subject);
 
-        const pData = processedGradesCache[studentIdStr][subject];
+        const pData = processedGradesCache[studentIdStr] && processedGradesCache[studentIdStr][subject];
         const stats = subjectStatsCache[subject];
+        if (!pData || !stats) return;
         const unit = getSubjectUnit(subject);
         const goal = computeSubjectGoal(pData, stats);
 
