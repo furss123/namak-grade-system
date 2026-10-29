@@ -2082,9 +2082,9 @@
             grid-template-columns: 14mm 1fr 14mm;
             align-items: center;
             column-gap: 2mm;
-            min-height: 15mm;
+            min-height: 16.5mm;
             margin: 0;
-            padding: 0 0 2mm 0;
+            padding: 0 0 2.2mm 0;
             border-bottom: 2px solid var(--school-navy-dark);
             box-sizing: border-box;
         }
@@ -2099,17 +2099,57 @@
             border: 1px solid #e2e8f0;
             box-shadow: 0 1px 3px rgba(15, 36, 64, 0.08);
         }
-        .page-doc-header h1 {
+        .page-doc-header-text {
             grid-column: 2;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 1.1mm;
+            text-align: center;
+        }
+        .page-doc-meta {
+            display: inline-flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 1.4mm;
+            max-width: 100%;
+            margin: 0;
+            font-size: calc(9px + 1.2pt);
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -0.01em;
+            color: var(--school-navy);
+        }
+        .page-doc-school {
+            margin: 0;
+            font-weight: 800;
+            color: var(--school-navy-dark);
+            word-break: keep-all;
+        }
+        .page-doc-exam {
+            margin: 0;
+            font-weight: 700;
+            color: var(--school-navy);
+            word-break: keep-all;
+        }
+        .page-doc-meta-sep {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+        .page-doc-header h1 {
             margin: 0;
             padding: 0;
             border: none;
             text-align: center;
-            font-size: calc(16px + 5.5pt);
+            font-size: calc(15px + 5pt);
             font-weight: 700;
             color: var(--school-navy-dark);
             letter-spacing: -0.02em;
-            line-height: 1.25;
+            line-height: 1.22;
+            word-break: keep-all;
         }
         .page-doc-header::after {
             content: '';
@@ -3764,7 +3804,14 @@
             <section class="report-zone report-zone-head">
             <div class="page-doc-header">
                 <img src="assets/namak-logo.png" alt="" class="page-logo js-school-logo" width="56" height="56">
-                <h1 class="js-exam-report-title">2026학년도 2학기 1차고사 결과 보고서</h1>
+                <div class="page-doc-header-text">
+                    <p class="page-doc-meta">
+                        <span class="page-doc-school js-school-name">남악고등학교</span>
+                        <span class="page-doc-meta-sep" aria-hidden="true">·</span>
+                        <span class="page-doc-exam js-exam-label">2학기 1차고사</span>
+                    </p>
+                    <h1 class="js-exam-report-title">2026학년도 2학기 1차고사 결과 보고서</h1>
+                </div>
             </div>
             <div class="report-panel report-panel-student">
             <div class="student-info">
@@ -3885,7 +3932,14 @@
             <section class="report-zone report-zone-dist">
             <div class="page-doc-header">
                 <img src="assets/namak-logo.png" alt="" class="page-logo js-school-logo" width="56" height="56">
-                <h1 id="distPageTitle">상·하위 10명 성적 분포</h1>
+                <div class="page-doc-header-text">
+                    <p class="page-doc-meta">
+                        <span class="page-doc-school js-school-name">남악고등학교</span>
+                        <span class="page-doc-meta-sep" aria-hidden="true">·</span>
+                        <span class="page-doc-exam js-exam-label">2학기 1차고사</span>
+                    </p>
+                    <h1 id="distPageTitle">상·하위 10명 성적 분포</h1>
+                </div>
             </div>
             <p id="distTableNote" class="dist-table-note">(※ 동일 점수는 괄호 안 인원으로 표시)</p>
             <div class="report-panel">
@@ -3967,7 +4021,7 @@
     </footer>
 
 <script>
-const APP_VERSION = '1.4.0';
+const APP_VERSION = '1.4.1';
 const APP_RELEASE_DATE = '2026-10-29';
 const THEME_KEY = 'namak-theme';
 
@@ -4164,6 +4218,9 @@ function applyExamInfo(semester, examName) {
     });
     document.querySelectorAll('.js-exam-stats-label').forEach(function(el) {
         el.textContent = getExamStatsLabel();
+    });
+    document.querySelectorAll('.js-exam-label').forEach(function(el) {
+        el.textContent = formatExamLabel(currentExamSemester, currentExamName);
     });
     syncExamPreviewLabel();
 }
