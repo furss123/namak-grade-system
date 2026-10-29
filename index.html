@@ -1224,6 +1224,54 @@
             text-decoration-color: rgba(30, 58, 95, 0.28);
             text-underline-offset: 2px;
         }
+        .upload-warnings {
+            margin: 10px 0 0;
+            padding: 0;
+            border: 1px solid #f0d4a8;
+            border-left: 3px solid #c2410c;
+            border-radius: var(--radius-sm);
+            background: #fffaf3;
+            color: var(--school-text);
+        }
+        .upload-warnings[hidden] { display: none !important; }
+        .upload-warnings-summary {
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            font-size: var(--text-sm);
+            font-weight: 650;
+            color: #9a3412;
+        }
+        .upload-warnings-summary::-webkit-details-marker { display: none; }
+        .upload-warnings-count {
+            font-weight: 700;
+            color: #c2410c;
+        }
+        .upload-warnings-list {
+            margin: 0;
+            padding: 0 12px 10px 28px;
+            max-height: 180px;
+            overflow: auto;
+            font-size: var(--text-xs);
+            line-height: 1.45;
+            color: #7c2d12;
+        }
+        .upload-warnings-list li { margin: 0 0 4px; }
+        html[data-theme="dark"] .upload-warnings {
+            background: rgba(194, 65, 12, 0.12);
+            border-color: #9a3412;
+            color: var(--theme-text);
+        }
+        html[data-theme="dark"] .upload-warnings-summary,
+        html[data-theme="dark"] .upload-warnings-list {
+            color: #fdba74;
+        }
+        html[data-theme="dark"] .upload-warnings-count {
+            color: #fb923c;
+        }
         .upload-example-notice {
             width: 100%;
             margin: var(--space-3) 0 0;
@@ -3678,6 +3726,13 @@
                     </div>
                 </div>
             </div>
+            <details class="upload-warnings" id="uploadWarnings" hidden>
+                <summary class="upload-warnings-summary">
+                    <span class="upload-warnings-title">데이터 검증 경고</span>
+                    <span class="upload-warnings-count" id="uploadWarningsCount"></span>
+                </summary>
+                <ul class="upload-warnings-list" id="uploadWarningsList"></ul>
+            </details>
             <p class="grade-privacy-note" role="note">
                 <strong>성적 파일은 저장되지 않습니다.</strong>
                 업로드한 엑셀 원본은 서버·브라우저에 보관하지 않습니다. 저장되는 항목은 위 「시험 정보」뿐입니다.
@@ -4543,10 +4598,87 @@ function loadDemoData() {
     isDemoData = true;
     processAllGrades();
     setUploadState('예시 데이터 적용됨', true, `가상 예시 (${studentData.length}명 · 1~10반)`);
+    clearUploadScoreWarnings();
     displayGeneralStats();
     clearPrintContainer();
     hidePrintFloatActions();
     saveSessionData('가상 예시', true);
+}
+
+function scoreHasExcessDecimals(raw) {
+    if (typeof raw === 'number') {
+        if (!Number.isFinite(raw)) return false;
+        const rounded = Math.round(raw * 100) / 100;
+        return Math.abs(raw - rounded) > 1e-9;
+    }
+    const s = String(raw == null ? '' : raw).trim();
+    const m = s.match(/\.(\d+)/);
+    return !!(m && m[1].length > 2);
+}
+
+function isActualZeroScore(raw) {
+    if (raw === 0) return true;
+    const t = trimCell(raw);
+    return t === '0' || /^0\.0+$/.test(t);
+}
+
+/** 업로드 원점수 검증 (계산 규칙은 그대로, 경고만) — 실제 0점은 경고하지 않음 */
+function collectUploadScoreWarnings(students) {
+    if (!students || !students.length) return [];
+    const subjects = getSubjects(students[0]);
+    const warnings = [];
+    students.forEach(function(student) {
+        const ban = student['반'];
+        const num = student['번호'];
+        const name = student['이름'] || '';
+        const who = ban + '반 ' + num + '번 ' + name;
+        subjects.forEach(function(subject) {
+            const hasKey = Object.prototype.hasOwnProperty.call(student, subject);
+            const raw = hasKey ? student[subject] : undefined;
+            if (!hasKey || raw === '' || raw == null) {
+                warnings.push(who + ' · ' + subject + ' · 0점으로 처리됨');
+                return;
+            }
+            if (isActualZeroScore(raw)) return;
+            const trimmed = trimCell(raw);
+            const n = typeof raw === 'number' ? raw : Number(trimmed);
+            if (!Number.isFinite(n)) {
+                warnings.push(who + ' · ' + subject + ' · 0점으로 처리됨');
+                return;
+            }
+            if (n < 0 || n > 100) {
+                warnings.push(who + ' · ' + subject + ' · ' + trimmed + ' (0 미만 또는 100 초과)');
+            }
+            if (scoreHasExcessDecimals(raw)) {
+                warnings.push(who + ' · ' + subject + ' · ' + trimmed + ' (입력 오류 가능성)');
+            }
+        });
+    });
+    return warnings;
+}
+
+function renderUploadScoreWarnings(warnings) {
+    const box = document.getElementById('uploadWarnings');
+    const countEl = document.getElementById('uploadWarningsCount');
+    const listEl = document.getElementById('uploadWarningsList');
+    if (!box || !listEl) return;
+    listEl.innerHTML = '';
+    if (!warnings || !warnings.length) {
+        box.hidden = true;
+        if (countEl) countEl.textContent = '';
+        return;
+    }
+    box.hidden = false;
+    if (countEl) countEl.textContent = warnings.length + '건';
+    warnings.forEach(function(text) {
+        const li = document.createElement('li');
+        li.textContent = text;
+        listEl.appendChild(li);
+    });
+}
+
+function clearUploadScoreWarnings() {
+    renderUploadScoreWarnings([]);
 }
 
 function applyParsedStudentData(parsedData, fileName, options = {}) {
@@ -4563,6 +4695,8 @@ function applyParsedStudentData(parsedData, fileName, options = {}) {
     isFileUploaded = true;
     processAllGrades();
     setUploadState('성적 데이터 분석 완료!', true, fileName);
+    if (options.isDemo) clearUploadScoreWarnings();
+    else renderUploadScoreWarnings(collectUploadScoreWarnings(studentData));
     displayGeneralStats();
     if (options.resetUi) {
         clearPrintContainer();
@@ -5815,6 +5949,7 @@ async function processExcelFiles(fileList) {
             isFileUploaded = false;
             studentData = [];
             clearSessionData();
+            clearUploadScoreWarnings();
             const hint = failedNames.length
                 ? `인식된 파일이 없습니다 (${failedNames.length}개 실패)`
                 : '유효한 성적 데이터가 없거나 올바른 양식이 아닙니다.';
