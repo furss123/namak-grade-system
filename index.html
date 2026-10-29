@@ -2349,10 +2349,10 @@
             --p1-stack-gap: var(--report-zone-gap);
         }
         .page-1.p1-opt-count-1 .report-goal-layout {
-            --goal-panel-h: 58mm;
+            --goal-panel-h: 48mm;
         }
         .page-1.p1-opt-count-2 .report-goal-layout {
-            --goal-panel-h: 48mm;
+            --goal-panel-h: 40mm;
         }
         .page-1.p1-opt-count-1 .report-block-main,
         .page-1.p1-opt-count-1 .report-block-goal,
@@ -2576,8 +2576,7 @@
             font-feature-settings: "tnum" 1;
             letter-spacing: 0;
         }
-        .page-1 .report-block .cell-sub,
-        .page-1 .report-grade-goal-table .cell-sub {
+        .page-1 .report-block .cell-sub {
             display: block;
             margin-top: 0.15em;
             font-size: 0.72em;
@@ -2588,14 +2587,35 @@
             font-feature-settings: "tnum" 1;
             letter-spacing: 0;
         }
-        .page-1 .report-block .grade-cell,
-        .page-1 .report-grade-goal-table .grade-cell {
+        .page-1 .report-grade-goal-table .cell-sub {
+            display: inline;
+            margin-top: 0;
+            margin-left: 0.35em;
+            font-size: 0.78em;
+            font-weight: 600;
+            color: #94a3b8;
+            line-height: 1;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum" 1;
+            letter-spacing: 0;
+        }
+        .page-1 .report-block .grade-cell {
             display: inline-flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             gap: 0;
             line-height: 1.15;
+        }
+        .page-1 .report-grade-goal-table .grade-cell {
+            display: inline-flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            line-height: 1;
+            white-space: nowrap;
         }
         .page-1 .report-block .grade-badge,
         .page-1 .report-grade-goal-table .grade-badge {
@@ -2867,7 +2887,7 @@
         .page-2 .dist-student-name.dist-name-size-sm { font-size: calc(8.5px + 1.5pt); }
         .page-2 .dist-student-name.dist-name-size-xs { font-size: calc(7.5px + 1.5pt); }
         .page-1 .report-goal-layout {
-            --goal-panel-h: 52mm;
+            --goal-panel-h: 44mm;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 2.6mm;
@@ -2953,15 +2973,21 @@
         }
         .page-1 .report-grade-goal-table th,
         .page-1 .report-grade-goal-table td {
-            padding: var(--goal-cell-pad-y) 2px;
-            font-size: var(--goal-font-cell);
-            line-height: 1.35;
+            padding: 0.6mm 2px;
+            font-size: calc(var(--goal-font-cell) - 0.5pt);
+            line-height: 1.2;
             text-align: center;
             vertical-align: middle;
             border: 1px solid #e8edf4;
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum" 1;
             letter-spacing: 0;
+        }
+        .page-1 .report-grade-goal-table .grade-badge {
+            min-width: 1.35em;
+            padding: 0.05em 0.28em;
+            font-size: 0.95em;
+            line-height: 1.15;
         }
         .page-1 .report-grade-goal-table thead th {
             background: var(--school-navy-dark);
@@ -7553,8 +7579,9 @@ function syncGoalSideLayout(root) {
     });
 }
 
-function applyReportPageFitScale(pageEl) {
+function applyReportPageFitScale(pageEl, options) {
     if (!pageEl) return;
+    const opts = options || {};
     const body = pageEl.querySelector('.page-body');
     if (!body) return;
     body.classList.remove('page-body-fit');
@@ -7563,8 +7590,14 @@ function applyReportPageFitScale(pageEl) {
     body.style.zoom = '';
     body.style.width = '';
 
-    /* 화면 미리보기(#printContainer): 페이지 높이를 내용에 맞추므로 축소·클리핑 없음 */
-    if (pageEl.closest('#printContainer')) return;
+    /* 화면 미리보기(#printContainer, height:auto): 축소 생략.
+       인쇄·PDF 캡처(고정 A4)는 적용 */
+    const printRoot = pageEl.closest('#printContainer');
+    if (printRoot && !opts.force) {
+        const fixedCapture = document.body.classList.contains('pdf-exporting')
+            || printRoot.classList.contains('pdf-export-capture');
+        if (!fixedCapture) return;
+    }
 
     const accent = pageEl.querySelector('.page-top-accent');
     const footer = pageEl.querySelector('.page-footer');
@@ -8438,6 +8471,30 @@ document.getElementById('studentId').addEventListener('input', function() {
         if (!e.target.closest('#uploadBox')) e.preventDefault();
     });
 })();
+
+window.addEventListener('beforeprint', function() {
+    const printContainer = document.getElementById('printContainer');
+    if (!printContainer) return;
+    syncGoalSideLayout(printContainer);
+    printContainer.querySelectorAll('.page-1, .page-2').forEach(function(pageEl) {
+        applyReportPageFitScale(pageEl, { force: true });
+    });
+});
+window.addEventListener('afterprint', function() {
+    const printContainer = document.getElementById('printContainer');
+    if (!printContainer) return;
+    printContainer.querySelectorAll('.page-1, .page-2').forEach(function(pageEl) {
+        const body = pageEl.querySelector('.page-body');
+        if (body) {
+            body.classList.remove('page-body-fit');
+            body.style.transform = '';
+            body.style.zoom = '';
+            body.style.width = '';
+        }
+        pageEl.style.setProperty('--page-fit-scale', '1');
+    });
+    syncGoalSideLayout(printContainer);
+});
 
 (async function initAppOnLoad() {
     initThemeToggle();
