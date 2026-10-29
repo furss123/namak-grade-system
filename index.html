@@ -3927,8 +3927,7 @@ let currentSchoolLogo = DEFAULT_SCHOOL_LOGO;
 let pendingSchoolLogoDataUrl = null;
 
 function getAppFooterCopyrightHtml() {
-    const name = escapeSchoolText(currentSchoolName || DEFAULT_SCHOOL_NAME);
-    return '© 2026 ' + name + ' <span class="footer-credit-hyot">HyoT</span>. All rights reserved.';
+    return '© 2026 <span class="footer-credit-hyot">HyoT</span>. All rights reserved.';
 }
 
 function getAppFooterVersionText() {
