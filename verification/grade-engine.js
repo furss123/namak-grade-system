@@ -26,15 +26,30 @@
         return /합계|총점|총계/.test(n);
     }
 
-    function getSubjects(student) {
-        const subjects = Object.keys(student).filter((k) => !isExcludedSubjectKey(k));
-        return subjects.sort((a, b) => {
+    function sortSubjects(subjects) {
+        return subjects.slice().sort((a, b) => {
             let idxA = SUBJECT_ORDER.indexOf(a);
             let idxB = SUBJECT_ORDER.indexOf(b);
             if (idxA === -1) idxA = 999;
             if (idxB === -1) idxB = 999;
             return idxA - idxB;
         });
+    }
+
+    function getSubjects(student) {
+        const subjects = Object.keys(student || {}).filter((k) => !isExcludedSubjectKey(k));
+        return sortSubjects(subjects);
+    }
+
+    /** 전체 학생 과목 키 합집합 (첫 학생 빈칸으로 과목이 사라지지 않게) */
+    function getSubjectsUnion(students) {
+        const set = new Set();
+        (students || []).forEach(function (s) {
+            Object.keys(s || {}).forEach(function (k) {
+                if (!isExcludedSubjectKey(k)) set.add(k);
+            });
+        });
+        return sortSubjects(Array.from(set));
     }
 
     function roundScore(score) {
@@ -65,7 +80,7 @@
             return { processedGradesCache, subjectStatsCache, cutLimits: null };
         }
 
-        const subjects = getSubjects(studentData[0]);
+        const subjects = getSubjectsUnion(studentData);
         const totalStudents = studentData.length;
         const cutLimits = {
             N: totalStudents,
@@ -167,5 +182,13 @@
         return { processedGradesCache, subjectStatsCache, cutLimits };
     }
 
-    return { getSubjects, isExcludedSubjectKey, roundScore, grade9FromIntermediatePercent, processAllGrades, META_KEYS };
+    return {
+        getSubjects,
+        getSubjectsUnion,
+        isExcludedSubjectKey,
+        roundScore,
+        grade9FromIntermediatePercent,
+        processAllGrades,
+        META_KEYS,
+    };
 });

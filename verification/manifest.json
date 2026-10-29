@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-29T01:59:05.642Z",
+  "generatedAt": "2026-10-29T03:06:57.129Z",
   "cases": [
     {
       "id": "case01_basic_10",
@@ -82,6 +82,21 @@
       "fixtureJson": "fixtures/case06_intermediate_step34.fixture.json",
       "fixtureCsv": "fixtures/case06_intermediate_step34.csv",
       "expected": "expected/case06_intermediate_step34.json",
+      "N": 10,
+      "cutLimits": {
+        "N": 10,
+        "cut1": 1,
+        "cut2": 3,
+        "cut3": 7,
+        "cut4": 9
+      }
+    },
+    {
+      "id": "case07_first_student_blank_subject",
+      "title": "10명 · 첫 학생 한 과목 빈칸",
+      "fixtureJson": "fixtures/case07_first_student_blank_subject.fixture.json",
+      "fixtureCsv": "fixtures/case07_first_student_blank_subject.csv",
+      "expected": "expected/case07_first_student_blank_subject.json",
       "N": 10,
       "cutLimits": {
         "N": 10,

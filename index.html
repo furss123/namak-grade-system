@@ -4890,7 +4890,7 @@ function isActualZeroScore(raw) {
 /** 업로드 원점수 검증 (계산 규칙은 그대로, 경고만) — 실제 0점은 경고하지 않음 */
 function collectUploadScoreWarnings(students) {
     if (!students || !students.length) return [];
-    const subjects = getSubjects(students[0]);
+    const subjects = getAllSubjects(students);
     const warnings = [];
     students.forEach(function(student) {
         const ban = student['반'];
@@ -4953,7 +4953,7 @@ function applyParsedStudentData(parsedData, fileName, options = {}) {
     if (options.subjectUnitMap && Object.keys(options.subjectUnitMap).length) {
         subjectUnitMap = normalizeSubjectUnitMapKeys(options.subjectUnitMap);
     } else if (!Object.keys(subjectUnitMap).length) {
-        subjectUnitMap = buildDefaultSubjectUnits(getSubjects(studentData[0]), true);
+        subjectUnitMap = buildDefaultSubjectUnits(getAllSubjects(studentData), true);
     } else {
         subjectUnitMap = normalizeSubjectUnitMapKeys(subjectUnitMap);
     }
@@ -5269,6 +5269,21 @@ function getSubjects(student) {
     });
 }
 
+/** 전체 학생 과목 합집합 (첫 학생 빈칸으로 과목 누락 방지) */
+function getAllSubjects(students) {
+    const list = students && students.length ? students : studentData;
+    if (typeof GradeEngine.getSubjectsUnion === 'function') {
+        return GradeEngine.getSubjectsUnion(list).filter(function(subject) {
+            return subject && !isExcludedSubjectKey(subject);
+        });
+    }
+    const set = {};
+    (list || []).forEach(function(s) {
+        getSubjects(s).forEach(function(sub) { set[sub] = true; });
+    });
+    return Object.keys(set);
+}
+
 /** 등급 산출 — verification/grade-engine.js (검증 세트와 동일) */
 function processAllGrades() {
     stripExcludedSubjectKeysFromStudents(studentData);
@@ -5518,7 +5533,7 @@ function getStudentsInClass(classKey) {
 function displayGeneralStats() {
     if (studentData.length === 0) return;
     
-    const subjects = getSubjects(studentData[0]);
+    const subjects = getAllSubjects(studentData);
     
     document.getElementById('statsTableHead').innerHTML = '<th class="stats-head-corner">구분</th>';
     document.getElementById('statsRowUnit').innerHTML = '<td class="stats-row-label">학점</td>';
@@ -5676,7 +5691,7 @@ function restoreSessionData() {
         studentData = saved.studentData;
         subjectUnitMap = saved.subjectUnitMap && typeof saved.subjectUnitMap === 'object'
             ? saved.subjectUnitMap
-            : buildDefaultSubjectUnits(getSubjects(studentData[0]));
+            : buildDefaultSubjectUnits(getAllSubjects(studentData));
         isFileUploaded = true;
         isDemoData = !!saved.isDemoData;
         processAllGrades();
@@ -5906,7 +5921,7 @@ function extractSubjectUnitsFromCells(cells, subjectHeaders) {
 
 function finalizeSubjectUnitMap(students, parsedUnits, unitsExplicit) {
     if (!students.length) return {};
-    const subjects = getSubjects(students[0]);
+    const subjects = getAllSubjects(students);
     const map = { ...parsedUnits };
     subjects.forEach((s) => {
         if (map[s] == null || Number.isNaN(map[s])) {
@@ -7350,7 +7365,7 @@ function populateTemplate(studentIdStr, options) {
     const student = studentData.find(s => String(s['학번']) === studentIdStr);
     if (!student) return false;
 
-    const subjects = getSubjects(student);
+    const subjects = getAllSubjects(studentData);
     const totalStudents = studentData.length;
     const includeDistribution = opts.includeDistribution !== false;
 
