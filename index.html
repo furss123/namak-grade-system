@@ -1546,10 +1546,26 @@
             background: var(--theme-bg-panel);
             container-type: inline-size;
             container-name: stats-wrap;
+            -webkit-overflow-scrolling: touch;
         }
         .stats-table {
             width: 100%; border-collapse: collapse; table-layout: fixed;
             font-size: clamp(10px, 0.72rem + 0.42vw, calc(12px + 2pt));
+        }
+        @media (max-width: 600px) {
+            .stats-dashboard .stats-table-wrap {
+                overflow-x: auto;
+            }
+            .stats-table {
+                min-width: 560px;
+                width: max-content;
+                table-layout: auto;
+            }
+            .stats-table thead th,
+            .stats-table tbody td,
+            .stats-table tbody th {
+                white-space: nowrap;
+            }
         }
         .stats-table th,
         .stats-table td {
@@ -2568,13 +2584,14 @@
             letter-spacing: 0;
         }
         .page-1 .report-block .cell-paren {
-            margin-left: 0.22em;
+            margin-left: 0.12em;
             font-size: 0.86em;
             font-weight: 600;
             color: #64748b;
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum" 1;
             letter-spacing: 0;
+            word-spacing: 0;
         }
         .page-1 .report-block .cell-sub {
             display: block;
@@ -2804,11 +2821,13 @@
             font-variant-numeric: tabular-nums;
             font-feature-settings: "tnum" 1;
         }
-        .page-2 .dist-table thead th {
-            background: var(--school-navy-dark);
-            color: #fff;
+        .page-2 .dist-table thead th,
+        #printContainer .page-2 .dist-table thead th {
+            background: var(--school-navy-dark) !important;
+            background-color: var(--school-navy-dark) !important;
+            color: #fff !important;
             font-weight: 600;
-            border-color: #1a3352;
+            border-color: #1a3352 !important;
             text-align: center;
             white-space: nowrap;
         }
@@ -3038,19 +3057,23 @@
             letter-spacing: 0;
         }
         .page-1 .report-homeroom-comment-lines {
+            --homeroom-line-gap: 5.5mm;
             flex: 1 1 auto;
             margin: 0;
-            padding: 2.5mm 3mm 3mm;
-            background:
-                repeating-linear-gradient(
-                    to bottom,
-                    transparent 0,
-                    transparent calc(5.2mm - 1px),
-                    #e8edf4 calc(5.2mm - 1px),
-                    #e8edf4 5.2mm
-                );
-            background-origin: content-box;
+            padding: 2.2mm 3mm 2.8mm;
             min-height: 31mm;
+            background-image: repeating-linear-gradient(
+                to bottom,
+                transparent 0,
+                transparent calc(var(--homeroom-line-gap) - 1px),
+                #dbe3ee calc(var(--homeroom-line-gap) - 1px),
+                #dbe3ee var(--homeroom-line-gap)
+            );
+            background-size: 100% var(--homeroom-line-gap);
+            background-repeat: repeat-y;
+            background-position: 0 0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
         .page-1 .report-grade-goal-panel .report-grade-goal-manual-note {
             flex-shrink: 0;
@@ -8029,6 +8052,13 @@ function pdfNormalizeCaptureNode(clonedNode) {
         page.style.background = '#fff';
         page.style.color = '#1a2332';
         page.style.colorScheme = 'light';
+    });
+    /* html2canvas + tnum 조합에서 숫자·단위 사이 간격이 벌어지는 것 방지 */
+    clonedNode.querySelectorAll('.page td, .page th, .page .cell-main, .page .cell-paren, .page .cell-sub, .page .goal-cell, .page .goal-cell-muted, .page .grade-badge, .page .dist-score-main').forEach(function(el) {
+        el.style.fontVariantNumeric = 'normal';
+        el.style.fontFeatureSettings = 'normal';
+        el.style.letterSpacing = '0';
+        el.style.wordSpacing = '0';
     });
 }
 
