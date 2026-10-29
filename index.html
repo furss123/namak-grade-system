@@ -3915,12 +3915,21 @@ function buildCanonicalHeaders(rawHeaders) {
             headers.push('');
             return;
         }
+        // 학번·반·번호·이름 등은 학생 식별용 — 합계 제외 로직에 걸리면 안 됨
+        if (UPLOAD_META_KEYS.has(key)) {
+            headers.push(key);
+            return;
+        }
         if (NON_SUBJECT_HEADERS.has(key)) {
             headers.push('');
             return;
         }
         const split = splitHeaderSubjectUnit(key);
         const subject = split.subject || key;
+        if (UPLOAD_META_KEYS.has(subject)) {
+            headers.push(subject);
+            return;
+        }
         if (isExcludedSubjectKey(subject) || NON_SUBJECT_HEADERS.has(subject)) {
             headers.push('');
             return;
