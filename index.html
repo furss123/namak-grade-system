@@ -4896,15 +4896,23 @@ function loadDemoData() {
     saveSessionData('가상 예시', true);
 }
 
-function scoreHasExcessDecimals(raw) {
+/** 점수 표기 소수 자릿수 (59.02→2, 59.1→1, 59→0) */
+function scoreDecimalPlaces(raw) {
+    if (raw == null || raw === '') return 0;
     if (typeof raw === 'number') {
-        if (!Number.isFinite(raw)) return false;
-        const rounded = Math.round(raw * 100) / 100;
-        return Math.abs(raw - rounded) > 1e-9;
+        if (!Number.isFinite(raw)) return 0;
+        const r0 = Math.round(raw);
+        if (Math.abs(raw - r0) < 1e-9) return 0;
+        const r1 = Math.round(raw * 10) / 10;
+        if (Math.abs(raw - r1) < 1e-9) return 1;
+        const r2 = Math.round(raw * 100) / 100;
+        if (Math.abs(raw - r2) < 1e-9) return 2;
+        return 3;
     }
-    const s = String(raw == null ? '' : raw).trim();
+    const s = String(raw).trim();
     const m = s.match(/\.(\d+)/);
-    return !!(m && m[1].length > 2);
+    if (!m) return 0;
+    return m[1].replace(/0+$/, '').length;
 }
 
 function isActualZeroScore(raw) {
@@ -4913,11 +4921,31 @@ function isActualZeroScore(raw) {
     return t === '0' || /^0\.0+$/.test(t);
 }
 
-/** 업로드 원점수 검증 (계산 규칙은 그대로, 경고만) — 실제 0점은 경고하지 않음 */
+/**
+ * 업로드 원점수 검증 (계산 규칙은 그대로, 경고만) — 실제 0점은 경고하지 않음.
+ * 파일 점수의 95% 이상이 소수 첫째 자리 이하면, 둘째 자리 이상을 「입력 오류 가능성」으로 경고.
+ */
 function collectUploadScoreWarnings(students) {
     if (!students || !students.length) return [];
     const subjects = getAllSubjects(students);
     const warnings = [];
+    const numericPlaces = [];
+
+    students.forEach(function(student) {
+        subjects.forEach(function(subject) {
+            const hasKey = Object.prototype.hasOwnProperty.call(student, subject);
+            const raw = hasKey ? student[subject] : undefined;
+            if (!hasKey || raw === '' || raw == null || isActualZeroScore(raw)) return;
+            const n = typeof raw === 'number' ? raw : Number(trimCell(raw));
+            if (!Number.isFinite(n)) return;
+            numericPlaces.push(scoreDecimalPlaces(raw));
+        });
+    });
+
+    const oneOrLess = numericPlaces.filter(function(p) { return p <= 1; }).length;
+    const warnSecondDecimal = numericPlaces.length > 0
+        && (oneOrLess / numericPlaces.length) >= 0.95;
+
     students.forEach(function(student) {
         const ban = student['반'];
         const num = student['번호'];
@@ -4940,7 +4968,7 @@ function collectUploadScoreWarnings(students) {
             if (n < 0 || n > 100) {
                 warnings.push(who + ' · ' + subject + ' · ' + trimmed + ' (0 미만 또는 100 초과)');
             }
-            if (scoreHasExcessDecimals(raw)) {
+            if (warnSecondDecimal && scoreDecimalPlaces(raw) >= 2) {
                 warnings.push(who + ' · ' + subject + ' · ' + trimmed + ' (입력 오류 가능성)');
             }
         });
