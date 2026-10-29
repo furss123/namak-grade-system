@@ -2099,16 +2099,6 @@
             color: var(--school-navy-dark);
             word-break: keep-all;
         }
-        .page-doc-exam {
-            margin: 0;
-            font-weight: 700;
-            color: var(--school-navy);
-            word-break: keep-all;
-        }
-        .page-doc-meta-sep {
-            color: #94a3b8;
-            font-weight: 600;
-        }
         .page-doc-header h1 {
             margin: 0;
             padding: 0;
@@ -3769,8 +3759,6 @@
                 <div class="page-doc-header-text">
                     <p class="page-doc-meta">
                         <span class="page-doc-school js-school-name">남악고등학교</span>
-                        <span class="page-doc-meta-sep" aria-hidden="true">·</span>
-                        <span class="page-doc-exam js-exam-label">2학기 1차고사</span>
                     </p>
                     <h1 class="js-exam-report-title">2026학년도 2학기 1차고사 결과 보고서</h1>
                 </div>
@@ -3897,8 +3885,6 @@
                 <div class="page-doc-header-text">
                     <p class="page-doc-meta">
                         <span class="page-doc-school js-school-name">남악고등학교</span>
-                        <span class="page-doc-meta-sep" aria-hidden="true">·</span>
-                        <span class="page-doc-exam js-exam-label">2학기 1차고사</span>
                     </p>
                     <h1 id="distPageTitle">상·하위 10명 성적 분포</h1>
                 </div>
@@ -4176,9 +4162,6 @@ function applyExamInfo(semester, examName) {
     });
     document.querySelectorAll('.js-exam-stats-label').forEach(function(el) {
         el.textContent = getExamStatsLabel();
-    });
-    document.querySelectorAll('.js-exam-label').forEach(function(el) {
-        el.textContent = formatExamLabel(currentExamSemester, currentExamName);
     });
 }
 
