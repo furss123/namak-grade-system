@@ -2223,6 +2223,10 @@
             border: 1px solid #e2e8f0;
             box-shadow: 0 1px 3px rgba(15, 36, 64, 0.08);
         }
+        /* 마크 없이 인쇄: 자리는 유지(제목이 가운데에 그대로 남도록)하고 마크만 숨김 */
+        .page-doc-header .page-logo.is-logo-hidden {
+            visibility: hidden;
+        }
         .page-doc-header-text {
             grid-column: 2;
             min-width: 0;
@@ -4043,6 +4047,10 @@
                                 <input type="checkbox" id="examWrittenOnlyInput" checked>
                                 <span>지필만 반영</span>
                             </label>
+                            <label class="exam-chip-toggle" for="examHideLogoInput">
+                                <input type="checkbox" id="examHideLogoInput">
+                                <span>마크 없이 인쇄</span>
+                            </label>
                         </div>
                     </div>
                     <div class="school-info-actions">
@@ -4534,6 +4542,7 @@ const DEFAULT_SCHOOL_LOGO = 'assets/namak-logo.png';
 const DEFAULT_EXAM_SEMESTER = '2';
 const DEFAULT_EXAM_NAME = '1차';
 const DEFAULT_WRITTEN_ONLY = true;
+const DEFAULT_HIDE_REPORT_LOGO = false;
 const SCHOOL_PROFILE_KEY = 'namak-school-profile-v1';
 const SCHOOL_LOGO_MAX_SIDE = 256;
 const SCHOOL_LOGO_MAX_BYTES = 1.8 * 1024 * 1024;
@@ -4543,6 +4552,7 @@ let currentSchoolLogo = DEFAULT_SCHOOL_LOGO;
 let currentExamSemester = DEFAULT_EXAM_SEMESTER;
 let currentExamName = DEFAULT_EXAM_NAME;
 let currentWrittenOnly = DEFAULT_WRITTEN_ONLY;
+let currentHideReportLogo = DEFAULT_HIDE_REPORT_LOGO;
 let pendingSchoolLogoDataUrl = null;
 
 /** 학년도: 1–2월은 직전 연도 */
@@ -4735,6 +4745,16 @@ function applyExamInfo(semester, examName, writtenOnly) {
     syncWrittenOnlyNotes(document);
 }
 
+/** 결과 보고서(인쇄·PDF) 머리글의 학교 마크 표시 여부 */
+function applyReportLogoVisibility(hide) {
+    currentHideReportLogo = !!hide;
+    const input = document.getElementById('examHideLogoInput');
+    if (input && document.activeElement !== input) input.checked = currentHideReportLogo;
+    document.querySelectorAll('.page-doc-header .page-logo').forEach(function(el) {
+        el.classList.toggle('is-logo-hidden', currentHideReportLogo);
+    });
+}
+
 function applySchoolBranding(name, logoUrl, semester, examName, writtenOnly) {
     currentSchoolName = normalizeSchoolName(name);
     currentSchoolLogo = logoUrl || DEFAULT_SCHOOL_LOGO;
@@ -4778,8 +4798,10 @@ function loadSchoolProfileIntoUi() {
     const semester = saved && saved.examSemester ? saved.examSemester : DEFAULT_EXAM_SEMESTER;
     const examName = saved && saved.examName ? saved.examName : DEFAULT_EXAM_NAME;
     const writtenOnly = saved && typeof saved.writtenOnly === 'boolean' ? saved.writtenOnly : DEFAULT_WRITTEN_ONLY;
+    const hideLogo = saved && typeof saved.hideReportLogo === 'boolean' ? saved.hideReportLogo : DEFAULT_HIDE_REPORT_LOGO;
     pendingSchoolLogoDataUrl = null;
     applySchoolBranding(name, logo, semester, examName, writtenOnly);
+    applyReportLogoVisibility(hideLogo);
     const input = document.getElementById('schoolNameInput');
     if (input) input.value = schoolNameStem(name);
 }
@@ -4885,6 +4907,8 @@ function saveSchoolProfile(event) {
     const semester = normalizeExamSemester(semInput ? semInput.value : currentExamSemester);
     const examName = normalizeExamName(examInput ? examInput.value : currentExamName);
     const writtenOnly = writtenInput ? !!writtenInput.checked : currentWrittenOnly;
+    const hideLogoInput = document.getElementById('examHideLogoInput');
+    const hideReportLogo = hideLogoInput ? !!hideLogoInput.checked : currentHideReportLogo;
     const logo = pendingSchoolLogoDataUrl || currentSchoolLogo || DEFAULT_SCHOOL_LOGO;
     try {
         writeSchoolProfile({
@@ -4893,10 +4917,12 @@ function saveSchoolProfile(event) {
             examSemester: semester,
             examName: examName,
             writtenOnly: writtenOnly,
+            hideReportLogo: hideReportLogo,
             savedAt: Date.now()
         });
         pendingSchoolLogoDataUrl = null;
         applySchoolBranding(name, logo || DEFAULT_SCHOOL_LOGO, semester, examName, writtenOnly);
+        applyReportLogoVisibility(hideReportLogo);
         setSchoolInfoStatus('시험 정보를 저장했습니다. (성적 파일은 저장되지 않습니다)', 'ok');
     } catch (err) {
         console.warn(err);
@@ -4914,6 +4940,7 @@ function resetSchoolProfile(event) {
     } catch (err) { /* ignore */ }
     pendingSchoolLogoDataUrl = null;
     applySchoolBranding(DEFAULT_SCHOOL_NAME, DEFAULT_SCHOOL_LOGO, DEFAULT_EXAM_SEMESTER, DEFAULT_EXAM_NAME, DEFAULT_WRITTEN_ONLY);
+    applyReportLogoVisibility(DEFAULT_HIDE_REPORT_LOGO);
     const input = document.getElementById('schoolNameInput');
     if (input) input.value = schoolNameStem(DEFAULT_SCHOOL_NAME);
     const semInput = document.getElementById('examSemesterInput');
@@ -5707,6 +5734,13 @@ function initSessionPersistenceListeners() {
             syncWrittenOnlyNotes(document);
             const printContainer = document.getElementById('printContainer');
             if (printContainer) syncWrittenOnlyNotes(printContainer);
+        });
+    }
+    const hideLogoEl = document.getElementById('examHideLogoInput');
+    if (hideLogoEl && !hideLogoEl.dataset.bound) {
+        hideLogoEl.dataset.bound = '1';
+        hideLogoEl.addEventListener('change', function() {
+            applyReportLogoVisibility(hideLogoEl.checked);
         });
     }
     const studentEl = document.getElementById('studentId');
