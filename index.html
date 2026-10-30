@@ -1616,6 +1616,39 @@
         .app-tab:hover:not(:disabled):not(.is-active) { background: var(--theme-bg-muted); color: var(--school-navy-dark); }
         .app-tab.is-active { background: var(--school-navy); color: #fff; }
         .app-tab:disabled { opacity: 0.45; cursor: not-allowed; }
+        @media (max-width: 640px) {
+            .app-tabs { gap: 3px; }
+            .app-tab { padding: 0 4px; font-size: .8rem; letter-spacing: -0.03em; }
+        }
+        .example-banner {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-3);
+            margin: 0 0 var(--space-3);
+            padding: 6px var(--space-3);
+            border-left: 3px solid var(--school-danger);
+            border-radius: var(--radius-sm);
+            background: #fef2f2;
+            color: var(--school-danger);
+            font-size: var(--text-sm);
+            font-weight: 600;
+            line-height: 1.4;
+        }
+        .example-banner[hidden] { display: none; }
+        .example-banner-btn {
+            flex: 0 0 auto;
+            padding: 3px 10px;
+            border: 1px solid currentColor;
+            border-radius: var(--radius-sm);
+            background: transparent;
+            color: inherit;
+            font: inherit;
+            font-size: .78rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .example-banner-btn:hover { background: rgba(220, 38, 38, 0.08); }
         .analysis-subtabs {
             display: flex;
             flex-wrap: wrap;
@@ -2219,6 +2252,11 @@
         html[data-theme="dark"] .upload-box.success:hover .upload-desc .upload-cta-mark {
             color: #93c5fd;
             text-decoration-color: rgba(147, 197, 253, 0.45);
+        }
+        html[data-theme="dark"] .example-banner {
+            color: #fca5a5;
+            background: rgba(239, 68, 68, 0.12);
+            border-left-color: #f87171;
         }
         html[data-theme="dark"] .upload-example-notice {
             color: #fca5a5;
@@ -4263,11 +4301,16 @@
     <div class="app-layout no-print">
     <main class="app-main">
     <div class="app-tabs no-print" role="tablist" aria-label="화면 선택">
+        <button type="button" class="app-tab" id="appTabSetup" role="tab" aria-selected="false" onclick="setAppTab('setup')">정보 등록</button>
         <button type="button" class="app-tab is-active" id="appTabQuery" role="tab" aria-selected="true" onclick="setAppTab('query')">성적 조회·인쇄</button>
         <button type="button" class="app-tab" id="appTabAnalysis" role="tab" aria-selected="false" onclick="setAppTab('analysis')" disabled title="성적 엑셀을 등록하면 사용할 수 있습니다">전교 분석</button>
     </div>
+    <div class="example-banner no-print" id="exampleBanner" data-tab-panel="query analysis" role="note" hidden>
+        <span class="example-banner-text">가상 예시 데이터입니다. 실제 성적이 아닙니다.</span>
+        <button type="button" class="example-banner-btn" onclick="setAppTab('setup')">정보 등록</button>
+    </div>
     <div class="search-container">
-        <section class="panel-section school-info-section" data-tab-panel="query" aria-labelledby="schoolInfoHeading">
+        <section class="panel-section school-info-section" data-tab-panel="setup" aria-labelledby="schoolInfoHeading">
             <div class="section-label" id="schoolInfoHeading">시험 정보 등록</div>
             <p class="school-info-privacy" role="note">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -4338,7 +4381,7 @@
             </div>
         </section>
 
-        <section class="panel-section" data-tab-panel="query">
+        <section class="panel-section" data-tab-panel="setup">
             <div class="section-label">성적 데이터 등록</div>
             <input type="file" id="excelFile" accept=".xlsx, .xls" multiple onchange="onExcelFilesPicked(this)" style="display:none;">
             <div class="upload-row">
@@ -4446,7 +4489,7 @@
                 </summary>
                 <ul class="upload-warnings-list" id="uploadWarningsList"></ul>
             </details>
-            <p class="upload-example-notice" id="uploadExampleNotice" role="note" hidden>지금은 예시 파일이 업로드 된 상태에서는 지금은 가상의 1학년 성적이 입력된 상태입니다.</p>
+            <p class="upload-example-notice" id="uploadExampleNotice" role="note" hidden>예시 파일이 적용된 상태입니다. 지금은 가상의 1학년 성적이 입력되어 있습니다.</p>
         </section>
 
         <section class="panel-section" data-tab-panel="query">
@@ -4682,7 +4725,7 @@
 
     </div>
 
-    <div id="printContainer"></div>
+    <div id="printContainer" data-tab-panel="query"></div>
 
 
 
@@ -5621,6 +5664,10 @@ function applyParsedStudentData(parsedData, fileName, options = {}) {
     if (options.resetUi) {
         clearPrintContainer();
         hidePrintFloatActions();
+        if (!options.isDemo) {
+            setAppTab('query');
+            scrollToPageTop(true);
+        }
     }
     if (options.saveSession) saveSessionData(fileName, !!options.resetUi);
     return true;
@@ -6360,12 +6407,12 @@ function isAnalysisAvailable() {
 
 function syncAppTabs() {
     document.querySelectorAll('[data-tab-panel]').forEach(function(el) {
-        const tabOk = el.getAttribute('data-tab-panel') === activeAppTab;
+        const tabOk = el.getAttribute('data-tab-panel').split(/\s+/).indexOf(activeAppTab) >= 0;
         const sub = el.getAttribute('data-subtab-panel');
         const subOk = !sub || sub === activeAnalysisSubtab;
         el.classList.toggle('is-tab-hidden', !(tabOk && subOk));
     });
-    [['appTabQuery', 'query'], ['appTabAnalysis', 'analysis']].forEach(function(pair) {
+    [['appTabSetup', 'setup'], ['appTabQuery', 'query'], ['appTabAnalysis', 'analysis']].forEach(function(pair) {
         const btn = document.getElementById(pair[0]);
         if (!btn) return;
         const on = activeAppTab === pair[1];
@@ -6396,6 +6443,8 @@ function setAppTab(tab) {
         if (!isAnalysisAvailable()) return;
         activeAppTab = 'analysis';
         renderAnalysisTab();
+    } else if (tab === 'setup') {
+        activeAppTab = 'setup';
     } else {
         activeAppTab = 'query';
     }
@@ -7648,6 +7697,8 @@ function updateUploadExampleNotice() {
     const notice = document.getElementById('uploadExampleNotice');
     if (!notice) return;
     notice.hidden = !isDemoData;
+    const banner = document.getElementById('exampleBanner');
+    if (banner) banner.hidden = !isDemoData;
 }
 
 function setUploadState(statusText, isSuccess, fileName = "") {
@@ -9871,7 +9922,9 @@ window.addEventListener('afterprint', function() {
     syncAnalysisAvailability();
     applySchoolBranding(currentSchoolName, currentSchoolLogo);
     await registerDdgServiceWorker();
-    restoreAppViewFromSession(savedUi);
+    const restoredView = restoreAppViewFromSession(savedUi);
+    // 예시(가상) 데이터만 있을 때는 정보 등록 탭에서 시작, 실제 성적이 있으면 조회 탭
+    setAppTab(isFileUploaded && !isDemoData ? 'query' : (restoredView ? 'query' : 'setup'));
     initPageScrollNav();
     if (!savedUi || !savedUi.scrollY) {
         requestAnimationFrame(function() {
