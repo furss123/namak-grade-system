@@ -1687,6 +1687,14 @@
         .rk-table td.rk-strong { font-weight: 800; color: var(--school-navy-dark); }
         html[data-theme="dark"] .rk-table td.rk-strong { color: var(--theme-text); }
         .rk-table td.rk-rank { font-weight: 800; color: var(--school-navy); }
+        .rk-table .rk-name {
+            display: inline-block;
+            max-width: 6em;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: bottom;
+        }
         .rk-empty { padding: 18px; text-align: center; color: var(--theme-text-muted); font-size: var(--text-sm); }
         .rk-badge {
             display: inline-block;
@@ -6279,6 +6287,12 @@ function buildAnalysisRows() {
     return rows;
 }
 
+/** 이름이 길면 칸 안에서 말줄임으로 자르고, 마우스를 올리면 전체 이름 표시 */
+function rkNameHtml(name) {
+    const safe = escapeSchoolText(name);
+    return '<span class="rk-name" title="' + safe + '">' + safe + '</span>';
+}
+
 function rkBadge(grade) {
     const g = Number(grade);
     if (!(g >= 1 && g <= 5)) return '-';
@@ -6353,7 +6367,7 @@ function rkAvgColumns() {
         { key: 'sid', label: '학번', sort: function(r) { return r.sid; }, html: function(r) { return escapeSchoolText(r.sid); }, xl: function(r) { return r.sid; } },
         { key: 'ban', label: '반', sort: function(r) { return r.year * 100 + r.ban; }, html: function(r) { return r.ban; }, xl: function(r) { return r.ban; } },
         { key: 'num', label: '번호', sort: function(r) { return r.num; }, html: function(r) { return r.num; }, xl: function(r) { return r.num; } },
-        { key: 'name', label: '이름', sort: function(r) { return r.name; }, html: function(r) { return escapeSchoolText(r.name); }, xl: function(r) { return r.name; } },
+        { key: 'name', label: '이름', sort: function(r) { return r.name; }, html: function(r) { return rkNameHtml(r.name); }, xl: function(r) { return r.name; } },
         { key: 'avgGrade', label: '평균 등급', cls: 'rk-strong', sort: function(r) { return r.avgGrade == null ? null : rkRound2(r.avgGrade); }, html: function(r) { return r.avgGrade == null ? '-' : rkRound2(r.avgGrade).toFixed(2); }, xl: function(r) { return r.avgGrade == null ? '' : rkRound2(r.avgGrade); } }
     ];
     subjects.forEach(function(subject) {
@@ -6387,7 +6401,7 @@ function rkSubjectColumns(subject) {
         { key: 'sid', label: '학번', sort: function(r) { return r.sid; }, html: function(r) { return escapeSchoolText(r.sid); }, xl: function(r) { return r.sid; } },
         { key: 'ban', label: '반', sort: function(r) { return r.year * 100 + r.ban; }, html: function(r) { return r.ban; }, xl: function(r) { return r.ban; } },
         { key: 'num', label: '번호', sort: function(r) { return r.num; }, html: function(r) { return r.num; }, xl: function(r) { return r.num; } },
-        { key: 'name', label: '이름', sort: function(r) { return r.name; }, html: function(r) { return escapeSchoolText(r.name); }, xl: function(r) { return r.name; } },
+        { key: 'name', label: '이름', sort: function(r) { return r.name; }, html: function(r) { return rkNameHtml(r.name); }, xl: function(r) { return r.name; } },
         { key: 'score', label: '원점수', cls: 'rk-strong', sort: function(r) { return p(r) ? p(r).score : null; }, html: function(r) { return p(r) ? p(r).score.toFixed(2) : '-'; }, xl: function(r) { return p(r) ? p(r).score : ''; } },
         { key: 'grade5', label: '5등급제', sort: function(r) { return p(r) ? p(r).grade : null; }, html: function(r) { return p(r) ? rkBadge(p(r).grade) : '-'; }, xl: function(r) { return p(r) ? p(r).grade : ''; } },
         { key: 'grade9', label: '9등급제', sort: function(r) { return p(r) ? p(r).grade9 : null; }, html: function(r) { return p(r) ? (p(r).grade9 != null ? p(r).grade9 : p(r).grade) : '-'; }, xl: function(r) { return p(r) ? (p(r).grade9 != null ? p(r).grade9 : p(r).grade) : ''; } },
