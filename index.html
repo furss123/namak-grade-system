@@ -1543,6 +1543,174 @@
             box-shadow: 0 4px 14px rgba(30, 58, 95, 0.2);
         }
 
+        /* ===== 상단 탭 (성적 조회·인쇄 / 전교 분석) ===== */
+        .is-tab-hidden { display: none !important; }
+        .app-tabs {
+            display: flex;
+            gap: 6px;
+            margin: 0 0 var(--space-4);
+            padding: 4px;
+            border: 1px solid var(--theme-border);
+            border-radius: var(--radius-lg);
+            background: var(--theme-bg-panel);
+            box-shadow: var(--shadow-sm);
+        }
+        .app-tab {
+            flex: 1;
+            height: 2.75rem;
+            padding: 0 14px;
+            border: 0;
+            border-radius: calc(var(--radius-lg) - 4px);
+            background: transparent;
+            color: var(--theme-text-muted);
+            font: inherit;
+            font-size: var(--text-sm);
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            cursor: pointer;
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+        .app-tab:hover:not(:disabled):not(.is-active) { background: var(--theme-bg-muted); color: var(--school-navy-dark); }
+        .app-tab.is-active { background: var(--school-navy); color: #fff; }
+        .app-tab:disabled { opacity: 0.45; cursor: not-allowed; }
+        .analysis-subtabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: var(--space-4) 28px 0;
+        }
+        .analysis-subtab {
+            height: 2.25rem;
+            padding: 0 14px;
+            border: 1px solid var(--theme-border);
+            border-radius: 999px;
+            background: var(--theme-input-bg);
+            color: var(--school-navy-dark);
+            font: inherit;
+            font-size: var(--text-sm);
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        html[data-theme="dark"] .analysis-subtab { color: var(--theme-text); }
+        .analysis-subtab.is-active {
+            border-color: var(--school-navy-light);
+            background: var(--theme-print-opt-checked);
+        }
+        .analysis-note {
+            margin: 0 0 var(--space-4);
+            color: var(--theme-text-muted);
+            font-size: var(--text-sm);
+            line-height: 1.5;
+        }
+        .rk-toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: var(--space-3);
+            margin-bottom: var(--space-3);
+        }
+        .rk-toolbar-top { margin-bottom: var(--space-5); }
+        .rk-title {
+            margin: 0;
+            font-size: var(--text-lg);
+            font-weight: 700;
+            color: var(--school-navy);
+            letter-spacing: -0.02em;
+        }
+        .rk-title small { font-size: var(--text-sm); font-weight: 600; color: var(--theme-text-muted); margin-left: 6px; }
+        .rk-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+        .rk-select {
+            height: 2.25rem;
+            padding: 0 10px;
+            border: 1px solid var(--theme-border);
+            border-radius: var(--radius-sm);
+            background: var(--theme-input-bg);
+            color: var(--theme-text);
+            font: inherit;
+            font-size: var(--text-sm);
+            font-weight: 600;
+        }
+        .rk-export-btn {
+            height: 2.25rem;
+            padding: 0 12px;
+            border: 1px solid var(--school-navy-light);
+            border-radius: var(--radius-sm);
+            background: var(--theme-bg-panel);
+            color: var(--school-navy);
+            font: inherit;
+            font-size: var(--text-sm);
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .rk-export-btn:hover { background: var(--theme-bg-muted); }
+        html[data-theme="dark"] .rk-export-btn { color: var(--theme-text); }
+        .rk-block + .rk-block { margin-top: var(--space-8); }
+        .rk-table-wrap {
+            max-height: 70vh;
+            overflow: auto;
+            border: 1px solid var(--theme-border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            background: var(--theme-bg-panel);
+            -webkit-overflow-scrolling: touch;
+        }
+        .rk-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: var(--text-sm);
+            font-variant-numeric: tabular-nums;
+        }
+        .rk-table th,
+        .rk-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--theme-border-light);
+            text-align: center;
+            white-space: nowrap;
+            line-height: 1.2;
+        }
+        .rk-table thead th {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+            background: var(--school-navy-dark);
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            user-select: none;
+        }
+        .rk-table thead th.is-sorted-asc::after { content: ' ▲'; font-size: 0.7em; }
+        .rk-table thead th.is-sorted-desc::after { content: ' ▼'; font-size: 0.7em; }
+        .rk-table tbody tr:hover td { background: var(--theme-bg-muted); }
+        .rk-table td.rk-strong { font-weight: 800; color: var(--school-navy-dark); }
+        html[data-theme="dark"] .rk-table td.rk-strong { color: var(--theme-text); }
+        .rk-table td.rk-rank { font-weight: 800; color: var(--school-navy); }
+        .rk-empty { padding: 18px; text-align: center; color: var(--theme-text-muted); font-size: var(--text-sm); }
+        .rk-badge {
+            display: inline-block;
+            min-width: 1.6em;
+            padding: 0.1em 0.4em;
+            border-radius: 3px;
+            font-weight: 800;
+            line-height: 1.25;
+        }
+        .rk-badge-1 { background: var(--grade-1-bg); color: var(--grade-1-fg); }
+        .rk-badge-2 { background: var(--grade-2-bg); color: var(--grade-2-fg); }
+        .rk-badge-3 { background: var(--grade-3-bg); color: var(--grade-3-fg); }
+        .rk-badge-4 { background: var(--grade-4-bg); color: var(--grade-4-fg); }
+        .rk-badge-5 { background: var(--grade-5-bg); color: var(--grade-5-fg); }
+        .rk-footnote {
+            margin: var(--space-2) 0 0;
+            color: var(--theme-text-muted);
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+        @media (max-width: 600px) {
+            .analysis-subtabs { padding: var(--space-3) 16px 0; }
+        }
+
         .stats-dashboard { display: none; }
         .stats-dashboard .stats-table-wrap {
             overflow-x: auto; border-radius: var(--radius-lg);
@@ -4006,8 +4174,12 @@
 
     <div class="app-layout no-print">
     <main class="app-main">
+    <div class="app-tabs no-print" role="tablist" aria-label="화면 선택">
+        <button type="button" class="app-tab is-active" id="appTabQuery" role="tab" aria-selected="true" onclick="setAppTab('query')">성적 조회·인쇄</button>
+        <button type="button" class="app-tab" id="appTabAnalysis" role="tab" aria-selected="false" onclick="setAppTab('analysis')" disabled title="성적 엑셀을 등록하면 사용할 수 있습니다">전교 분석</button>
+    </div>
     <div class="search-container">
-        <section class="panel-section school-info-section" aria-labelledby="schoolInfoHeading">
+        <section class="panel-section school-info-section" data-tab-panel="query" aria-labelledby="schoolInfoHeading">
             <div class="section-label" id="schoolInfoHeading">시험 정보 등록</div>
             <p class="school-info-privacy" role="note">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
@@ -4078,7 +4250,7 @@
             </div>
         </section>
 
-        <section class="panel-section">
+        <section class="panel-section" data-tab-panel="query">
             <div class="section-label">성적 데이터 등록</div>
             <input type="file" id="excelFile" accept=".xlsx, .xls" multiple onchange="onExcelFilesPicked(this)" style="display:none;">
             <div class="upload-row">
@@ -4183,7 +4355,7 @@
             <p class="upload-example-notice" id="uploadExampleNotice" role="note" hidden>지금은 예시 파일이 업로드 된 상태에서는 지금은 가상의 1학년 성적이 입력된 상태입니다.</p>
         </section>
 
-        <section class="panel-section">
+        <section class="panel-section" data-tab-panel="query">
             <div class="section-label">학생 성적 조회</div>
             <div class="query-layout">
                 <div class="query-card query-card-single">
@@ -4252,7 +4424,49 @@
             </div>
         </section>
 
-        <section class="panel-section stats-dashboard" id="statsDashboard">
+        <div class="analysis-subtabs is-tab-hidden" data-tab-panel="analysis" role="tablist" aria-label="분석 메뉴">
+            <button type="button" class="analysis-subtab is-active" id="analysisSubtabRanking" role="tab" aria-selected="true" onclick="setAnalysisSubtab('ranking')">순위·일람</button>
+            <button type="button" class="analysis-subtab" id="analysisSubtabSubjects" role="tab" aria-selected="false" onclick="setAnalysisSubtab('subjects')">과목·시험 분석</button>
+        </div>
+
+        <section class="panel-section is-tab-hidden" id="rankingSection" data-tab-panel="analysis" data-subtab-panel="ranking">
+            <div class="section-label">순위·일람</div>
+            <p class="analysis-note" role="note">교사용 화면입니다. 학생 이름과 순위는 인쇄 보고서에 포함되지 않으며, 업로드한 성적은 이 브라우저 안에서만 처리됩니다.</p>
+
+            <div class="rk-toolbar rk-toolbar-top">
+                <div class="rk-controls">
+                    <label for="rkClassFilter" class="analysis-note" style="margin:0;">보기</label>
+                    <select id="rkClassFilter" class="rk-select" onchange="renderRankingTables()" aria-label="반 선택">
+                        <option value="">전교</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="rk-block">
+                <div class="rk-toolbar">
+                    <h3 class="rk-title">평균 등급 순위<small>(학점 가중)</small></h3>
+                    <div class="rk-controls">
+                        <button type="button" class="rk-export-btn" onclick="exportAvgGradeRanking()">엑셀로 내보내기</button>
+                    </div>
+                </div>
+                <div class="rk-table-wrap"><table class="rk-table" id="rkAvgTable"></table></div>
+                <p class="rk-footnote">평균 등급이 소수 둘째 자리까지 같으면 동순위로 표시하고, 동순위 안에서는 평균 원점수가 높은 순으로 나열합니다. 머리글을 누르면 정렬이 바뀝니다.</p>
+            </div>
+
+            <div class="rk-block">
+                <div class="rk-toolbar">
+                    <h3 class="rk-title">과목별 순위</h3>
+                    <div class="rk-controls">
+                        <select id="rkSubjectSelect" class="rk-select" onchange="onRankingSubjectChange()" aria-label="과목 선택"></select>
+                        <button type="button" class="rk-export-btn" onclick="exportSubjectRanking()">엑셀로 내보내기</button>
+                    </div>
+                </div>
+                <div class="rk-table-wrap"><table class="rk-table" id="rkSubjectTable"></table></div>
+                <p class="rk-footnote">석차 괄호는 동석차 인원입니다. 상위%는 인쇄 보고서와 같이 석차 ÷ 전체 인원으로 계산합니다(전교 기준).</p>
+            </div>
+        </section>
+
+        <section class="panel-section stats-dashboard" id="statsDashboard" data-tab-panel="analysis" data-subtab-panel="subjects">
             <div class="section-label js-exam-stats-label">2학기 1차고사 결과 기본 정보</div>
             <div class="stats-table-wrap">
             <table class="stats-table">
@@ -5847,6 +6061,8 @@ function displayGeneralStats() {
     });
 
     document.getElementById('statsDashboard').style.display = 'block';
+    syncAnalysisAvailability();
+    if (activeAppTab === 'analysis') renderAnalysisTab();
 }
 
 function countGradeDistributionBySubject(subjects) {
@@ -5928,6 +6144,349 @@ function renderStatsGradeDistribution(subjects) {
         noteEl.textContent =
             '총 ' + totalStudents + '명 기준 · 막대 너비는 과목별 등급 인원 비율(%)입니다.';
     }
+}
+
+/* ===================== 상단 탭 · 전교 분석 (교사용) ===================== */
+let activeAppTab = 'query';
+let activeAnalysisSubtab = 'ranking';
+let analysisRows = [];
+const rkSort = {
+    avg: { key: 'rank', dir: 1 },
+    subject: { key: 'rank', dir: 1 }
+};
+
+function isAnalysisAvailable() {
+    return !!(isFileUploaded && Array.isArray(studentData) && studentData.length > 0);
+}
+
+function syncAppTabs() {
+    document.querySelectorAll('[data-tab-panel]').forEach(function(el) {
+        const tabOk = el.getAttribute('data-tab-panel') === activeAppTab;
+        const sub = el.getAttribute('data-subtab-panel');
+        const subOk = !sub || sub === activeAnalysisSubtab;
+        el.classList.toggle('is-tab-hidden', !(tabOk && subOk));
+    });
+    [['appTabQuery', 'query'], ['appTabAnalysis', 'analysis']].forEach(function(pair) {
+        const btn = document.getElementById(pair[0]);
+        if (!btn) return;
+        const on = activeAppTab === pair[1];
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+    [['analysisSubtabRanking', 'ranking'], ['analysisSubtabSubjects', 'subjects']].forEach(function(pair) {
+        const btn = document.getElementById(pair[0]);
+        if (!btn) return;
+        const on = activeAnalysisSubtab === pair[1];
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+}
+
+/** 업로드 여부에 따라 「전교 분석」 탭 활성/비활성 */
+function syncAnalysisAvailability() {
+    const btn = document.getElementById('appTabAnalysis');
+    const ok = isAnalysisAvailable();
+    if (btn) {
+        btn.disabled = !ok;
+        btn.title = ok ? '' : '성적 엑셀을 등록하면 사용할 수 있습니다';
+    }
+    if (!ok && activeAppTab === 'analysis') activeAppTab = 'query';
+    syncAppTabs();
+}
+
+function setAppTab(tab) {
+    if (tab === 'analysis') {
+        if (!isAnalysisAvailable()) return;
+        activeAppTab = 'analysis';
+        renderAnalysisTab();
+    } else {
+        activeAppTab = 'query';
+    }
+    syncAppTabs();
+}
+
+function setAnalysisSubtab(sub) {
+    activeAnalysisSubtab = sub === 'subjects' ? 'subjects' : 'ranking';
+    syncAppTabs();
+}
+
+function rkRound2(n) {
+    return Math.round(n * 100) / 100;
+}
+
+/** 학생별 평균 등급(학점 가중)·과목별 결과를 한 번에 모음 — 개인 보고서의 평균 등급과 같은 계산 */
+function buildAnalysisRows() {
+    const subjects = getAllSubjects(studentData);
+    const rows = studentData.map(function(st) {
+        const sid = String(st['학번']);
+        const grades = processedGradesCache[sid] || {};
+        let weight = 0;
+        let weighted = 0;
+        let scoreSum = 0;
+        let scoreCnt = 0;
+        const per = {};
+        subjects.forEach(function(subject) {
+            const p = grades[subject];
+            if (!p) return;
+            const unit = getSubjectUnit(subject);
+            weight += unit;
+            weighted += p.grade * unit;
+            scoreSum += p.score;
+            scoreCnt++;
+            per[subject] = p;
+        });
+        return {
+            sid: sid,
+            year: Number(st['학년']) || 1,
+            ban: Number(st['반']) || 0,
+            num: Number(st['번호']) || 0,
+            name: st['이름'] || '',
+            avgGrade: weight > 0 ? weighted / weight : null,
+            avgScore: scoreCnt > 0 ? scoreSum / scoreCnt : null,
+            per: per
+        };
+    });
+
+    function cmp(a, b) {
+        if (a.avgGrade == null && b.avgGrade == null) return a.sid.localeCompare(b.sid);
+        if (a.avgGrade == null) return 1;
+        if (b.avgGrade == null) return -1;
+        const d = rkRound2(a.avgGrade) - rkRound2(b.avgGrade);
+        if (d !== 0) return d;
+        const s = (b.avgScore || 0) - (a.avgScore || 0);
+        if (s !== 0) return s;
+        return a.sid.localeCompare(b.sid);
+    }
+    function assign(list, field) {
+        const sorted = list.slice().sort(cmp);
+        let prev = null;
+        let rank = 0;
+        sorted.forEach(function(r, i) {
+            if (r.avgGrade == null) { r[field] = null; return; }
+            const k = rkRound2(r.avgGrade);
+            if (k !== prev) { rank = i + 1; prev = k; }
+            r[field] = rank;
+        });
+    }
+    assign(rows, 'rank');
+    const groups = {};
+    rows.forEach(function(r) {
+        const key = r.year + '-' + r.ban;
+        (groups[key] = groups[key] || []).push(r);
+    });
+    Object.keys(groups).forEach(function(key) { assign(groups[key], 'classRank'); });
+    rows.sort(cmp); /* 동순위는 평균 원점수 높은 순이 기본 정렬 */
+    return rows;
+}
+
+function rkBadge(grade) {
+    const g = Number(grade);
+    if (!(g >= 1 && g <= 5)) return '-';
+    return '<span class="rk-badge rk-badge-' + g + '">' + g + '</span>';
+}
+
+function rkFilteredRows() {
+    const sel = document.getElementById('rkClassFilter');
+    const val = sel ? sel.value : '';
+    if (!val) return analysisRows;
+    return analysisRows.filter(function(r) { return (r.year + '-' + r.ban) === val; });
+}
+
+function rkSortRows(rows, columns, state) {
+    const col = columns.filter(function(c) { return c.key === state.key; })[0] || columns[0];
+    return rows.slice().sort(function(a, b) {
+        const va = col.sort(a);
+        const vb = col.sort(b);
+        const na = va == null || va === '';
+        const nb = vb == null || vb === '';
+        if (na && nb) return 0;
+        if (na) return 1;
+        if (nb) return -1;
+        let d;
+        if (typeof va === 'number' && typeof vb === 'number') d = va - vb;
+        else d = String(va).localeCompare(String(vb), 'ko');
+        return d * state.dir;
+    });
+}
+
+function rkRenderTable(tableId, columns, rows, state, rerender) {
+    const table = document.getElementById(tableId);
+    if (!table) return [];
+    const sorted = rkSortRows(rows, columns, state);
+    let html = '<thead><tr>';
+    columns.forEach(function(c) {
+        const cls = state.key === c.key ? (state.dir === 1 ? ' class="is-sorted-asc"' : ' class="is-sorted-desc"') : '';
+        html += '<th data-key="' + escapeSchoolText(c.key) + '"' + cls + '>' + escapeSchoolText(c.label) + '</th>';
+    });
+    html += '</tr></thead><tbody>';
+    if (!sorted.length) {
+        html += '<tr><td class="rk-empty" colspan="' + columns.length + '">표시할 데이터가 없습니다.</td></tr>';
+    }
+    sorted.forEach(function(r) {
+        html += '<tr>';
+        columns.forEach(function(c) {
+            html += '<td' + (c.cls ? ' class="' + c.cls + '"' : '') + '>' + c.html(r) + '</td>';
+        });
+        html += '</tr>';
+    });
+    html += '</tbody>';
+    table.innerHTML = html;
+    if (!table.dataset.bound) {
+        table.dataset.bound = '1';
+        table.addEventListener('click', function(e) {
+            const th = e.target.closest ? e.target.closest('th[data-key]') : null;
+            if (!th) return;
+            const key = th.getAttribute('data-key');
+            if (state.key === key) state.dir = -state.dir;
+            else { state.key = key; state.dir = 1; }
+            rerender();
+        });
+    }
+    return sorted;
+}
+
+function rkAvgColumns() {
+    const subjects = getAllSubjects(studentData);
+    const cols = [
+        { key: 'rank', label: '전교 순위', cls: 'rk-rank', sort: function(r) { return r.rank; }, html: function(r) { return r.rank == null ? '-' : r.rank; }, xl: function(r) { return r.rank; } },
+        { key: 'classRank', label: '반 순위', sort: function(r) { return r.classRank; }, html: function(r) { return r.classRank == null ? '-' : r.classRank; }, xl: function(r) { return r.classRank; } },
+        { key: 'sid', label: '학번', sort: function(r) { return r.sid; }, html: function(r) { return escapeSchoolText(r.sid); }, xl: function(r) { return r.sid; } },
+        { key: 'ban', label: '반', sort: function(r) { return r.year * 100 + r.ban; }, html: function(r) { return r.ban; }, xl: function(r) { return r.ban; } },
+        { key: 'num', label: '번호', sort: function(r) { return r.num; }, html: function(r) { return r.num; }, xl: function(r) { return r.num; } },
+        { key: 'name', label: '이름', sort: function(r) { return r.name; }, html: function(r) { return escapeSchoolText(r.name); }, xl: function(r) { return r.name; } },
+        { key: 'avgGrade', label: '평균 등급', cls: 'rk-strong', sort: function(r) { return r.avgGrade == null ? null : rkRound2(r.avgGrade); }, html: function(r) { return r.avgGrade == null ? '-' : rkRound2(r.avgGrade).toFixed(2); }, xl: function(r) { return r.avgGrade == null ? '' : rkRound2(r.avgGrade); } }
+    ];
+    subjects.forEach(function(subject) {
+        cols.push({
+            key: 'sub:' + subject,
+            label: subject,
+            sort: function(r) { return r.per[subject] ? r.per[subject].grade : null; },
+            html: function(r) { return r.per[subject] ? rkBadge(r.per[subject].grade) : '-'; },
+            xl: function(r) { return r.per[subject] ? r.per[subject].grade : ''; }
+        });
+    });
+    cols.push({
+        key: 'avgScore', label: '평균 원점수',
+        sort: function(r) { return r.avgScore; },
+        html: function(r) { return r.avgScore == null ? '-' : r.avgScore.toFixed(2); },
+        xl: function(r) { return r.avgScore == null ? '' : rkRound2(r.avgScore); }
+    });
+    return cols;
+}
+
+function rkSelectedSubject() {
+    const sel = document.getElementById('rkSubjectSelect');
+    return sel ? sel.value : '';
+}
+
+function rkSubjectColumns(subject) {
+    const total = studentData.length || 1;
+    function p(r) { return r.per[subject]; }
+    return [
+        { key: 'rank', label: '석차', cls: 'rk-rank', sort: function(r) { return p(r) ? p(r).rank : null; }, html: function(r) { return p(r) ? escapeSchoolText(p(r).rankStr) : '-'; }, xl: function(r) { return p(r) ? p(r).rank : ''; } },
+        { key: 'sid', label: '학번', sort: function(r) { return r.sid; }, html: function(r) { return escapeSchoolText(r.sid); }, xl: function(r) { return r.sid; } },
+        { key: 'ban', label: '반', sort: function(r) { return r.year * 100 + r.ban; }, html: function(r) { return r.ban; }, xl: function(r) { return r.ban; } },
+        { key: 'num', label: '번호', sort: function(r) { return r.num; }, html: function(r) { return r.num; }, xl: function(r) { return r.num; } },
+        { key: 'name', label: '이름', sort: function(r) { return r.name; }, html: function(r) { return escapeSchoolText(r.name); }, xl: function(r) { return r.name; } },
+        { key: 'score', label: '원점수', cls: 'rk-strong', sort: function(r) { return p(r) ? p(r).score : null; }, html: function(r) { return p(r) ? p(r).score.toFixed(2) : '-'; }, xl: function(r) { return p(r) ? p(r).score : ''; } },
+        { key: 'grade5', label: '5등급제', sort: function(r) { return p(r) ? p(r).grade : null; }, html: function(r) { return p(r) ? rkBadge(p(r).grade) : '-'; }, xl: function(r) { return p(r) ? p(r).grade : ''; } },
+        { key: 'grade9', label: '9등급제', sort: function(r) { return p(r) ? p(r).grade9 : null; }, html: function(r) { return p(r) ? (p(r).grade9 != null ? p(r).grade9 : p(r).grade) : '-'; }, xl: function(r) { return p(r) ? (p(r).grade9 != null ? p(r).grade9 : p(r).grade) : ''; } },
+        { key: 'pct', label: '상위%', sort: function(r) { return p(r) ? p(r).rank : null; }, html: function(r) { return p(r) ? ((p(r).rank / total) * 100).toFixed(1) + '%' : '-'; }, xl: function(r) { return p(r) ? Math.round((p(r).rank / total) * 1000) / 10 : ''; } }
+    ];
+}
+
+function rkSubjectRows() {
+    const subject = rkSelectedSubject();
+    return rkFilteredRows().filter(function(r) { return !!r.per[subject]; });
+}
+
+function renderAvgGradeRanking() {
+    rkRenderTable('rkAvgTable', rkAvgColumns(), rkFilteredRows(), rkSort.avg, renderAvgGradeRanking);
+}
+
+function renderSubjectRanking() {
+    const subject = rkSelectedSubject();
+    rkRenderTable('rkSubjectTable', rkSubjectColumns(subject), rkSubjectRows(), rkSort.subject, renderSubjectRanking);
+}
+
+function renderRankingTables() {
+    renderAvgGradeRanking();
+    renderSubjectRanking();
+}
+
+function onRankingSubjectChange() {
+    rkSort.subject.key = 'rank';
+    rkSort.subject.dir = 1;
+    renderSubjectRanking();
+}
+
+function rebuildRankingControls() {
+    const classSel = document.getElementById('rkClassFilter');
+    if (classSel) {
+        const prev = classSel.value;
+        const seen = {};
+        const list = [];
+        analysisRows.forEach(function(r) {
+            const key = r.year + '-' + r.ban;
+            if (seen[key]) return;
+            seen[key] = true;
+            list.push({ key: key, year: r.year, ban: r.ban });
+        });
+        list.sort(function(a, b) { return a.year - b.year || a.ban - b.ban; });
+        classSel.innerHTML = '<option value="">전교</option>' + list.map(function(c) {
+            return '<option value="' + c.key + '">' + c.year + '학년 ' + c.ban + '반</option>';
+        }).join('');
+        classSel.value = list.some(function(c) { return c.key === prev; }) ? prev : '';
+    }
+    const subSel = document.getElementById('rkSubjectSelect');
+    if (subSel) {
+        const prev = subSel.value;
+        const subjects = getAllSubjects(studentData);
+        subSel.innerHTML = subjects.map(function(s) {
+            return '<option value="' + escapeSchoolText(s) + '">' + escapeSchoolText(s) + '</option>';
+        }).join('');
+        subSel.value = subjects.indexOf(prev) >= 0 ? prev : (subjects[0] || '');
+    }
+}
+
+function renderAnalysisTab() {
+    if (!isAnalysisAvailable()) return;
+    analysisRows = buildAnalysisRows();
+    rebuildRankingControls();
+    renderRankingTables();
+}
+
+function rkDownloadXlsx(columns, rows, fileBase, sheetName) {
+    if (typeof XLSX === 'undefined') {
+        alert('엑셀 라이브러리를 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 새로고침해 주세요.');
+        return;
+    }
+    const aoa = [columns.map(function(c) { return c.label; })];
+    rows.forEach(function(r) {
+        aoa.push(columns.map(function(c) { return c.xl(r); }));
+    });
+    const ws = XLSX.utils.aoa_to_sheet(aoa);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, String(sheetName).replace(/[\\\/\?\*\[\]:]/g, ' ').slice(0, 31) || 'Sheet1');
+    XLSX.writeFile(wb, fileBase + '.xlsx');
+}
+
+function rkScopeLabel() {
+    const sel = document.getElementById('rkClassFilter');
+    return sel && sel.value ? sel.options[sel.selectedIndex].text.replace(/\s+/g, '') : '전교';
+}
+
+function exportAvgGradeRanking() {
+    const cols = rkAvgColumns();
+    const rows = rkSortRows(rkFilteredRows(), cols, rkSort.avg);
+    rkDownloadXlsx(cols, rows, '평균등급순위_' + rkScopeLabel(), '평균등급순위');
+}
+
+function exportSubjectRanking() {
+    const subject = rkSelectedSubject();
+    const cols = rkSubjectColumns(subject);
+    const rows = rkSortRows(rkSubjectRows(), cols, rkSort.subject);
+    rkDownloadXlsx(cols, rows, '과목별순위_' + subject + '_' + rkScopeLabel(), subject);
 }
 
 function appendStatsTd(rowId, text, className = 'stats-val') {
@@ -6526,6 +7085,7 @@ async function processExcelFiles(fileList) {
                 : '유효한 성적 데이터가 없거나 올바른 양식이 아닙니다.';
             setUploadState(hint, false);
             document.getElementById('statsDashboard').style.display = 'none';
+            syncAnalysisAvailability();
             hidePrintFloatActions();
             clearPrintContainer();
             return false;
@@ -6551,6 +7111,7 @@ async function processExcelFiles(fileList) {
         clearSessionData();
         setUploadState('파일을 읽는 중 오류가 발생했습니다.', false);
         document.getElementById('statsDashboard').style.display = 'none';
+        syncAnalysisAvailability();
         hidePrintFloatActions();
         clearPrintContainer();
     }
@@ -8791,6 +9352,7 @@ window.addEventListener('afterprint', function() {
     }
     initUnivRefTable();
     initAppFooter();
+    syncAnalysisAvailability();
     applySchoolBranding(currentSchoolName, currentSchoolLogo);
     await registerDdgServiceWorker();
     restoreAppViewFromSession(savedUi);
