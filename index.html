@@ -4454,11 +4454,11 @@
             <div class="query-layout">
                 <div class="query-card query-card-single">
                     <div class="query-card-title">단일 학생 조회</div>
-                    <p class="query-card-desc">4자리 학번을 입력한 뒤 조회합니다.</p>
+                    <p class="query-card-desc">학번을 입력한 뒤 조회합니다. (예: 1101 · 10반 이상은 11001)</p>
                     <div class="input-area">
                         <input type="text" id="studentId" class="student-id-input" value="1101"
-                            maxlength="4" inputmode="numeric" autocomplete="off"
-                            placeholder="4자리 학번" aria-label="4자리 학번">
+                            maxlength="5" inputmode="numeric" autocomplete="off"
+                            placeholder="학번" aria-label="학번">
                         <button type="button" class="search-btn" onclick="searchSingleStudent()">
                             <svg style="width:18px; height:18px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -5963,11 +5963,35 @@ function processAllGrades() {
     refreshClassSelect();
 }
 
+/**
+ * 학번 입력 정규화 — 학년(1자리)+반+번호(2자리)
+ * 9반 이하: 4자리(1101), 10반 이상: 5자리(11001). 반을 두 자리로 채운 5자리(10101)는 4자리(1101)로 맞춘다.
+ */
 function normalizeStudentId(raw) {
-    const digits = String(raw || '').replace(/\D/g, '');
+    let digits = String(raw || '').replace(/\D/g, '');
     if (!digits) return '';
-    if (digits.length > 4) return digits.slice(-4);
-    return digits.padStart(4, '0');
+    if (digits.length > 5) digits = digits.slice(-5);
+    if (digits.length < 4) return digits.padStart(4, '0');
+    if (digits.length === 5) {
+        const ban = parseInt(digits.slice(1, 3), 10);
+        if (ban >= 1 && ban < 10) return digits.charAt(0) + String(ban) + digits.slice(3);
+    }
+    return digits;
+}
+
+/** 입력한 학번에 해당하는 학생 — 학번 문자열이 같거나, 학년·반·번호가 같은 학생 */
+function findStudentByIdInput(normalizedId) {
+    const id = String(normalizedId || '');
+    if (!id) return null;
+    const exact = studentData.find(function(s) { return String(s['학번']) === id; });
+    if (exact) return exact;
+    if (id.length < 4) return null;
+    const grade = parseInt(id.charAt(0), 10);
+    const ban = parseInt(id.slice(1, id.length - 2), 10);
+    const num = parseInt(id.slice(-2), 10);
+    return studentData.find(function(s) {
+        return (Number(s['학년']) || 1) === grade && Number(s['반']) === ban && Number(s['번호']) === num;
+    }) || null;
 }
 
 function getPrintOptions() {
@@ -6387,6 +6411,11 @@ function rkRound2(n) {
     return Math.round(n * 100) / 100;
 }
 
+/** 학번 정렬용 숫자 키 — 문자열 비교면 10반이 2반보다 앞에 오므로 학년·반·번호로 계산 */
+function rkIdKey(r) {
+    return r.year * 10000 + r.ban * 100 + r.num;
+}
+
 /** 학생별 평균 등급(학점 가중)·과목별 결과를 한 번에 모음 — 개인 보고서의 평균 등급과 같은 계산 */
 function buildAnalysisRows() {
     const subjects = getAllSubjects(studentData);
@@ -6421,14 +6450,14 @@ function buildAnalysisRows() {
     });
 
     function cmp(a, b) {
-        if (a.avgGrade == null && b.avgGrade == null) return a.sid.localeCompare(b.sid);
+        if (a.avgGrade == null && b.avgGrade == null) return rkIdKey(a) - rkIdKey(b);
         if (a.avgGrade == null) return 1;
         if (b.avgGrade == null) return -1;
         const d = rkRound2(a.avgGrade) - rkRound2(b.avgGrade);
         if (d !== 0) return d;
         const s = (b.avgScore || 0) - (a.avgScore || 0);
         if (s !== 0) return s;
-        return a.sid.localeCompare(b.sid);
+        return rkIdKey(a) - rkIdKey(b);
     }
     function assign(list, field) {
         const sorted = list.slice().sort(cmp);
@@ -6536,7 +6565,7 @@ function rkAvgColumns() {
     const cols = [
         { key: 'rank', label: '전교 순위', cls: 'rk-rank', sort: function(r) { return r.rank; }, html: function(r) { return r.rank == null ? '-' : r.rank; }, xl: function(r) { return r.rank; } },
         { key: 'classRank', label: '반 순위', sort: function(r) { return r.classRank; }, html: function(r) { return r.classRank == null ? '-' : r.classRank; }, xl: function(r) { return r.classRank; } },
-        { key: 'sid', label: '학번', sort: function(r) { return r.sid; }, html: function(r) { return escapeSchoolText(r.sid); }, xl: function(r) { return r.sid; } },
+        { key: 'sid', label: '학번', sort: function(r) { return rkIdKey(r); }, html: function(r) { return escapeSchoolText(r.sid); }, xl: function(r) { return r.sid; } },
         { key: 'ban', label: '반', sort: function(r) { return r.year * 100 + r.ban; }, html: function(r) { return r.ban; }, xl: function(r) { return r.ban; } },
         { key: 'num', label: '번호', sort: function(r) { return r.num; }, html: function(r) { return r.num; }, xl: function(r) { return r.num; } },
         { key: 'name', label: '이름', sort: function(r) { return r.name; }, html: function(r) { return rkNameHtml(r.name); }, xl: function(r) { return r.name; } },
@@ -6570,7 +6599,7 @@ function rkSubjectColumns(subject) {
     function p(r) { return r.per[subject]; }
     return [
         { key: 'rank', label: '석차', cls: 'rk-rank', sort: function(r) { return p(r) ? p(r).rank : null; }, html: function(r) { return p(r) ? escapeSchoolText(p(r).rankStr) : '-'; }, xl: function(r) { return p(r) ? p(r).rank : ''; } },
-        { key: 'sid', label: '학번', sort: function(r) { return r.sid; }, html: function(r) { return escapeSchoolText(r.sid); }, xl: function(r) { return r.sid; } },
+        { key: 'sid', label: '학번', sort: function(r) { return rkIdKey(r); }, html: function(r) { return escapeSchoolText(r.sid); }, xl: function(r) { return r.sid; } },
         { key: 'ban', label: '반', sort: function(r) { return r.year * 100 + r.ban; }, html: function(r) { return r.ban; }, xl: function(r) { return r.ban; } },
         { key: 'num', label: '번호', sort: function(r) { return r.num; }, html: function(r) { return r.num; }, xl: function(r) { return r.num; } },
         { key: 'name', label: '이름', sort: function(r) { return r.name; }, html: function(r) { return rkNameHtml(r.name); }, xl: function(r) { return r.name; } },
@@ -6918,7 +6947,7 @@ function bdColumns(mode) {
         { key: 'cls', label: '반', sort: function(e) { return e.r.year * 100 + e.r.ban; }, html: function(e) { return e.r.ban; }, xl: function(e) { return e.r.ban; } },
         { key: 'num', label: '번호', sort: function(e) { return e.r.num; }, html: function(e) { return e.r.num; }, xl: function(e) { return e.r.num; } },
         { key: 'name', label: '이름', sort: function(e) { return e.r.name; }, html: function(e) { return rkNameHtml(e.r.name); }, xl: function(e) { return e.r.name; } },
-        { key: 'sid', label: '학번', sort: function(e) { return e.r.sid; }, html: function(e) { return escapeSchoolText(e.r.sid); }, xl: function(e) { return e.r.sid; } },
+        { key: 'sid', label: '학번', sort: function(e) { return rkIdKey(e.r); }, html: function(e) { return escapeSchoolText(e.r.sid); }, xl: function(e) { return e.r.sid; } },
         { key: 'subject', label: '과목', sort: function(e) { return e.subject; }, html: function(e) { return escapeSchoolText(e.subject); }, xl: function(e) { return e.subject; } },
         { key: 'grade', label: '현재 등급', sort: function(e) { return e.grade; }, html: function(e) { return rkBadge(e.grade); }, xl: function(e) { return e.grade; } },
         { key: 'score', label: '원점수', sort: function(e) { return e.score; }, html: function(e) { return e.score.toFixed(2); }, xl: function(e) { return e.score; } },
@@ -9639,19 +9668,21 @@ function searchSingleStudent(studentIdOverride, options) {
     const studentEl = document.getElementById('studentId');
     const rawId = (studentIdOverride != null ? String(studentIdOverride) : (studentEl ? studentEl.value.trim() : ''));
     const studentId = normalizeStudentId(rawId);
-    if (!studentId || studentId.length !== 4) {
-        if (!opts.silent) alert('4자리 학번을 입력해 주세요.');
+    if (!studentId || studentId.length < 4 || studentId.length > 5) {
+        if (!opts.silent) alert('학번을 입력해 주세요. (예: 1101, 10반 이상은 11001)');
         return false;
     }
     if (studentEl) studentEl.value = studentId;
     const printOpts = getPrintOptions();
-    if (!populateTemplate(studentId, { includeDistribution: printOpts.dist })) {
+    const target = findStudentByIdInput(studentId);
+    const targetId = target ? String(target['학번']) : studentId;
+    if (!target || !populateTemplate(targetId, { includeDistribution: printOpts.dist })) {
         if (!opts.silent) alert('해당 학번의 학생을 찾을 수 없습니다.');
         return false;
     }
-    appendReportsToPrintContainer([studentId], printOpts);
+    appendReportsToPrintContainer([targetId], printOpts);
     showPrintFloatActions();
-    recordQuerySession('single', [studentId]);
+    recordQuerySession('single', [targetId]);
     if (!opts.silent) scrollToReportStart();
     return true;
 }
@@ -9755,7 +9786,7 @@ function resetMainTables() {
 document.getElementById('studentId').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchSingleStudent(); });
 document.getElementById('classSelect').addEventListener('keydown', function(e) { if (e.key === 'Enter') searchClassStudents(); });
 document.getElementById('studentId').addEventListener('input', function() {
-    this.value = this.value.replace(/\D/g, '').slice(0, 4);
+    this.value = this.value.replace(/\D/g, '').slice(0, 5);
 });
 
 (function initUploadDragDrop() {
