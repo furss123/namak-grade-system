@@ -3132,8 +3132,9 @@
             border-bottom: 1px solid #e3e9f1;
         }
         .page-1 .report-grade-goal-table .col-subject { width: 28%; }
-        .page-1 .report-grade-goal-table .col-grade { width: 28%; }
-        .page-1 .report-grade-goal-table .col-goal { width: 44%; }
+        .page-1 .report-grade-goal-table .col-grade { width: 20%; }
+        .page-1 .report-grade-goal-table .col-grade9 { width: 20%; }
+        .page-1 .report-grade-goal-table .col-goal { width: 32%; }
         .page-1 .report-grade-goal-panel .report-grade-goal-manual-note {
             flex-shrink: 0;
             margin: 0;
@@ -3562,6 +3563,20 @@
             font-weight: 800;
             background: #eef4fc !important;
             color: var(--school-navy-dark);
+        }
+        .page-1 .row-grade9 td,
+        .page-1 .row-grade9 th.row-label {
+            font-weight: 700;
+            background: #f6f9fd !important;
+        }
+        .page-1 .grade9-num {
+            font-weight: 700;
+            font-variant-numeric: tabular-nums;
+            font-feature-settings: "tnum" 1;
+            color: var(--school-navy-dark);
+        }
+        .page-1 .report-grade-goal-table .grade9-num {
+            font-size: 0.95em;
         }
         .page-1 .my-score-row td { background: #e8f2fc !important; }
 
@@ -4315,13 +4330,14 @@
                     <tr id="rowScore" class="row-score"><th class="row-label">원점수</th></tr>
                     <tr id="rowRank" class="row-rank"><th class="row-label">석차</th></tr>
                     <tr id="rowPercent" class="row-percent"><th class="row-label">상위%</th></tr>
-                    <tr id="rowGrade" class="row-grade" style="font-weight: bold;"><th class="row-label">등급</th></tr>
+                    <tr id="rowGrade" class="row-grade" style="font-weight: bold;"><th class="row-label">5등급제</th></tr>
+                    <tr id="rowGrade9" class="row-grade row-grade9"><th class="row-label">9등급제</th></tr>
                     <tr id="rowDiffUp" class="row-diff-up"><th class="row-label">윗등급 차</th></tr>
                     <tr id="rowDiffDown" class="row-diff-down"><th class="row-label">아랫등급 차</th></tr>
                 </tbody>
             </table>
             </div>
-            <p class="report-table-footnote">석차 괄호 · 동석차 인원 | 작은 글씨 · 9등급(참고) | 윗등급 차 · 위 등급 컷까지 남은 점수</p>
+            <p class="report-table-footnote">석차 괄호 · 동석차 인원 | 9등급제 · 참고용 | 윗등급 차 · 위 등급 컷까지 남은 점수</p>
             </div>
             </section>
 
@@ -7723,7 +7739,8 @@ function populateTemplate(studentIdStr, options) {
         appendTd('rowScore', pData.score.toFixed(2));
         appendTd('rowRank', pData.rankStr, { paren: true });
         appendTd('rowPercent', topPercent);
-        appendGradeTd('rowGrade', pData.grade, grade9);
+        appendGradeTd('rowGrade', pData.grade);
+        appendGrade9Td('rowGrade9', grade9);
         appendTd('rowDiffUp', diffUp);
         appendTd('rowDiffDown', diffDown);
         appendTd('rowAvg', formatCutDisplay(stats.avg));
@@ -7753,18 +7770,27 @@ function populateTemplate(studentIdStr, options) {
     return true;
 }
 
-function formatGradeCellHtml(grade5, grade9) {
+function formatGradeCellHtml(grade5) {
     const g5 = Number(grade5) || 5;
-    const g9 = grade9 != null ? Number(grade9) : g5;
     return '<span class="grade-cell">' +
         '<span class="grade-badge grade-badge-' + g5 + '">' + g5 + '</span>' +
-        '<span class="cell-sub">9등급 ' + g9 + '</span>' +
         '</span>';
 }
 
-function appendGradeTd(targetId, grade5, grade9) {
+function formatGrade9CellHtml(grade9) {
+    const g9 = Number(grade9) || 9;
+    return '<span class="grade9-num">' + g9 + '</span>';
+}
+
+function appendGradeTd(targetId, grade5) {
     const td = document.createElement('td');
-    td.innerHTML = formatGradeCellHtml(grade5, grade9);
+    td.innerHTML = formatGradeCellHtml(grade5);
+    document.getElementById(targetId).appendChild(td);
+}
+
+function appendGrade9Td(targetId, grade9) {
+    const td = document.createElement('td');
+    td.innerHTML = formatGrade9CellHtml(grade9);
     document.getElementById(targetId).appendChild(td);
 }
 
@@ -7775,15 +7801,16 @@ function renderSubjectGoalTable(subjectRows) {
     const table = document.createElement('table');
     table.className = 'report-grade-goal-table';
     table.innerHTML =
-        '<colgroup><col class="col-subject"><col class="col-grade"><col class="col-goal"></colgroup>' +
-        '<thead><tr><th>과목</th><th>등급</th><th>목표 점수</th></tr></thead>';
+        '<colgroup><col class="col-subject"><col class="col-grade"><col class="col-grade9"><col class="col-goal"></colgroup>' +
+        '<thead><tr><th>과목</th><th>5등급제</th><th>9등급제</th><th>목표 점수</th></tr></thead>';
     const tbody = document.createElement('tbody');
     subjectRows.forEach(function(row) {
         const tr = document.createElement('tr');
         const goalClass = row.goal.hasGoal ? 'goal-cell' : 'goal-cell-muted';
         tr.innerHTML =
             '<th class="subject-name">' + row.subject + '</th>' +
-            '<td>' + formatGradeCellHtml(row.grade, row.grade9) + '</td>' +
+            '<td>' + formatGradeCellHtml(row.grade) + '</td>' +
+            '<td>' + formatGrade9CellHtml(row.grade9) + '</td>' +
             '<td class="' + goalClass + '">' + row.goal.display + '</td>';
         tbody.appendChild(tr);
     });
@@ -8220,7 +8247,7 @@ function pdfNormalizeCaptureNode(clonedNode) {
         page.style.colorScheme = 'light';
     });
     /* html2canvas + tnum 조합에서 숫자·단위 사이 간격이 벌어지는 것 방지 */
-    clonedNode.querySelectorAll('.page td, .page th, .page .cell-main, .page .cell-paren, .page .cell-sub, .page .goal-cell, .page .goal-cell-muted, .page .grade-badge, .page .dist-score-main').forEach(function(el) {
+    clonedNode.querySelectorAll('.page td, .page th, .page .cell-main, .page .cell-paren, .page .cell-sub, .page .goal-cell, .page .goal-cell-muted, .page .grade-badge, .page .grade9-num, .page .dist-score-main').forEach(function(el) {
         el.style.fontVariantNumeric = 'normal';
         el.style.fontFeatureSettings = 'normal';
         el.style.letterSpacing = '0';
@@ -8621,7 +8648,8 @@ function resetMainTables() {
     document.getElementById('rowScore').innerHTML = '<th class="row-label">원점수</th>';
     document.getElementById('rowRank').innerHTML = '<th class="row-label">석차</th>';
     document.getElementById('rowPercent').innerHTML = '<th class="row-label">상위%</th>';
-    document.getElementById('rowGrade').innerHTML = '<th class="row-label">등급</th>';
+    document.getElementById('rowGrade').innerHTML = '<th class="row-label">5등급제</th>';
+    document.getElementById('rowGrade9').innerHTML = '<th class="row-label">9등급제</th>';
     document.getElementById('rowDiffUp').innerHTML = '<th class="row-label">윗등급 차</th>';
     document.getElementById('rowDiffDown').innerHTML = '<th class="row-label">아랫등급 차</th>';
     document.getElementById('rowCut1').innerHTML = '<th class="row-label">1등급 컷</th>';
