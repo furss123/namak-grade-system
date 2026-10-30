@@ -2215,6 +2215,20 @@
         html[data-theme="dark"] .app-footer-version span {
             color: #94b8d8;
         }
+        /* 전교 분석 탭·순위 표 — 짙은 남색 글자/배경은 다크 배경에서 묻히므로 밝게 */
+        html[data-theme="dark"] .app-tab.is-active {
+            background: var(--school-navy-light);
+            color: #fff;
+        }
+        html[data-theme="dark"] .app-tab:hover:not(:disabled):not(.is-active) {
+            color: var(--theme-text);
+        }
+        html[data-theme="dark"] .rk-title {
+            color: #cbd5e1;
+        }
+        html[data-theme="dark"] .rk-table td.rk-rank {
+            color: #bfdbfe;
+        }
 
         /* Reports / print: always light (paper) — screen dark mode does not affect output */
         html[data-theme="dark"] #reportTemplate,
